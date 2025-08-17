@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { useAuth } from '../contexts/AuthContext'
+import { mockApi } from '../services/mockApi'
 
 const SuperAdminPanel = () => {
   const [activeTab, setActiveTab] = useState('create')
@@ -18,14 +19,24 @@ const SuperAdminPanel = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [message, setMessage] = useState('')
   const [messageType, setMessageType] = useState('')
+  const [admins, setAdmins] = useState([])
 
-  const { createAdmin, resetAdminPassword } = useAuth()
+  const { createAdmin, resetAdminPassword, token } = useAuth()
 
-  const mockAdmins = [
-    { id: '1', name: 'John Doe', email: 'john@example.com' },
-    { id: '2', name: 'Jane Smith', email: 'jane@example.com' },
-    { id: '3', name: 'Bob Johnson', email: 'bob@example.com' },
-  ]
+  useEffect(() => {
+    const loadAdmins = async () => {
+      try {
+        const adminList = await mockApi.users.getAdmins(token)
+        setAdmins(adminList)
+      } catch (error) {
+        console.error('Failed to load admins:', error)
+      }
+    }
+    
+    if (token) {
+      loadAdmins()
+    }
+  }, [token])
 
   const validateCreateForm = () => {
     const newErrors = {}
@@ -128,6 +139,13 @@ const SuperAdminPanel = () => {
         email: '',
         password: '',
       })
+      
+      try {
+        const adminList = await mockApi.users.getAdmins(token)
+        setAdmins(adminList)
+      } catch (error) {
+        console.error('Failed to refresh admin list:', error)
+      }
     } else {
       setMessage(result.error)
       setMessageType('error')
@@ -342,7 +360,7 @@ const SuperAdminPanel = () => {
                       onChange={handleResetChange}
                     >
                       <option value="">Choose an admin...</option>
-                      {mockAdmins.map(admin => (
+                      {admins.map(admin => (
                         <option key={admin.id} value={admin.id}>
                           {admin.name} ({admin.email})
                         </option>

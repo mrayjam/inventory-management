@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { 
   PlusIcon, 
@@ -8,53 +8,9 @@ import {
   XMarkIcon,
   EyeIcon
 } from '@heroicons/react/24/outline'
+import { useAuth } from '../contexts/AuthContext'
+import { mockApi } from '../services/mockApi'
 
-const mockProducts = [
-  { 
-    id: 1, 
-    name: 'Wireless Headphones', 
-    category: 'Electronics', 
-    price: 99.99, 
-    stock: 45, 
-    supplier: 'TechCorp',
-    sku: 'WH-001',
-    imageUrl: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=300',
-    description: 'Premium wireless headphones with noise cancellation and 30-hour battery life'
-  },
-  { 
-    id: 2, 
-    name: 'Cotton T-Shirt', 
-    category: 'Clothing', 
-    price: 24.99, 
-    stock: 120, 
-    supplier: 'FashionHub',
-    sku: 'CT-002',
-    imageUrl: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=300',
-    description: '100% organic cotton t-shirt, available in multiple colors and sizes'
-  },
-  { 
-    id: 3, 
-    name: 'Programming Guide', 
-    category: 'Books', 
-    price: 49.99, 
-    stock: 8, 
-    supplier: 'BookWorld',
-    sku: 'PG-003',
-    imageUrl: 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=300',
-    description: 'Comprehensive guide to modern programming practices and design patterns'
-  },
-  { 
-    id: 4, 
-    name: 'Garden Tools Set', 
-    category: 'Home & Garden', 
-    price: 159.99, 
-    stock: 25, 
-    supplier: 'GreenThumb',
-    sku: 'GT-004',
-    imageUrl: 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=300',
-    description: 'Professional 5-piece garden tools set with ergonomic handles and carrying case'
-  }
-]
 
 const ProductDetailModal = ({ isOpen, onClose, product }) => {
   if (!isOpen || !product) return null
@@ -142,28 +98,34 @@ const ProductDetailModal = ({ isOpen, onClose, product }) => {
   )
 }
 
-const ProductModal = ({ isOpen, onClose, product, mode }) => {
+const ProductModal = ({ isOpen, onClose, product, mode, onProductSaved }) => {
   if (!isOpen) return null
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    console.log('API Call:', {
-      endpoint: mode === 'add' ? 'POST /api/products' : `PUT /api/products/${product?.id}`,
-      headers: { 'Authorization': 'Bearer <token>', 'Content-Type': 'application/json' },
-      request: {
-        name: e.target.name.value,
-        category: e.target.category.value,
-        price: parseFloat(e.target.price.value),
-        stock: parseInt(e.target.stock.value),
-        supplier: e.target.supplier.value,
-        sku: e.target.sku.value
-      },
-      response: {
-        success: true,
-        data: { id: product?.id || Date.now(), ...Object.fromEntries(new FormData(e.target)) }
+    
+    const formData = new FormData(e.target)
+    const productData = {
+      name: formData.get('name'),
+      category: formData.get('category'),
+      price: parseFloat(formData.get('price')),
+      stock: parseInt(formData.get('stock')),
+      supplier: formData.get('supplier'),
+      sku: formData.get('sku'),
+      description: formData.get('description') || '',
+      imageUrl: formData.get('imageUrl') || 'https://via.placeholder.com/300'
+    }
+    
+    try {
+      if (mode === 'add') {
+        await onProductSaved('create', productData)
+      } else {
+        await onProductSaved('update', product.id, productData)
       }
-    })
-    onClose()
+      onClose()
+    } catch (error) {
+      console.error('Failed to save product:', error)
+    }
   }
 
   return (
@@ -245,6 +207,26 @@ const ProductModal = ({ isOpen, onClose, product, mode }) => {
               required
             />
           </div>
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Image URL</label>
+            <input
+              name="imageUrl"
+              type="url"
+              defaultValue={product?.imageUrl || ''}
+              className="w-full border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="https://example.com/image.jpg"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Description</label>
+            <textarea
+              name="description"
+              rows="3"
+              defaultValue={product?.description || ''}
+              className="w-full border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Product description..."
+            />
+          </div>
           <div className="flex gap-3 pt-4">
             <button
               type="submit"
@@ -270,20 +252,67 @@ export default function Products() {
   const [searchTerm, setSearchTerm] = useState('')
   const [modalState, setModalState] = useState({ isOpen: false, product: null, mode: 'add' })
   const [detailModal, setDetailModal] = useState({ isOpen: false, product: null })
+  const [products, setProducts] = useState([])
+  const [loading, setLoading] = useState(true)
 
-  const filteredProducts = mockProducts.filter(product =>
+  const { token } = useAuth()
+
+  useEffect(() => {
+    const loadProducts = async () => {
+      try {
+        setLoading(true)
+        const productList = await mockApi.products.getAll(token)
+        setProducts(productList)
+      } catch (error) {
+        console.error('Failed to load products:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    if (token) {
+      loadProducts()
+    }
+  }, [token])
+
+  const filteredProducts = products.filter(product =>
     product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     product.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
     product.supplier.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
-  const handleDelete = (productId) => {
-    console.log('API Call:', {
-      endpoint: `DELETE /api/products/${productId}`,
-      headers: { 'Authorization': 'Bearer <token>' },
-      request: null,
-      response: { success: true, message: 'Product deleted successfully' }
-    })
+  const handleProductSaved = async (action, productId, productData) => {
+    try {
+      if (action === 'create') {
+        await mockApi.products.create(token, productData)
+      } else if (action === 'update') {
+        await mockApi.products.update(token, productId, productData)
+      }
+      
+      const updatedProducts = await mockApi.products.getAll(token)
+      setProducts(updatedProducts)
+    } catch (error) {
+      console.error('Failed to save product:', error)
+      throw error
+    }
+  }
+
+  const handleDelete = async (productId) => {
+    try {
+      await mockApi.products.delete(token, productId)
+      const updatedProducts = await mockApi.products.getAll(token)
+      setProducts(updatedProducts)
+    } catch (error) {
+      console.error('Failed to delete product:', error)
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+      </div>
+    )
   }
 
   return (
@@ -409,6 +438,7 @@ export default function Products() {
         onClose={() => setModalState({ isOpen: false, product: null, mode: 'add' })}
         product={modalState.product}
         mode={modalState.mode}
+        onProductSaved={handleProductSaved}
       />
     </div>
   )

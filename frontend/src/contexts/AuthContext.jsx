@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react'
+import { mockApi } from '../services/mockApi'
 
 const AuthContext = createContext(null)
 
@@ -28,20 +29,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      })
-
-      if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.message || 'Login failed')
-      }
-
-      const data = await response.json()
+      const data = await mockApi.auth.login(email, password)
       
       setToken(data.token)
       setUser(data.user)
@@ -63,21 +51,7 @@ export const AuthProvider = ({ children }) => {
 
   const changePassword = async (currentPassword, newPassword) => {
     try {
-      const response = await fetch('/api/auth/change-password', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify({ currentPassword, newPassword }),
-      })
-
-      const data = await response.json()
-      
-      if (!response.ok) {
-        throw new Error(data.message || 'Password change failed')
-      }
-
+      const data = await mockApi.auth.changePassword(token, currentPassword, newPassword)
       return { success: true, message: data.message }
     } catch (error) {
       return { success: false, error: error.message }
@@ -86,21 +60,7 @@ export const AuthProvider = ({ children }) => {
 
   const createAdmin = async (name, email, password) => {
     try {
-      const response = await fetch('/api/users', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify({ name, email, password, role: 'admin' }),
-      })
-
-      const data = await response.json()
-      
-      if (!response.ok) {
-        throw new Error(data.message || 'Admin creation failed')
-      }
-
+      const data = await mockApi.users.create(token, { name, email, password, role: 'admin' })
       return { success: true, user: data.user }
     } catch (error) {
       return { success: false, error: error.message }
@@ -109,21 +69,7 @@ export const AuthProvider = ({ children }) => {
 
   const resetAdminPassword = async (userId, newPassword) => {
     try {
-      const response = await fetch(`/api/users/${userId}/reset-password`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify({ newPassword }),
-      })
-
-      const data = await response.json()
-      
-      if (!response.ok) {
-        throw new Error(data.message || 'Password reset failed')
-      }
-
+      const data = await mockApi.users.resetPassword(token, userId, newPassword)
       return { success: true, message: data.message }
     } catch (error) {
       return { success: false, error: error.message }
