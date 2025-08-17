@@ -4,7 +4,9 @@ import {
   PlusIcon, 
   PencilIcon, 
   TrashIcon, 
-  MagnifyingGlassIcon 
+  MagnifyingGlassIcon,
+  XMarkIcon,
+  EyeIcon
 } from '@heroicons/react/24/outline'
 
 const mockProducts = [
@@ -15,7 +17,9 @@ const mockProducts = [
     price: 99.99, 
     stock: 45, 
     supplier: 'TechCorp',
-    sku: 'WH-001'
+    sku: 'WH-001',
+    imageUrl: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=300',
+    description: 'Premium wireless headphones with noise cancellation and 30-hour battery life'
   },
   { 
     id: 2, 
@@ -24,7 +28,9 @@ const mockProducts = [
     price: 24.99, 
     stock: 120, 
     supplier: 'FashionHub',
-    sku: 'CT-002'
+    sku: 'CT-002',
+    imageUrl: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=300',
+    description: '100% organic cotton t-shirt, available in multiple colors and sizes'
   },
   { 
     id: 3, 
@@ -33,7 +39,9 @@ const mockProducts = [
     price: 49.99, 
     stock: 8, 
     supplier: 'BookWorld',
-    sku: 'PG-003'
+    sku: 'PG-003',
+    imageUrl: 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=300',
+    description: 'Comprehensive guide to modern programming practices and design patterns'
   },
   { 
     id: 4, 
@@ -42,9 +50,97 @@ const mockProducts = [
     price: 159.99, 
     stock: 25, 
     supplier: 'GreenThumb',
-    sku: 'GT-004'
+    sku: 'GT-004',
+    imageUrl: 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=300',
+    description: 'Professional 5-piece garden tools set with ergonomic handles and carrying case'
   }
 ]
+
+const ProductDetailModal = ({ isOpen, onClose, product }) => {
+  if (!isOpen || !product) return null
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4"
+      onClick={onClose}
+    >
+      <motion.div
+        initial={{ opacity: 0, scale: 0.8, y: 50 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.8, y: 50 }}
+        transition={{ type: "spring", damping: 25, stiffness: 300 }}
+        className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="relative">
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 z-10 p-2 bg-white rounded-full shadow-md hover:bg-gray-50 transition-colors"
+          >
+            <XMarkIcon className="h-5 w-5 text-gray-600" />
+          </button>
+          
+          <div className="aspect-w-16 aspect-h-9">
+            <img
+              src={product.imageUrl}
+              alt={product.name}
+              className="w-full h-64 object-cover rounded-t-xl"
+            />
+          </div>
+          
+          <div className="p-6">
+            <div className="flex justify-between items-start mb-4">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">{product.name}</h2>
+                <p className="text-sm text-gray-500">SKU: {product.sku}</p>
+              </div>
+              <div className="text-right">
+                <p className="text-3xl font-bold text-green-600">${product.price}</p>
+                <span className={`inline-flex px-3 py-1 text-sm font-medium rounded-full ${
+                  product.stock < 20 
+                    ? 'bg-red-100 text-red-800' 
+                    : product.stock < 50 
+                    ? 'bg-yellow-100 text-yellow-800' 
+                    : 'bg-green-100 text-green-800'
+                }`}>
+                  {product.stock} in stock
+                </span>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4 mb-6">
+              <div>
+                <p className="text-sm font-medium text-gray-500">Category</p>
+                <p className="text-lg text-gray-900">{product.category}</p>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-500">Supplier</p>
+                <p className="text-lg text-gray-900">{product.supplier}</p>
+              </div>
+            </div>
+            
+            <div className="mb-6">
+              <p className="text-sm font-medium text-gray-500 mb-2">Description</p>
+              <p className="text-gray-700 leading-relaxed">{product.description}</p>
+            </div>
+            
+            <div className="flex gap-3">
+              <button className="flex-1 bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium">
+                Edit Product
+              </button>
+              <button className="flex-1 border border-gray-300 text-gray-700 py-3 px-4 rounded-lg hover:bg-gray-50 transition-colors font-medium">
+                View History
+              </button>
+            </div>
+          </div>
+        </div>
+      </motion.div>
+    </motion.div>
+  )
+}
 
 const ProductModal = ({ isOpen, onClose, product, mode }) => {
   if (!isOpen) return null
@@ -173,6 +269,7 @@ const ProductModal = ({ isOpen, onClose, product, mode }) => {
 export default function Products() {
   const [searchTerm, setSearchTerm] = useState('')
   const [modalState, setModalState] = useState({ isOpen: false, product: null, mode: 'add' })
+  const [detailModal, setDetailModal] = useState({ isOpen: false, product: null })
 
   const filteredProducts = mockProducts.filter(product =>
     product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -242,9 +339,17 @@ export default function Products() {
                   className="hover:bg-slate-50"
                 >
                   <td className="px-6 py-4">
-                    <div>
-                      <div className="font-medium text-slate-900">{product.name}</div>
-                      <div className="text-sm text-slate-500">SKU: {product.sku}</div>
+                    <div className="flex items-center gap-3">
+                      <img
+                        src={product.imageUrl}
+                        alt={product.name}
+                        className="h-12 w-12 rounded-lg object-cover cursor-pointer hover:opacity-80 transition-opacity"
+                        onClick={() => setDetailModal({ isOpen: true, product })}
+                      />
+                      <div>
+                        <div className="font-medium text-slate-900">{product.name}</div>
+                        <div className="text-sm text-slate-500">SKU: {product.sku}</div>
+                      </div>
                     </div>
                   </td>
                   <td className="px-6 py-4 text-sm text-slate-900">{product.category}</td>
@@ -264,14 +369,23 @@ export default function Products() {
                   <td className="px-6 py-4">
                     <div className="flex gap-2">
                       <button
+                        onClick={() => setDetailModal({ isOpen: true, product })}
+                        className="text-gray-600 hover:text-gray-800 p-1"
+                        title="View Details"
+                      >
+                        <EyeIcon className="h-4 w-4" />
+                      </button>
+                      <button
                         onClick={() => setModalState({ isOpen: true, product, mode: 'edit' })}
                         className="text-blue-600 hover:text-blue-800 p-1"
+                        title="Edit Product"
                       >
                         <PencilIcon className="h-4 w-4" />
                       </button>
                       <button
                         onClick={() => handleDelete(product.id)}
                         className="text-red-600 hover:text-red-800 p-1"
+                        title="Delete Product"
                       >
                         <TrashIcon className="h-4 w-4" />
                       </button>
@@ -283,6 +397,12 @@ export default function Products() {
           </table>
         </div>
       </div>
+
+      <ProductDetailModal
+        isOpen={detailModal.isOpen}
+        onClose={() => setDetailModal({ isOpen: false, product: null })}
+        product={detailModal.product}
+      />
 
       <ProductModal
         isOpen={modalState.isOpen}
