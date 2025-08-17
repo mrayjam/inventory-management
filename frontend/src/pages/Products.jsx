@@ -1,27 +1,46 @@
 import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Swiper, SwiperSlide } from 'swiper/react'
+import { Navigation, Pagination, Autoplay } from 'swiper/modules'
+import 'swiper/css'
+import 'swiper/css/navigation'
+import 'swiper/css/pagination'
 import { 
   PlusIcon, 
   PencilIcon, 
   TrashIcon, 
   MagnifyingGlassIcon,
   XMarkIcon,
-  EyeIcon
+  EyeIcon,
+  ClockIcon,
+  Squares2X2Icon,
+  RectangleGroupIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon
 } from '@heroicons/react/24/outline'
 import toast from 'react-hot-toast'
 import { useAuth } from '../contexts/AuthContext'
 import { mockApi } from '../services/mockApi'
 
 
-const ProductDetailModal = ({ isOpen, onClose, product }) => {
+const ProductDetailModal = ({ isOpen, onClose, product, onEditProduct, onViewHistory }) => {
   if (!isOpen || !product) return null
+
+  const handleEditClick = () => {
+    onEditProduct(product)
+    onClose()
+  }
+
+  const handleViewHistoryClick = () => {
+    onViewHistory(product)
+  }
 
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4"
+      className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4"
       onClick={onClose}
     >
       <motion.div
@@ -29,7 +48,7 @@ const ProductDetailModal = ({ isOpen, onClose, product }) => {
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.8, y: 50 }}
         transition={{ type: "spring", damping: 25, stiffness: 300 }}
-        className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+        className="bg-white/95 backdrop-blur-xl rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-white/20"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="relative">
@@ -85,18 +104,110 @@ const ProductDetailModal = ({ isOpen, onClose, product }) => {
             </div>
             
             <div className="flex gap-3">
-              <button className="flex-1 bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center justify-center gap-2">
+              <motion.button 
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={handleEditClick}
+                className="flex-1 bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center justify-center gap-2"
+              >
                 <PencilIcon className="w-4 h-4" />
                 Edit Product
-              </button>
-              <button className="flex-1 border border-gray-300 text-gray-700 py-3 px-4 rounded-lg hover:bg-gray-50 transition-colors font-medium flex items-center justify-center gap-2">
+              </motion.button>
+              <motion.button 
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={handleViewHistoryClick}
+                className="flex-1 border border-gray-300 text-gray-700 py-3 px-4 rounded-lg hover:bg-gray-50 transition-colors font-medium flex items-center justify-center gap-2"
+              >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                 </svg>
                 View History
-              </button>
+              </motion.button>
             </div>
           </div>
+        </div>
+      </motion.div>
+    </motion.div>
+  )
+}
+
+const ProductHistoryModal = ({ isOpen, onClose, product }) => {
+  if (!isOpen || !product) return null
+
+  const mockHistory = [
+    { id: 1, action: 'Created', user: 'John Doe', date: '2024-01-15', details: 'Product added to inventory' },
+    { id: 2, action: 'Stock Updated', user: 'Jane Smith', date: '2024-01-20', details: 'Stock increased from 45 to 75 units' },
+    { id: 3, action: 'Price Modified', user: 'John Doe', date: '2024-01-25', details: 'Price changed from $899.99 to $849.99' },
+    { id: 4, action: 'Description Updated', user: 'Admin', date: '2024-02-01', details: 'Product description enhanced' },
+  ]
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+      onClick={onClose}
+    >
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.9, y: 20 }}
+        transition={{ type: "spring", damping: 25, stiffness: 300 }}
+        className="bg-white/95 backdrop-blur-xl rounded-2xl p-6 w-full max-w-2xl max-h-[80vh] overflow-y-auto shadow-2xl border border-white/20"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+              <ClockIcon className="w-5 h-5 text-blue-600" />
+            </div>
+            <div>
+              <h2 className="text-xl font-bold text-slate-900">Product History</h2>
+              <p className="text-sm text-slate-600">{product.name}</p>
+            </div>
+          </div>
+          <button
+            onClick={onClose}
+            className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+          >
+            <XMarkIcon className="h-5 w-5 text-gray-600" />
+          </button>
+        </div>
+
+        <div className="space-y-4">
+          {mockHistory.map((entry, index) => (
+            <motion.div
+              key={entry.id}
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: index * 0.1 }}
+              className="bg-white/70 backdrop-blur-sm rounded-lg p-4 border border-white/30"
+            >
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="font-semibold text-slate-900">{entry.action}</span>
+                    <span className="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded-full">
+                      {entry.user}
+                    </span>
+                  </div>
+                  <p className="text-sm text-slate-600 mb-1">{entry.details}</p>
+                  <p className="text-xs text-slate-400">{entry.date}</p>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+
+        <div className="mt-6 flex justify-end">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 bg-slate-200 text-slate-800 rounded-lg hover:bg-slate-300 transition-colors"
+          >
+            Close
+          </button>
         </div>
       </motion.div>
     </motion.div>
@@ -134,11 +245,17 @@ const ProductModal = ({ isOpen, onClose, product, mode, onProductSaved }) => {
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div 
+      className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+      onClick={onClose}
+    >
       <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        className="bg-white rounded-xl p-6 w-full max-w-md mx-4"
+        initial={{ opacity: 0, scale: 0.9, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.9, y: 20 }}
+        transition={{ type: "spring", damping: 25, stiffness: 300 }}
+        className="bg-white/95 backdrop-blur-xl rounded-2xl p-6 w-full max-w-md shadow-2xl border border-white/20"
+        onClick={(e) => e.stopPropagation()}
       >
         <h2 className="text-xl font-bold text-slate-900 mb-4">
           {mode === 'add' ? 'Add Product' : 'Edit Product'}
@@ -255,8 +372,10 @@ const ProductModal = ({ isOpen, onClose, product, mode, onProductSaved }) => {
 
 export default function Products() {
   const [searchTerm, setSearchTerm] = useState('')
+  const [viewMode, setViewMode] = useState('table') // 'table' or 'cards'
   const [modalState, setModalState] = useState({ isOpen: false, product: null, mode: 'add' })
   const [detailModal, setDetailModal] = useState({ isOpen: false, product: null })
+  const [historyModal, setHistoryModal] = useState({ isOpen: false, product: null })
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
 
@@ -319,6 +438,15 @@ export default function Products() {
     }
   }
 
+  const handleEditProduct = (product) => {
+    setModalState({ isOpen: true, product, mode: 'edit' })
+  }
+
+  const handleViewHistory = (product) => {
+    setHistoryModal({ isOpen: true, product })
+    toast.success(`Viewing history for ${product.name}`)
+  }
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -329,20 +457,46 @@ export default function Products() {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-8">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
         <div>
           <h1 className="text-3xl font-bold text-slate-900">Products</h1>
           <p className="text-slate-600 mt-1">Manage your product inventory</p>
         </div>
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={() => setModalState({ isOpen: true, product: null, mode: 'add' })}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-700 transition-colors"
-        >
-          <PlusIcon className="h-5 w-5" />
-          Add Product
-        </motion.button>
+        <div className="flex items-center gap-3">
+          <div className="flex items-center bg-white/80 backdrop-blur-sm rounded-lg p-1 border border-white/30">
+            <button
+              onClick={() => setViewMode('table')}
+              className={`p-2 rounded-md transition-colors ${
+                viewMode === 'table'
+                  ? 'bg-blue-600 text-white shadow-sm'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+              }`}
+              title="Table view"
+            >
+              <Squares2X2Icon className="h-4 w-4" />
+            </button>
+            <button
+              onClick={() => setViewMode('cards')}
+              className={`p-2 rounded-md transition-colors ${
+                viewMode === 'cards'
+                  ? 'bg-blue-600 text-white shadow-sm'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+              }`}
+              title="Card view"
+            >
+              <RectangleGroupIcon className="h-4 w-4" />
+            </button>
+          </div>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => setModalState({ isOpen: true, product: null, mode: 'add' })}
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-700 transition-colors"
+          >
+            <PlusIcon className="h-5 w-5" />
+            Add Product
+          </motion.button>
+        </div>
       </div>
 
       <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-sm border border-white/30">
@@ -439,11 +593,25 @@ export default function Products() {
         </div>
       </div>
 
-      <ProductDetailModal
-        isOpen={detailModal.isOpen}
-        onClose={() => setDetailModal({ isOpen: false, product: null })}
-        product={detailModal.product}
-      />
+      <AnimatePresence>
+        {detailModal.isOpen && (
+          <ProductDetailModal
+            isOpen={detailModal.isOpen}
+            onClose={() => setDetailModal({ isOpen: false, product: null })}
+            product={detailModal.product}
+            onEditProduct={handleEditProduct}
+            onViewHistory={handleViewHistory}
+          />
+        )}
+        
+        {historyModal.isOpen && (
+          <ProductHistoryModal
+            isOpen={historyModal.isOpen}
+            onClose={() => setHistoryModal({ isOpen: false, product: null })}
+            product={historyModal.product}
+          />
+        )}
+      </AnimatePresence>
 
       <ProductModal
         isOpen={modalState.isOpen}

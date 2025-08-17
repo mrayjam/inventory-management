@@ -44,6 +44,7 @@ export default function Dashboard() {
           <StatCard
             title="Total Products"
             value={mockStats.totalProducts.toLocaleString()}
+            rawValue={mockStats.totalProducts}
             icon={CubeIcon}
             color="blue"
             trend={12}
@@ -51,6 +52,7 @@ export default function Dashboard() {
           <StatCard
             title="Low Stock Items"
             value={mockStats.lowStockItems}
+            rawValue={mockStats.lowStockItems}
             icon={ExclamationTriangleIcon}
             color="red"
             trend={-8}
@@ -58,15 +60,17 @@ export default function Dashboard() {
           <StatCard
             title="Active Suppliers"
             value={mockStats.totalSuppliers}
+            rawValue={mockStats.totalSuppliers}
             icon={BuildingStorefrontIcon}
             color="green"
             trend={5}
           />
           <StatCard
             title="Monthly Revenue"
-            value={`$${(mockStats.monthlyRevenue / 1000).toFixed(0)}k`}
+            value={`$${(mockStats.monthlyRevenue / 1000).toFixed(0)}K`}
+            rawValue={mockStats.monthlyRevenue}
             icon={CurrencyDollarIcon}
-            color="yellow"
+            color="purple"
             trend={18}
           />
         </div>
@@ -109,10 +113,20 @@ export default function Dashboard() {
             className="bg-white/80 backdrop-blur-sm rounded-xl shadow-sm border border-white/30 p-6"
           >
             <h3 className="text-lg font-semibold text-slate-900 mb-4">Inventory by Category</h3>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={mockInventoryData}>
+            <ResponsiveContainer width="100%" height={320}>
+              <BarChart 
+                data={mockInventoryData} 
+                margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
+              >
                 <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                <XAxis dataKey="category" stroke="#64748b" />
+                <XAxis 
+                  dataKey="category" 
+                  stroke="#64748b" 
+                  angle={-45}
+                  textAnchor="end"
+                  height={60}
+                  interval={0}
+                />
                 <YAxis stroke="#64748b" />
                 <Tooltip 
                   contentStyle={{ 

@@ -1,6 +1,7 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { EyeIcon, EyeSlashIcon, LockClosedIcon, ShieldCheckIcon } from '@heroicons/react/24/outline'
+import { EyeIcon, EyeSlashIcon, LockClosedIcon, ShieldCheckIcon, CheckCircleIcon } from '@heroicons/react/24/outline'
 import toast from 'react-hot-toast'
 import { useAuth } from '../contexts/AuthContext'
 
@@ -12,6 +13,7 @@ const ChangePasswordPage = () => {
   })
   const [errors, setErrors] = useState({})
   const [isLoading, setIsLoading] = useState(false)
+  const [showSuccessModal, setShowSuccessModal] = useState(false)
   const [showPasswords, setShowPasswords] = useState({
     current: false,
     new: false,
@@ -20,6 +22,7 @@ const ChangePasswordPage = () => {
   const [focusedField, setFocusedField] = useState('')
 
   const { changePassword, user } = useAuth()
+  const navigate = useNavigate()
 
   const validateForm = () => {
     const newErrors = {}
@@ -61,11 +64,6 @@ const ChangePasswordPage = () => {
         [name]: ''
       }))
     }
-    
-    if (message) {
-      setMessage('')
-      setMessageType('')
-    }
   }
 
   const handleSubmit = async (e) => {
@@ -89,6 +87,7 @@ const ChangePasswordPage = () => {
           newPassword: '',
           confirmPassword: '',
         })
+        setShowSuccessModal(true)
       } else {
         toast.error(result.error, { id: loadingToast })
       }
@@ -107,13 +106,14 @@ const ChangePasswordPage = () => {
   }
 
   return (
-    <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.6, type: "spring", damping: 25 }}
-        className="w-full max-w-md"
-      >
+    <>
+      <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.6, type: "spring", damping: 25 }}
+          className="w-full max-w-md"
+        >
         <motion.div
           className="bg-white/90 backdrop-blur-xl shadow-2xl rounded-3xl p-8 border border-white/20"
           initial={{ y: 50, opacity: 0 }}
@@ -335,6 +335,60 @@ const ChangePasswordPage = () => {
         </motion.div>
       </motion.div>
     </div>
+
+    <AnimatePresence>
+      {showSuccessModal && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+        >
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+            transition={{ type: "spring", damping: 25, stiffness: 300 }}
+            className="bg-white/95 backdrop-blur-xl rounded-2xl p-8 w-full max-w-md shadow-2xl border border-white/20 text-center"
+          >
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: 0.2, type: "spring", damping: 15 }}
+              className="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-4"
+            >
+              <CheckCircleIcon className="w-8 h-8 text-green-600" />
+            </motion.div>
+            
+            <h3 className="text-xl font-bold text-slate-900 mb-2">Password Changed Successfully!</h3>
+            <p className="text-slate-600 mb-6">Your password has been updated securely.</p>
+            
+            <div className="flex gap-3">
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => {
+                  setShowSuccessModal(false)
+                  navigate('/')
+                }}
+                className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium"
+              >
+                Go to Dashboard
+              </motion.button>
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => setShowSuccessModal(false)}
+                className="flex-1 bg-slate-200 text-slate-800 py-2 px-4 rounded-lg hover:bg-slate-300 transition-colors font-medium"
+              >
+                Stay Here
+              </motion.button>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  </>
   )
 }
 

@@ -1,12 +1,19 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
+import { Swiper, SwiperSlide } from 'swiper/react'
+import { Navigation, Pagination, Autoplay } from 'swiper/modules'
+import 'swiper/css'
+import 'swiper/css/navigation'
+import 'swiper/css/pagination'
 import { 
   PlusIcon, 
   PencilIcon, 
   TrashIcon, 
   MagnifyingGlassIcon,
   EnvelopeIcon,
-  PhoneIcon 
+  PhoneIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon 
 } from '@heroicons/react/24/outline'
 
 const mockSuppliers = [
@@ -73,11 +80,17 @@ const SupplierModal = ({ isOpen, onClose, supplier, mode }) => {
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div 
+      className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+      onClick={onClose}
+    >
       <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        className="bg-white rounded-xl p-6 w-full max-w-lg mx-4"
+        initial={{ opacity: 0, scale: 0.9, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.9, y: 20 }}
+        transition={{ type: "spring", damping: 25, stiffness: 300 }}
+        className="bg-white/95 backdrop-blur-xl rounded-2xl p-6 w-full max-w-lg shadow-2xl border border-white/20"
+        onClick={(e) => e.stopPropagation()}
       >
         <h2 className="text-xl font-bold text-slate-900 mb-4">
           {mode === 'add' ? 'Add Supplier' : 'Edit Supplier'}
@@ -226,62 +239,134 @@ export default function Suppliers() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
-          {filteredSuppliers.map((supplier) => (
-            <motion.div
-              key={supplier.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              whileHover={{ y: -5, boxShadow: '0 10px 25px rgba(0,0,0,0.1)' }}
-              className="bg-white border border-slate-200 rounded-lg p-6 hover:shadow-lg transition-all"
+        <div className="p-6">
+          <div className="relative">
+            <Swiper
+              modules={[Navigation, Pagination, Autoplay]}
+              spaceBetween={24}
+              slidesPerView={1}
+              navigation={{
+                prevEl: '.swiper-button-prev-custom',
+                nextEl: '.swiper-button-next-custom',
+              }}
+              pagination={{
+                clickable: true,
+                bulletClass: 'swiper-pagination-bullet-custom',
+                bulletActiveClass: 'swiper-pagination-bullet-active-custom',
+              }}
+              autoplay={{
+                delay: 5000,
+                disableOnInteraction: false,
+              }}
+              breakpoints={{
+                640: {
+                  slidesPerView: 1,
+                },
+                768: {
+                  slidesPerView: 2,
+                },
+                1024: {
+                  slidesPerView: 3,
+                },
+                1280: {
+                  slidesPerView: 4,
+                }
+              }}
+              className="supplier-swiper"
             >
-              <div className="flex justify-between items-start mb-4">
-                <div>
-                  <h3 className="font-semibold text-slate-900 text-lg">{supplier.name}</h3>
-                  <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full mt-1 ${
-                    supplier.status === 'Active' 
-                      ? 'bg-green-100 text-green-800' 
-                      : 'bg-red-100 text-red-800'
-                  }`}>
-                    {supplier.status}
-                  </span>
-                </div>
-                <div className="flex gap-1">
-                  <button
-                    onClick={() => setModalState({ isOpen: true, supplier, mode: 'edit' })}
-                    className="text-blue-600 hover:text-blue-800 p-1"
+              {filteredSuppliers.map((supplier) => (
+                <SwiperSlide key={supplier.id}>
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    whileHover={{ y: -8, scale: 1.02 }}
+                    transition={{ duration: 0.3, type: "spring", damping: 20 }}
+                    className="bg-white/90 backdrop-blur-sm border border-white/30 rounded-2xl p-6 hover:shadow-xl transition-all duration-300 h-full"
                   >
-                    <PencilIcon className="h-4 w-4" />
-                  </button>
-                  <button
-                    onClick={() => handleDelete(supplier.id)}
-                    className="text-red-600 hover:text-red-800 p-1"
-                  >
-                    <TrashIcon className="h-4 w-4" />
-                  </button>
-                </div>
-              </div>
-              
-              <div className="space-y-3">
-                <div className="flex items-center text-sm text-slate-600">
-                  <EnvelopeIcon className="h-4 w-4 mr-2" />
-                  {supplier.email}
-                </div>
-                <div className="flex items-center text-sm text-slate-600">
-                  <PhoneIcon className="h-4 w-4 mr-2" />
-                  {supplier.phone}
-                </div>
-                <div className="text-sm text-slate-600">
-                  <p className="font-medium">Category:</p>
-                  <p>{supplier.category}</p>
-                </div>
-                <div className="text-sm text-slate-600">
-                  <p className="font-medium">Address:</p>
-                  <p>{supplier.address}</p>
-                </div>
-              </div>
-            </motion.div>
-          ))}
+                    <div className="flex justify-between items-start mb-4">
+                      <div className="flex-1">
+                        <h3 className="font-bold text-slate-900 text-lg mb-2 truncate">{supplier.name}</h3>
+                        <span className={`inline-flex px-3 py-1 text-xs font-semibold rounded-full ${
+                          supplier.status === 'Active' 
+                            ? 'bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 border border-green-200' 
+                            : 'bg-gradient-to-r from-red-100 to-rose-100 text-red-800 border border-red-200'
+                        }`}>
+                          {supplier.status}
+                        </span>
+                      </div>
+                      <div className="flex gap-2 ml-2">
+                        <motion.button
+                          whileHover={{ scale: 1.1 }}
+                          whileTap={{ scale: 0.9 }}
+                          onClick={() => setModalState({ isOpen: true, supplier, mode: 'edit' })}
+                          className="text-blue-600 hover:text-blue-800 p-2 rounded-lg hover:bg-blue-50 transition-colors"
+                        >
+                          <PencilIcon className="h-4 w-4" />
+                        </motion.button>
+                        <motion.button
+                          whileHover={{ scale: 1.1 }}
+                          whileTap={{ scale: 0.9 }}
+                          onClick={() => handleDelete(supplier.id)}
+                          className="text-red-600 hover:text-red-800 p-2 rounded-lg hover:bg-red-50 transition-colors"
+                        >
+                          <TrashIcon className="h-4 w-4" />
+                        </motion.button>
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-3">
+                      <div className="flex items-center text-sm text-slate-600 group">
+                        <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mr-3 group-hover:bg-blue-200 transition-colors">
+                          <EnvelopeIcon className="h-4 w-4 text-blue-600" />
+                        </div>
+                        <span className="truncate flex-1">{supplier.email}</span>
+                      </div>
+                      <div className="flex items-center text-sm text-slate-600 group">
+                        <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center mr-3 group-hover:bg-green-200 transition-colors">
+                          <PhoneIcon className="h-4 w-4 text-green-600" />
+                        </div>
+                        <span className="truncate flex-1">{supplier.phone}</span>
+                      </div>
+                      <div className="bg-slate-50 rounded-lg p-3 border border-slate-100">
+                        <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Category</p>
+                        <p className="text-sm font-medium text-slate-700">{supplier.category}</p>
+                      </div>
+                      <div className="bg-slate-50 rounded-lg p-3 border border-slate-100">
+                        <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Address</p>
+                        <p className="text-sm text-slate-600 leading-relaxed">{supplier.address}</p>
+                      </div>
+                    </div>
+                  </motion.div>
+                </SwiperSlide>
+              ))}
+            </Swiper>
+            
+            <button className="swiper-button-prev-custom absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full shadow-lg border border-white/30 flex items-center justify-center text-slate-600 hover:text-slate-900 hover:bg-white transition-all duration-200 -ml-5">
+              <ChevronLeftIcon className="w-5 h-5" />
+            </button>
+            <button className="swiper-button-next-custom absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full shadow-lg border border-white/30 flex items-center justify-center text-slate-600 hover:text-slate-900 hover:bg-white transition-all duration-200 -mr-5">
+              <ChevronRightIcon className="w-5 h-5" />
+            </button>
+          </div>
+          
+          <style jsx>{`
+            .supplier-swiper .swiper-pagination {
+              bottom: -40px !important;
+            }
+            .swiper-pagination-bullet-custom {
+              width: 12px;
+              height: 12px;
+              background: rgb(148 163 184);
+              opacity: 0.5;
+              border-radius: 50%;
+              transition: all 0.3s ease;
+            }
+            .swiper-pagination-bullet-active-custom {
+              background: rgb(59 130 246);
+              opacity: 1;
+              transform: scale(1.2);
+            }
+          `}</style>
         </div>
       </div>
 

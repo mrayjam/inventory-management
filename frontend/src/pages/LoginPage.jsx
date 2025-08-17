@@ -109,17 +109,19 @@ const LoginPage = () => {
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ delay: 0.4, type: "spring", damping: 15 }}
-                className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-full mb-4"
+                className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-indigo-600 via-purple-600 to-blue-600 rounded-2xl mb-4 shadow-lg"
               >
-                <SparklesIcon className="w-8 h-8 text-white" />
+                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                </svg>
               </motion.div>
               <motion.h2
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.5, duration: 0.5 }}
-                className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent"
+                className="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent"
               >
-                Welcome Back
+                Welcome to InventFlow
               </motion.h2>
               <motion.p
                 initial={{ y: 20, opacity: 0 }}
@@ -127,7 +129,7 @@ const LoginPage = () => {
                 transition={{ delay: 0.6, duration: 0.5 }}
                 className="mt-2 text-gray-600"
               >
-                Sign in to your inventory dashboard
+                Sign in to your management suite
               </motion.p>
             </div>
             
