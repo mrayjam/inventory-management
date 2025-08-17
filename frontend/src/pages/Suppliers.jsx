@@ -204,7 +204,7 @@ const SupplierModal = ({ isOpen, onClose, supplier, mode }) => {
             <Button
               type="submit"
               size="lg"
-              className="flex-1 text-sm sm:text-base"
+              className="flex-1 text-sm sm:text-base min-h-[48px]"
             >
               {mode === 'add' ? 'Add Supplier' : 'Update Supplier'}
             </Button>
@@ -213,7 +213,7 @@ const SupplierModal = ({ isOpen, onClose, supplier, mode }) => {
               variant="secondary"
               size="lg"
               onClick={onClose}
-              className="flex-1 text-sm sm:text-base"
+              className="flex-1 text-sm sm:text-base min-h-[48px]"
             >
               Cancel
             </Button>
@@ -294,7 +294,7 @@ export default function Suppliers() {
   }
 
   return (
-    <div className="w-full max-w-full overflow-x-hidden">
+    <div className="w-full max-w-full overflow-x-hidden min-w-0">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-8">
         <div>
           <h1 className="text-xl sm:text-2xl max-[1440px]:text-xl lg:text-3xl font-bold text-slate-900">Suppliers</h1>
@@ -335,14 +335,14 @@ export default function Suppliers() {
           >
             <CarouselContent className="-ml-4">
               {filteredSuppliers.map((supplier, index) => (
-                <CarouselItem key={supplier.id} className="pl-4 basis-[95%] sm:basis-[95%] md:basis-1/2 min-[1246px]:basis-1/3 max-[1245px]:basis-1/2">
+                <CarouselItem key={supplier.id} className="pl-4 basis-[95%] sm:basis-[95%] md:basis-1/2 min-[1246px]:basis-1/3 max-[1245px]:basis-1/2 max-[775px]:basis-full">
                   <div className="h-full">
                     <motion.div
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: index * 0.1 }}
                       whileHover={{ y: -8, scale: 1.02, boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)" }}
-                      className="bg-gradient-to-br from-white/95 to-slate-50/95 backdrop-blur-sm border border-white/40 rounded-2xl p-4 hover:shadow-2xl transition-all duration-500 h-full mx-auto max-w-sm"
+                      className="bg-gradient-to-br from-white/95 to-slate-50/95 backdrop-blur-sm border border-white/40 rounded-2xl p-4 hover:shadow-2xl transition-all duration-500 h-full mx-auto max-w-sm min-w-0"
                     >
                     <div className="flex justify-between items-start mb-4">
                       <div className="flex-1">

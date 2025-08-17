@@ -371,7 +371,7 @@ const ProductModal = ({ isOpen, onClose, product, mode, onProductSaved }) => {
             <Button
               type="submit"
               size="lg"
-              className="flex-1"
+              className="flex-1 min-h-[48px]"
             >
               {mode === 'add' ? 'Add Product' : 'Update Product'}
             </Button>
@@ -380,7 +380,7 @@ const ProductModal = ({ isOpen, onClose, product, mode, onProductSaved }) => {
               variant="secondary"
               size="lg"
               onClick={onClose}
-              className="flex-1"
+              className="flex-1 min-h-[48px]"
             >
               Cancel
             </Button>
@@ -399,6 +399,8 @@ export default function Products() {
   const [historyModal, setHistoryModal] = useState({ isOpen: false, product: null })
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
+  const [currentPage, setCurrentPage] = useState(1)
+  const productsPerPage = 2
 
   const { token } = useAuth()
 
@@ -425,6 +427,15 @@ export default function Products() {
     product.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
     product.supplier.toLowerCase().includes(searchTerm.toLowerCase())
   )
+
+  const totalPages = Math.ceil(filteredProducts.length / productsPerPage)
+  const startIndex = (currentPage - 1) * productsPerPage
+  const endIndex = startIndex + productsPerPage
+  const currentProducts = filteredProducts.slice(startIndex, endIndex)
+
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [searchTerm])
 
   const handleProductSaved = async (action, productId, productData) => {
     const loadingToast = toast.loading(`${action === 'create' ? 'Creating' : 'Updating'} product...`)
@@ -516,7 +527,7 @@ export default function Products() {
   }
 
   return (
-    <div className="w-full max-w-full overflow-x-hidden">
+    <div className="w-full max-w-full overflow-x-hidden min-w-0">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-8">
         <div>
           <h1 className="text-xl sm:text-2xl max-[1440px]:text-xl lg:text-3xl font-bold text-slate-900">Products</h1>
@@ -621,7 +632,7 @@ export default function Products() {
                       </td>
                       <td className="px-6 py-4 text-sm text-slate-900">{product.supplier}</td>
                       <td className="px-6 py-4">
-                        <div className="flex gap-2">
+                        <div className="flex gap-2 max-[420px]:gap-1">
                           <button
                             onClick={() => setDetailModal({ isOpen: true, product })}
                             className="text-gray-600 hover:text-gray-800 p-1"
@@ -701,27 +712,30 @@ export default function Products() {
                     <div className="text-sm text-slate-900">{product.supplier}</div>
                   </div>
                   
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 max-[420px]:gap-1">
                     <button
                       onClick={() => setDetailModal({ isOpen: true, product })}
                       className="flex-1 bg-slate-100 text-slate-700 py-2 px-3 rounded-lg hover:bg-slate-200 transition-colors text-sm font-medium flex items-center justify-center gap-1"
+                      title="View Details"
                     >
                       <EyeIcon className="h-4 w-4" />
-                      View
+                      <span className="max-[420px]:hidden">View</span>
                     </button>
                     <button
                       onClick={() => setModalState({ isOpen: true, product, mode: 'edit' })}
                       className="flex-1 bg-blue-600 text-white py-2 px-3 rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium flex items-center justify-center gap-1"
+                      title="Edit Product"
                     >
                       <PencilIcon className="h-4 w-4" />
-                      Edit
+                      <span className="max-[420px]:hidden">Edit</span>
                     </button>
                     <button
                       onClick={() => handleDelete(product.id)}
                       className="flex-1 bg-red-600 text-white py-2 px-3 rounded-lg hover:bg-red-700 transition-colors text-sm font-medium flex items-center justify-center gap-1"
+                      title="Delete Product"
                     >
                       <TrashIcon className="h-4 w-4" />
-                      Delete
+                      <span className="max-[420px]:hidden">Delete</span>
                     </button>
                   </div>
                 </motion.div>
@@ -778,27 +792,30 @@ export default function Products() {
                     <div className="text-sm text-slate-900">{product.supplier}</div>
                   </div>
                   
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 max-[420px]:gap-1">
                     <button
                       onClick={() => setDetailModal({ isOpen: true, product })}
                       className="flex-1 bg-slate-100 text-slate-700 py-2 px-3 rounded-lg hover:bg-slate-200 transition-colors text-sm font-medium flex items-center justify-center gap-1"
+                      title="View Details"
                     >
                       <EyeIcon className="h-4 w-4" />
-                      View
+                      <span className="max-[420px]:hidden">View</span>
                     </button>
                     <button
                       onClick={() => setModalState({ isOpen: true, product, mode: 'edit' })}
                       className="flex-1 bg-blue-600 text-white py-2 px-3 rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium flex items-center justify-center gap-1"
+                      title="Edit Product"
                     >
                       <PencilIcon className="h-4 w-4" />
-                      Edit
+                      <span className="max-[420px]:hidden">Edit</span>
                     </button>
                     <button
                       onClick={() => handleDelete(product.id)}
                       className="flex-1 bg-red-600 text-white py-2 px-3 rounded-lg hover:bg-red-700 transition-colors text-sm font-medium flex items-center justify-center gap-1"
+                      title="Delete Product"
                     >
                       <TrashIcon className="h-4 w-4" />
-                      Delete
+                      <span className="max-[420px]:hidden">Delete</span>
                     </button>
                   </div>
                 </motion.div>
@@ -807,23 +824,16 @@ export default function Products() {
           </>
         ) : (
           <div className="px-3 sm:px-4 lg:px-6 py-6">
-            <Carousel
-              opts={{
-                align: "start",
-                loop: true,
-              }}
-              className="w-full max-w-none"
-            >
-              <CarouselContent className="-ml-4">
-                {filteredProducts.map((product, index) => (
-                  <CarouselItem key={product.id} className="pl-4 basis-[95%] sm:basis-[95%] md:basis-1/2 lg:basis-1/3">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+              {currentProducts.map((product, index) => (
+                <div key={product.id} className="h-full">
                     <div className="h-full">
                       <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: index * 0.1 }}
                         whileHover={{ y: -8, scale: 1.02, boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)" }}
-                        className="bg-gradient-to-br from-white/95 to-slate-50/95 backdrop-blur-sm border border-white/40 rounded-2xl overflow-hidden hover:shadow-2xl transition-all duration-500 flex flex-col h-[420px] mx-auto max-w-sm"
+                        className="bg-gradient-to-br from-white/95 to-slate-50/95 backdrop-blur-sm border border-white/40 rounded-2xl overflow-hidden hover:shadow-2xl transition-all duration-500 flex flex-col h-[420px] mx-auto max-w-sm min-w-0"
                       >
                       <div className="relative h-40 flex-shrink-0">
                         <img
@@ -909,12 +919,59 @@ export default function Products() {
                       </div>
                       </motion.div>
                     </div>
-                  </CarouselItem>
-                ))}
-              </CarouselContent>
-              <CarouselPrevious className="w-10 h-10 sm:w-12 sm:h-12 bg-white/95 backdrop-blur-sm border border-white/40 shadow-xl hover:bg-white hover:scale-110 transition-all duration-300 -left-2 sm:-left-4 md:-left-6" />
-              <CarouselNext className="w-10 h-10 sm:w-12 sm:h-12 bg-white/95 backdrop-blur-sm border border-white/40 shadow-xl hover:bg-white hover:scale-110 transition-all duration-300 -right-2 sm:-right-4 md:-right-6" />
-            </Carousel>
+                </div>
+              ))}
+            </div>
+            
+            {totalPages > 1 && (
+              <div className="flex items-center justify-center gap-2">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1}
+                  className={`p-2 rounded-lg transition-all duration-200 ${
+                    currentPage === 1
+                      ? 'text-gray-400 cursor-not-allowed'
+                      : 'text-gray-600 hover:text-gray-800 hover:bg-gray-50'
+                  }`}
+                >
+                  <ChevronLeftIcon className="h-5 w-5" />
+                </motion.button>
+                
+                <div className="flex items-center gap-2">
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                    <motion.button
+                      key={page}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => setCurrentPage(page)}
+                      className={`w-10 h-10 rounded-lg font-medium transition-all duration-200 ${
+                        currentPage === page
+                          ? 'bg-blue-600 text-white shadow-md'
+                          : 'text-gray-600 hover:text-gray-800 hover:bg-gray-50'
+                      }`}
+                    >
+                      {page}
+                    </motion.button>
+                  ))}
+                </div>
+                
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                  disabled={currentPage === totalPages}
+                  className={`p-2 rounded-lg transition-all duration-200 ${
+                    currentPage === totalPages
+                      ? 'text-gray-400 cursor-not-allowed'
+                      : 'text-gray-600 hover:text-gray-800 hover:bg-gray-50'
+                  }`}
+                >
+                  <ChevronRightIcon className="h-5 w-5" />
+                </motion.button>
+              </div>
+            )}
           </div>
         )}
       </div>

@@ -41,7 +41,7 @@ export default function Dashboard() {
         </div>
 
         <motion.div 
-          className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-4 gap-4 sm:gap-6 mb-6 lg:mb-8"
+          className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-4 gap-4 sm:gap-6 mb-6 lg:mb-8 px-3"
           variants={{
             hidden: { opacity: 0 },
             show: {

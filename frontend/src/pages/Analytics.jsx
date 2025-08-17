@@ -91,8 +91,8 @@ export default function Analytics() {
           className="bg-white rounded-xl shadow-sm border border-slate-200 p-6"
         >
           <h3 className="text-lg font-semibold text-slate-900 mb-4">Inventory Distribution</h3>
-          <div className="flex flex-col lg:flex-row items-center">
-            <div className="w-full lg:w-1/2">
+          <div className="flex flex-col xl:flex-row items-center">
+            <div className="w-full xl:w-1/2">
               <ResponsiveContainer width="100%" height={250}>
                 <PieChart>
                   <Pie
@@ -113,7 +113,7 @@ export default function Analytics() {
                 </PieChart>
               </ResponsiveContainer>
             </div>
-            <div className="w-full lg:w-1/2 lg:pl-4">
+            <div className="w-full xl:w-1/2 lg:pl-4">
               <div className="space-y-3">
                 {mockCategoryData.map((category, index) => (
                   <motion.div

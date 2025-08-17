@@ -124,15 +124,15 @@ const ChangePasswordPage = () => {
 
   return (
     <>
-      <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
+      <div className="min-h-screen py-6 px-4 sm:py-12 sm:px-6 lg:px-8 flex items-center justify-center overflow-x-hidden">
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.6, type: "spring", damping: 25 }}
-          className="w-full max-w-md"
+          className="w-full max-w-md max-[455px]:max-w-[95%]"
         >
         <motion.div
-          className="bg-white/90 backdrop-blur-xl shadow-2xl rounded-3xl p-8 border border-white/20 relative"
+          className="bg-white/90 backdrop-blur-xl shadow-2xl rounded-3xl p-6 sm:p-8 border border-white/20 relative max-[455px]:p-4"
           initial={{ y: 50, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.2, duration: 0.6 }}
@@ -145,7 +145,7 @@ const ChangePasswordPage = () => {
             <XMarkIcon className="h-5 w-5 text-gray-600" />
           </button>
           
-          <div className="text-center mb-8">
+          <div className="text-center mb-6 sm:mb-8">
             <motion.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
@@ -158,7 +158,7 @@ const ChangePasswordPage = () => {
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.5, duration: 0.5 }}
-              className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent"
+              className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent"
             >
               Change Password
             </motion.h2>
@@ -166,13 +166,13 @@ const ChangePasswordPage = () => {
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.6, duration: 0.5 }}
-              className="mt-2 text-gray-600"
+              className="mt-2 text-gray-600 text-sm sm:text-base"
             >
               Update your password for {user?.email}
             </motion.p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
             <motion.div
               initial={{ x: -20, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
@@ -343,7 +343,7 @@ const ChangePasswordPage = () => {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-xl text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98]"
+                className="w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-xl text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] min-h-[48px]"
               >
                 {isLoading ? (
                   <motion.div
