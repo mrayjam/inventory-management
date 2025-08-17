@@ -40,7 +40,7 @@ const ProductDetailModal = ({ isOpen, onClose, product, onEditProduct, onViewHis
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+      className="fixed inset-0 bg-black/20 backdrop-blur-md flex items-center justify-center z-50 p-4"
       onClick={onClose}
     >
       <motion.div
@@ -147,7 +147,7 @@ const ProductHistoryModal = ({ isOpen, onClose, product }) => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+      className="fixed inset-0 bg-black/20 backdrop-blur-md flex items-center justify-center z-50 p-4"
       onClick={onClose}
     >
       <motion.div
@@ -246,7 +246,7 @@ const ProductModal = ({ isOpen, onClose, product, mode, onProductSaved }) => {
 
   return (
     <div 
-      className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+      className="fixed inset-0 bg-black/20 backdrop-blur-md flex items-center justify-center z-50 p-4"
       onClick={onClose}
     >
       <motion.div
@@ -254,112 +254,130 @@ const ProductModal = ({ isOpen, onClose, product, mode, onProductSaved }) => {
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.9, y: 20 }}
         transition={{ type: "spring", damping: 25, stiffness: 300 }}
-        className="bg-white/95 backdrop-blur-xl rounded-2xl p-6 w-full max-w-md shadow-2xl border border-white/20"
+        className="bg-white/95 backdrop-blur-xl rounded-2xl p-6 w-full max-w-4xl max-h-[85vh] overflow-y-auto shadow-2xl border border-white/20"
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="text-xl font-bold text-slate-900 mb-4">
-          {mode === 'add' ? 'Add Product' : 'Edit Product'}
-        </h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Name</label>
-            <input
-              name="name"
-              type="text"
-              defaultValue={product?.name || ''}
-              className="w-full border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Category</label>
-            <select
-              name="category"
-              defaultValue={product?.category || ''}
-              className="w-full border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            >
-              <option value="">Select Category</option>
-              <option value="Electronics">Electronics</option>
-              <option value="Clothing">Clothing</option>
-              <option value="Books">Books</option>
-              <option value="Home & Garden">Home & Garden</option>
-            </select>
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Price</label>
-              <input
-                name="price"
-                type="number"
-                step="0.01"
-                defaultValue={product?.price || ''}
-                className="w-full border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required
-              />
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-xl font-bold text-slate-900">
+            {mode === 'add' ? 'Add Product' : 'Edit Product'}
+          </h2>
+          <button
+            onClick={onClose}
+            className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+          >
+            <XMarkIcon className="h-5 w-5 text-gray-600" />
+          </button>
+        </div>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Product Name</label>
+                <input
+                  name="name"
+                  type="text"
+                  defaultValue={product?.name || ''}
+                  className="w-full border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  required
+                />
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Category</label>
+                  <select
+                    name="category"
+                    defaultValue={product?.category || ''}
+                    className="w-full border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
+                  >
+                    <option value="">Select Category</option>
+                    <option value="Electronics">Electronics</option>
+                    <option value="Clothing">Clothing</option>
+                    <option value="Books">Books</option>
+                    <option value="Home & Garden">Home & Garden</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">SKU</label>
+                  <input
+                    name="sku"
+                    type="text"
+                    defaultValue={product?.sku || ''}
+                    className="w-full border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Price ($)</label>
+                  <input
+                    name="price"
+                    type="number"
+                    step="0.01"
+                    defaultValue={product?.price || ''}
+                    className="w-full border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Stock Quantity</label>
+                  <input
+                    name="stock"
+                    type="number"
+                    defaultValue={product?.stock || ''}
+                    className="w-full border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
+                  />
+                </div>
+              </div>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Stock</label>
-              <input
-                name="stock"
-                type="number"
-                defaultValue={product?.stock || ''}
-                className="w-full border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required
-              />
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Supplier</label>
+                <input
+                  name="supplier"
+                  type="text"
+                  defaultValue={product?.supplier || ''}
+                  className="w-full border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Product Image URL</label>
+                <input
+                  name="imageUrl"
+                  type="url"
+                  defaultValue={product?.imageUrl || ''}
+                  className="w-full border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="https://example.com/image.jpg"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Description</label>
+                <textarea
+                  name="description"
+                  rows="4"
+                  defaultValue={product?.description || ''}
+                  className="w-full border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                  placeholder="Enter product description..."
+                />
+              </div>
             </div>
           </div>
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Supplier</label>
-            <input
-              name="supplier"
-              type="text"
-              defaultValue={product?.supplier || ''}
-              className="w-full border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">SKU</label>
-            <input
-              name="sku"
-              type="text"
-              defaultValue={product?.sku || ''}
-              className="w-full border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Image URL</label>
-            <input
-              name="imageUrl"
-              type="url"
-              defaultValue={product?.imageUrl || ''}
-              className="w-full border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="https://example.com/image.jpg"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Description</label>
-            <textarea
-              name="description"
-              rows="3"
-              defaultValue={product?.description || ''}
-              className="w-full border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Product description..."
-            />
-          </div>
-          <div className="flex gap-3 pt-4">
+          
+          <div className="flex gap-3 pt-4 border-t border-gray-200">
             <button
               type="submit"
-              className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
+              className="flex-1 bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium"
             >
               {mode === 'add' ? 'Add Product' : 'Update Product'}
             </button>
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 bg-slate-200 text-slate-800 py-2 px-4 rounded-lg hover:bg-slate-300 transition-colors"
+              className="flex-1 bg-slate-200 text-slate-800 py-3 px-4 rounded-lg hover:bg-slate-300 transition-colors font-medium"
             >
               Cancel
             </button>
@@ -426,6 +444,45 @@ export default function Products() {
   }
 
   const handleDelete = async (productId) => {
+    const product = products.find(p => p.id === productId)
+    const productName = product?.name || 'this product'
+    
+    const confirmed = await new Promise((resolve) => {
+      toast((t) => (
+        <div className="flex items-center gap-3">
+          <div>
+            <p className="font-semibold text-gray-900">Confirm Deletion</p>
+            <p className="text-sm text-gray-600">Delete "{productName}"?</p>
+          </div>
+          <div className="flex gap-2">
+            <button
+              onClick={() => {
+                toast.dismiss(t.id)
+                resolve(true)
+              }}
+              className="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700"
+            >
+              Delete
+            </button>
+            <button
+              onClick={() => {
+                toast.dismiss(t.id)
+                resolve(false)
+              }}
+              className="bg-gray-300 text-gray-700 px-3 py-1 rounded text-sm hover:bg-gray-400"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      ), {
+        duration: Infinity,
+        position: 'top-center',
+      })
+    })
+
+    if (!confirmed) return
+
     const loadingToast = toast.loading('Deleting product...')
     
     try {
@@ -513,84 +570,241 @@ export default function Products() {
           </div>
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-slate-50">
-              <tr>
-                <th className="text-left px-6 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider">Product</th>
-                <th className="text-left px-6 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider">Category</th>
-                <th className="text-left px-6 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider">Price</th>
-                <th className="text-left px-6 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider">Stock</th>
-                <th className="text-left px-6 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider">Supplier</th>
-                <th className="text-left px-6 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-200">
-              {filteredProducts.map((product) => (
-                <motion.tr
-                  key={product.id}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="hover:bg-slate-50"
-                >
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-3">
-                      <img
-                        src={product.imageUrl}
-                        alt={product.name}
-                        className="h-12 w-12 rounded-lg object-cover cursor-pointer hover:opacity-80 transition-opacity"
-                        onClick={() => setDetailModal({ isOpen: true, product })}
-                      />
-                      <div>
-                        <div className="font-medium text-slate-900">{product.name}</div>
-                        <div className="text-sm text-slate-500">SKU: {product.sku}</div>
+{viewMode === 'table' ? (
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-slate-50">
+                <tr>
+                  <th className="text-left px-6 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider">Product</th>
+                  <th className="text-left px-6 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider">Category</th>
+                  <th className="text-left px-6 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider">Price</th>
+                  <th className="text-left px-6 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider">Stock</th>
+                  <th className="text-left px-6 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider">Supplier</th>
+                  <th className="text-left px-6 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-200">
+                {filteredProducts.map((product) => (
+                  <motion.tr
+                    key={product.id}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="hover:bg-slate-50"
+                  >
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-3">
+                        <img
+                          src={product.imageUrl}
+                          alt={product.name}
+                          className="h-12 w-12 rounded-lg object-cover cursor-pointer hover:opacity-80 transition-opacity"
+                          onClick={() => setDetailModal({ isOpen: true, product })}
+                        />
+                        <div>
+                          <div className="font-medium text-slate-900">{product.name}</div>
+                          <div className="text-sm text-slate-500">SKU: {product.sku}</div>
+                        </div>
                       </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 text-sm text-slate-900">{product.category}</td>
-                  <td className="px-6 py-4 text-sm text-slate-900">${product.price}</td>
-                  <td className="px-6 py-4">
-                    <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
-                      product.stock < 20 
-                        ? 'bg-red-100 text-red-800' 
-                        : product.stock < 50 
-                        ? 'bg-yellow-100 text-yellow-800' 
-                        : 'bg-green-100 text-green-800'
-                    }`}>
-                      {product.stock} units
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-sm text-slate-900">{product.supplier}</td>
-                  <td className="px-6 py-4">
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => setDetailModal({ isOpen: true, product })}
-                        className="text-gray-600 hover:text-gray-800 p-1"
-                        title="View Details"
-                      >
-                        <EyeIcon className="h-4 w-4" />
-                      </button>
-                      <button
-                        onClick={() => setModalState({ isOpen: true, product, mode: 'edit' })}
-                        className="text-blue-600 hover:text-blue-800 p-1"
-                        title="Edit Product"
-                      >
-                        <PencilIcon className="h-4 w-4" />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(product.id)}
-                        className="text-red-600 hover:text-red-800 p-1"
-                        title="Delete Product"
-                      >
-                        <TrashIcon className="h-4 w-4" />
-                      </button>
-                    </div>
-                  </td>
-                </motion.tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                    </td>
+                    <td className="px-6 py-4 text-sm text-slate-900">{product.category}</td>
+                    <td className="px-6 py-4 text-sm text-slate-900">${product.price}</td>
+                    <td className="px-6 py-4">
+                      <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
+                        product.stock < 20 
+                          ? 'bg-red-100 text-red-800' 
+                          : product.stock < 50 
+                          ? 'bg-yellow-100 text-yellow-800' 
+                          : 'bg-green-100 text-green-800'
+                      }`}>
+                        {product.stock} units
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-sm text-slate-900">{product.supplier}</td>
+                    <td className="px-6 py-4">
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => setDetailModal({ isOpen: true, product })}
+                          className="text-gray-600 hover:text-gray-800 p-1"
+                          title="View Details"
+                        >
+                          <EyeIcon className="h-4 w-4" />
+                        </button>
+                        <button
+                          onClick={() => setModalState({ isOpen: true, product, mode: 'edit' })}
+                          className="text-blue-600 hover:text-blue-800 p-1"
+                          title="Edit Product"
+                        >
+                          <PencilIcon className="h-4 w-4" />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(product.id)}
+                          className="text-red-600 hover:text-red-800 p-1"
+                          title="Delete Product"
+                        >
+                          <TrashIcon className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </motion.tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <div className="p-6">
+            <div className="relative">
+              <Swiper
+                modules={[Navigation, Pagination, Autoplay]}
+                spaceBetween={24}
+                slidesPerView={1}
+                navigation={{
+                  prevEl: '.product-swiper-button-prev',
+                  nextEl: '.product-swiper-button-next',
+                }}
+                pagination={{
+                  clickable: true,
+                  bulletClass: 'swiper-pagination-bullet-custom',
+                  bulletActiveClass: 'swiper-pagination-bullet-active-custom',
+                }}
+                breakpoints={{
+                  640: {
+                    slidesPerView: 1,
+                  },
+                  768: {
+                    slidesPerView: 2,
+                  },
+                  1024: {
+                    slidesPerView: 3,
+                  },
+                  1280: {
+                    slidesPerView: 4,
+                  }
+                }}
+                className="product-swiper"
+              >
+                {filteredProducts.map((product) => (
+                  <SwiperSlide key={product.id}>
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      whileHover={{ y: -8, scale: 1.02 }}
+                      transition={{ duration: 0.3, type: "spring", damping: 20 }}
+                      className="bg-white/90 backdrop-blur-sm border border-white/30 rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-300 flex flex-col max-w-sm mx-auto h-[480px]"
+                    >
+                      <div className="relative h-48 flex-shrink-0">
+                        <img
+                          src={product.imageUrl}
+                          alt={product.name}
+                          className="w-full h-full object-cover cursor-pointer hover:opacity-90 transition-opacity"
+                          onClick={() => setDetailModal({ isOpen: true, product })}
+                        />
+                        <div className="absolute top-3 right-3">
+                          <span className={`inline-flex px-3 py-1 text-xs font-semibold rounded-full ${
+                            product.stock < 20 
+                              ? 'bg-red-100 text-red-800 border border-red-200' 
+                              : product.stock < 50 
+                              ? 'bg-yellow-100 text-yellow-800 border border-yellow-200' 
+                              : 'bg-green-100 text-green-800 border border-green-200'
+                          }`}>
+                            {product.stock} in stock
+                          </span>
+                        </div>
+                      </div>
+                      
+                      <div className="p-4 flex flex-col justify-between flex-1">
+                        <div>
+                          <div className="flex justify-between items-start mb-2">
+                            <div className="flex-1 min-w-0">
+                              <h3 className="font-bold text-slate-900 text-lg truncate">{product.name}</h3>
+                              <p className="text-sm text-slate-500">SKU: {product.sku}</p>
+                            </div>
+                            <div className="text-right ml-2">
+                              <p className="text-xl font-bold text-green-600">${product.price}</p>
+                            </div>
+                          </div>
+                          
+                          <div className="space-y-2 mb-4">
+                            <div className="flex items-center text-sm text-slate-600">
+                              <div className="w-6 h-6 bg-blue-100 rounded-lg flex items-center justify-center mr-2">
+                                <svg className="w-3 h-3 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                                  <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm0 4a1 1 0 011-1h12a1 1 0 011 1v8a1 1 0 01-1 1H4a1 1 0 01-1-1V8z" clipRule="evenodd" />
+                                </svg>
+                              </div>
+                              <span className="truncate">{product.category}</span>
+                            </div>
+                            <div className="flex items-center text-sm text-slate-600">
+                              <div className="w-6 h-6 bg-green-100 rounded-lg flex items-center justify-center mr-2">
+                                <svg className="w-3 h-3 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                                  <path fillRule="evenodd" d="M4 4a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2H4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1z" clipRule="evenodd" />
+                                </svg>
+                              </div>
+                              <span className="truncate">{product.supplier}</span>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="flex gap-2 mt-auto">
+                          <motion.button
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            onClick={() => setDetailModal({ isOpen: true, product })}
+                            className="flex-1 text-gray-600 hover:text-gray-800 py-2 px-3 rounded-lg hover:bg-gray-50 transition-colors flex items-center justify-center gap-1"
+                            title="View Details"
+                          >
+                            <EyeIcon className="h-4 w-4" />
+                          </motion.button>
+                          <motion.button
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            onClick={() => setModalState({ isOpen: true, product, mode: 'edit' })}
+                            className="flex-1 text-blue-600 hover:text-blue-800 py-2 px-3 rounded-lg hover:bg-blue-50 transition-colors flex items-center justify-center gap-1"
+                            title="Edit Product"
+                          >
+                            <PencilIcon className="h-4 w-4" />
+                          </motion.button>
+                          <motion.button
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            onClick={() => handleDelete(product.id)}
+                            className="flex-1 text-red-600 hover:text-red-800 py-2 px-3 rounded-lg hover:bg-red-50 transition-colors flex items-center justify-center gap-1"
+                            title="Delete Product"
+                          >
+                            <TrashIcon className="h-4 w-4" />
+                          </motion.button>
+                        </div>
+                      </div>
+                    </motion.div>
+                  </SwiperSlide>
+                ))}
+              </Swiper>
+              
+              <button className="product-swiper-button-prev absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full shadow-lg border border-white/30 flex items-center justify-center text-slate-600 hover:text-slate-900 hover:bg-white transition-all duration-200 -ml-5">
+                <ChevronLeftIcon className="w-5 h-5" />
+              </button>
+              <button className="product-swiper-button-next absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full shadow-lg border border-white/30 flex items-center justify-center text-slate-600 hover:text-slate-900 hover:bg-white transition-all duration-200 -mr-5">
+                <ChevronRightIcon className="w-5 h-5" />
+              </button>
+            </div>
+            
+            <style jsx>{`
+              .product-swiper .swiper-pagination {
+                bottom: -40px !important;
+              }
+              .swiper-pagination-bullet-custom {
+                width: 12px;
+                height: 12px;
+                background: rgb(148 163 184);
+                opacity: 0.5;
+                border-radius: 50%;
+                transition: all 0.3s ease;
+              }
+              .swiper-pagination-bullet-active-custom {
+                background: rgb(59 130 246);
+                opacity: 1;
+                transform: scale(1.2);
+              }
+            `}</style>
+          </div>
+        )}
       </div>
 
       <AnimatePresence>

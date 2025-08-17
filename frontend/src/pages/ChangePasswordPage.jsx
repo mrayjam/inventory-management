@@ -1,7 +1,7 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { EyeIcon, EyeSlashIcon, LockClosedIcon, ShieldCheckIcon, CheckCircleIcon } from '@heroicons/react/24/outline'
+import { EyeIcon, EyeSlashIcon, LockClosedIcon, ShieldCheckIcon, CheckCircleIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import toast from 'react-hot-toast'
 import { useAuth } from '../contexts/AuthContext'
 
@@ -20,9 +20,20 @@ const ChangePasswordPage = () => {
     confirm: false,
   })
   const [focusedField, setFocusedField] = useState('')
+  const [countdown, setCountdown] = useState(3)
 
   const { changePassword, user } = useAuth()
   const navigate = useNavigate()
+
+  useEffect(() => {
+    let interval
+    if (showSuccessModal && countdown > 0) {
+      interval = setInterval(() => {
+        setCountdown(prev => prev - 1)
+      }, 1000)
+    }
+    return () => clearInterval(interval)
+  }, [showSuccessModal, countdown])
 
   const validateForm = () => {
     const newErrors = {}
@@ -88,6 +99,12 @@ const ChangePasswordPage = () => {
           confirmPassword: '',
         })
         setShowSuccessModal(true)
+        setCountdown(3)
+        
+        setTimeout(() => {
+          setShowSuccessModal(false)
+          navigate('/')
+        }, 3000)
       } else {
         toast.error(result.error, { id: loadingToast })
       }
@@ -115,11 +132,19 @@ const ChangePasswordPage = () => {
           className="w-full max-w-md"
         >
         <motion.div
-          className="bg-white/90 backdrop-blur-xl shadow-2xl rounded-3xl p-8 border border-white/20"
+          className="bg-white/90 backdrop-blur-xl shadow-2xl rounded-3xl p-8 border border-white/20 relative"
           initial={{ y: 50, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.2, duration: 0.6 }}
         >
+          <button
+            onClick={() => navigate('/')}
+            className="absolute top-4 right-4 p-2 rounded-lg hover:bg-gray-100 transition-colors"
+            title="Close and return to dashboard"
+          >
+            <XMarkIcon className="h-5 w-5 text-gray-600" />
+          </button>
+          
           <div className="text-center mb-8">
             <motion.div
               initial={{ scale: 0 }}
@@ -361,7 +386,10 @@ const ChangePasswordPage = () => {
             </motion.div>
             
             <h3 className="text-xl font-bold text-slate-900 mb-2">Password Changed Successfully!</h3>
-            <p className="text-slate-600 mb-6">Your password has been updated securely.</p>
+            <p className="text-slate-600 mb-2">Your password has been updated securely.</p>
+            <p className="text-sm text-slate-500 mb-6">
+              Redirecting to dashboard in {countdown} second{countdown !== 1 ? 's' : ''}...
+            </p>
             
             <div className="flex gap-3">
               <motion.button

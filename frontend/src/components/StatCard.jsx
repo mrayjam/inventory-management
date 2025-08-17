@@ -3,11 +3,11 @@ import { useCountUp } from '../hooks/useCountUp'
 
 export default function StatCard({ title, value, icon: Icon, color = 'blue', trend, rawValue }) {
   const colorClasses = {
-    blue: 'bg-blue-500 text-blue-600 shadow-blue-500/20',
-    green: 'bg-green-500 text-green-600 shadow-green-500/20',
-    yellow: 'bg-yellow-500 text-yellow-600 shadow-yellow-500/20',
-    red: 'bg-red-500 text-red-600 shadow-red-500/20',
-    purple: 'bg-purple-500 text-purple-600 shadow-purple-500/20'
+    blue: 'bg-blue-500 text-gray-200 shadow-blue-500/20',
+    green: 'bg-green-500 text-gray-200 shadow-green-500/20',
+    yellow: 'bg-yellow-500 text-gray-200 shadow-yellow-500/20',
+    red: 'bg-red-500 text-gray-200 shadow-red-500/20',
+    purple: 'bg-purple-500 text-gray-200 shadow-purple-500/20',
   }
 
   const bgClasses = {
@@ -41,11 +41,11 @@ export default function StatCard({ title, value, icon: Icon, color = 'blue', tre
     >
       <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-white/20 to-transparent rounded-full -mr-10 -mt-10"></div>
       
-      <div className="flex items-center justify-between relative">
-        <div className="flex-1">
+      <div className="flex items-start justify-between relative">
+        <div className="flex-1 min-w-0">
           <p className="text-sm font-medium text-slate-600 mb-1">{title}</p>
           <motion.p 
-            className="text-3xl font-bold text-slate-900"
+            className="text-3xl font-bold text-slate-900 leading-none"
             initial={{ scale: 0.8 }}
             animate={{ scale: 1 }}
             transition={{ delay: 0.5, type: "spring", damping: 15 }}
@@ -69,7 +69,7 @@ export default function StatCard({ title, value, icon: Icon, color = 'blue', tre
           )}
         </div>
         <motion.div 
-          className={`p-4 rounded-2xl bg-opacity-10 shadow-lg ${colorClasses[color]}`}
+          className={`flex-shrink-0 p-4 rounded-2xl bg-opacity-10 shadow-lg ${colorClasses[color]} self-start`}
           initial={{ scale: 0, rotate: -180 }}
           animate={{ scale: 1, rotate: 0 }}
           transition={{ delay: 0.3, type: "spring", damping: 15 }}

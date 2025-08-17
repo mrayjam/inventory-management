@@ -91,25 +91,56 @@ export default function Analytics() {
           className="bg-white rounded-xl shadow-sm border border-slate-200 p-6"
         >
           <h3 className="text-lg font-semibold text-slate-900 mb-4">Inventory Distribution</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <PieChart>
-              <Pie
-                data={mockCategoryData}
-                cx="50%"
-                cy="50%"
-                labelLine={false}
-                label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                outerRadius={80}
-                fill="#8884d8"
-                dataKey="value"
-              >
-                {mockCategoryData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} />
+          <div className="flex flex-col lg:flex-row items-center">
+            <div className="w-full lg:w-1/2">
+              <ResponsiveContainer width="100%" height={250}>
+                <PieChart>
+                  <Pie
+                    data={mockCategoryData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={40}
+                    outerRadius={80}
+                    paddingAngle={2}
+                    fill="#8884d8"
+                    dataKey="value"
+                  >
+                    {mockCategoryData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip formatter={(value, name) => [`${value} items`, name]} />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+            <div className="w-full lg:w-1/2 lg:pl-4">
+              <div className="space-y-3">
+                {mockCategoryData.map((category, index) => (
+                  <motion.div
+                    key={category.name}
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.1 * index }}
+                    className="flex items-center justify-between p-3 bg-slate-50 rounded-lg"
+                  >
+                    <div className="flex items-center">
+                      <div 
+                        className="w-4 h-4 rounded-full mr-3"
+                        style={{ backgroundColor: category.color }}
+                      />
+                      <span className="font-medium text-slate-900 text-sm">{category.name}</span>
+                    </div>
+                    <div className="text-right">
+                      <div className="font-bold text-slate-900">{category.value}</div>
+                      <div className="text-xs text-slate-500">
+                        {((category.value / mockCategoryData.reduce((sum, cat) => sum + cat.value, 0)) * 100).toFixed(1)}%
+                      </div>
+                    </div>
+                  </motion.div>
                 ))}
-              </Pie>
-              <Tooltip />
-            </PieChart>
-          </ResponsiveContainer>
+              </div>
+            </div>
+          </div>
         </motion.div>
       </div>
 
@@ -167,41 +198,104 @@ export default function Analytics() {
           transition={{ delay: 0.4 }}
           className="bg-white rounded-xl shadow-sm border border-slate-200 p-6"
         >
-          <h3 className="text-lg font-semibold text-slate-900 mb-4">Key Metrics</h3>
+          <h3 className="text-lg font-semibold text-slate-900 mb-6">Key Metrics</h3>
           <div className="space-y-6">
-            <div>
-              <div className="flex justify-between items-center mb-2">
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.5 }}
+            >
+              <div className="flex justify-between items-center mb-3">
                 <span className="text-sm font-medium text-slate-600">Inventory Turnover</span>
-                <span className="text-sm font-bold text-slate-900">8.5x</span>
+                <motion.span 
+                  className="text-sm font-bold text-slate-900"
+                  initial={{ scale: 0.8 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: 0.7, type: "spring" }}
+                >
+                  8.5x
+                </motion.span>
               </div>
-              <div className="w-full bg-slate-200 rounded-full h-2">
-                <div className="bg-blue-600 h-2 rounded-full" style={{ width: '85%' }} />
+              <div className="w-full bg-slate-200 rounded-full h-3 overflow-hidden">
+                <motion.div 
+                  className="bg-gradient-to-r from-blue-500 to-blue-600 h-3 rounded-full shadow-sm"
+                  initial={{ width: 0 }}
+                  animate={{ width: '85%' }}
+                  transition={{ delay: 0.8, duration: 1.2, ease: "easeOut" }}
+                />
               </div>
-            </div>
-            <div>
-              <div className="flex justify-between items-center mb-2">
+            </motion.div>
+            
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.6 }}
+            >
+              <div className="flex justify-between items-center mb-3">
                 <span className="text-sm font-medium text-slate-600">Stock Accuracy</span>
-                <span className="text-sm font-bold text-slate-900">96.8%</span>
+                <motion.span 
+                  className="text-sm font-bold text-slate-900"
+                  initial={{ scale: 0.8 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: 0.9, type: "spring" }}
+                >
+                  96.8%
+                </motion.span>
               </div>
-              <div className="w-full bg-slate-200 rounded-full h-2">
-                <div className="bg-green-600 h-2 rounded-full" style={{ width: '96.8%' }} />
+              <div className="w-full bg-slate-200 rounded-full h-3 overflow-hidden">
+                <motion.div 
+                  className="bg-gradient-to-r from-green-500 to-green-600 h-3 rounded-full shadow-sm"
+                  initial={{ width: 0 }}
+                  animate={{ width: '96.8%' }}
+                  transition={{ delay: 1.0, duration: 1.2, ease: "easeOut" }}
+                />
               </div>
-            </div>
-            <div>
-              <div className="flex justify-between items-center mb-2">
+            </motion.div>
+            
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.7 }}
+            >
+              <div className="flex justify-between items-center mb-3">
                 <span className="text-sm font-medium text-slate-600">Order Fill Rate</span>
-                <span className="text-sm font-bold text-slate-900">94.2%</span>
+                <motion.span 
+                  className="text-sm font-bold text-slate-900"
+                  initial={{ scale: 0.8 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: 1.1, type: "spring" }}
+                >
+                  94.2%
+                </motion.span>
               </div>
-              <div className="w-full bg-slate-200 rounded-full h-2">
-                <div className="bg-yellow-600 h-2 rounded-full" style={{ width: '94.2%' }} />
+              <div className="w-full bg-slate-200 rounded-full h-3 overflow-hidden">
+                <motion.div 
+                  className="bg-gradient-to-r from-yellow-500 to-yellow-600 h-3 rounded-full shadow-sm"
+                  initial={{ width: 0 }}
+                  animate={{ width: '94.2%' }}
+                  transition={{ delay: 1.2, duration: 1.2, ease: "easeOut" }}
+                />
               </div>
-            </div>
-            <div className="pt-4 border-t border-slate-200">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-slate-900">$261.8k</div>
-                <div className="text-sm text-slate-600">Total Inventory Value</div>
+            </motion.div>
+            
+            <motion.div 
+              className="pt-6 border-t border-slate-200"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1.4 }}
+            >
+              <div className="text-center bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-4">
+                <motion.div 
+                  className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"
+                  initial={{ scale: 0.5 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: 1.6, type: "spring", damping: 15 }}
+                >
+                  $261.8k
+                </motion.div>
+                <div className="text-sm text-slate-600 font-medium">Total Inventory Value</div>
               </div>
-            </div>
+            </motion.div>
           </div>
         </motion.div>
       </div>

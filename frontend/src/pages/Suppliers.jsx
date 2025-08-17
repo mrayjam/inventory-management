@@ -1,10 +1,5 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { motion } from 'framer-motion'
-import { Swiper, SwiperSlide } from 'swiper/react'
-import { Navigation, Pagination, Autoplay } from 'swiper/modules'
-import 'swiper/css'
-import 'swiper/css/navigation'
-import 'swiper/css/pagination'
 import { 
   PlusIcon, 
   PencilIcon, 
@@ -191,6 +186,7 @@ const SupplierModal = ({ isOpen, onClose, supplier, mode }) => {
 export default function Suppliers() {
   const [searchTerm, setSearchTerm] = useState('')
   const [modalState, setModalState] = useState({ isOpen: false, supplier: null, mode: 'add' })
+  const scrollContainerRef = useRef(null)
 
   const filteredSuppliers = mockSuppliers.filter(supplier =>
     supplier.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -205,6 +201,18 @@ export default function Suppliers() {
       request: null,
       response: { success: true, message: 'Supplier deleted successfully' }
     })
+  }
+
+  const scrollLeft = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({ left: -320, behavior: 'smooth' })
+    }
+  }
+
+  const scrollRight = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({ left: 320, behavior: 'smooth' })
+    }
   }
 
   return (
@@ -241,47 +249,24 @@ export default function Suppliers() {
 
         <div className="p-6">
           <div className="relative">
-            <Swiper
-              modules={[Navigation, Pagination, Autoplay]}
-              spaceBetween={24}
-              slidesPerView={1}
-              navigation={{
-                prevEl: '.swiper-button-prev-custom',
-                nextEl: '.swiper-button-next-custom',
-              }}
-              pagination={{
-                clickable: true,
-                bulletClass: 'swiper-pagination-bullet-custom',
-                bulletActiveClass: 'swiper-pagination-bullet-active-custom',
-              }}
-              autoplay={{
-                delay: 5000,
-                disableOnInteraction: false,
-              }}
-              breakpoints={{
-                640: {
-                  slidesPerView: 1,
-                },
-                768: {
-                  slidesPerView: 2,
-                },
-                1024: {
-                  slidesPerView: 3,
-                },
-                1280: {
-                  slidesPerView: 4,
-                }
-              }}
-              className="supplier-swiper"
-            >
-              {filteredSuppliers.map((supplier) => (
-                <SwiperSlide key={supplier.id}>
+            <div className="overflow-hidden">
+              <div 
+                ref={scrollContainerRef}
+                className="flex gap-6 overflow-x-auto scrollbar-hide pb-4"
+                style={{
+                  scrollSnapType: 'x mandatory',
+                  scrollBehavior: 'smooth'
+                }}
+              >
+                {filteredSuppliers.map((supplier, index) => (
                   <motion.div
+                    key={supplier.id}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.1 }}
                     whileHover={{ y: -8, scale: 1.02 }}
-                    transition={{ duration: 0.3, type: "spring", damping: 20 }}
-                    className="bg-white/90 backdrop-blur-sm border border-white/30 rounded-2xl p-6 hover:shadow-xl transition-all duration-300 h-full"
+                    className="bg-white/90 backdrop-blur-sm border border-white/30 rounded-2xl p-6 hover:shadow-xl transition-all duration-300 flex-shrink-0 w-80 max-w-sm"
+                    style={{ scrollSnapAlign: 'start' }}
                   >
                     <div className="flex justify-between items-start mb-4">
                       <div className="flex-1">
@@ -337,34 +322,39 @@ export default function Suppliers() {
                       </div>
                     </div>
                   </motion.div>
-                </SwiperSlide>
-              ))}
-            </Swiper>
+                ))}
+              </div>
+            </div>
             
-            <button className="swiper-button-prev-custom absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full shadow-lg border border-white/30 flex items-center justify-center text-slate-600 hover:text-slate-900 hover:bg-white transition-all duration-200 -ml-5">
-              <ChevronLeftIcon className="w-5 h-5" />
-            </button>
-            <button className="swiper-button-next-custom absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full shadow-lg border border-white/30 flex items-center justify-center text-slate-600 hover:text-slate-900 hover:bg-white transition-all duration-200 -mr-5">
-              <ChevronRightIcon className="w-5 h-5" />
-            </button>
+            {filteredSuppliers.length > 1 && (
+              <>
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={scrollLeft}
+                  className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full shadow-lg border border-white/30 flex items-center justify-center text-slate-600 hover:text-slate-900 hover:bg-white transition-all duration-200 -ml-5"
+                >
+                  <ChevronLeftIcon className="w-5 h-5" />
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={scrollRight}
+                  className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full shadow-lg border border-white/30 flex items-center justify-center text-slate-600 hover:text-slate-900 hover:bg-white transition-all duration-200 -mr-5"
+                >
+                  <ChevronRightIcon className="w-5 h-5" />
+                </motion.button>
+              </>
+            )}
           </div>
           
           <style jsx>{`
-            .supplier-swiper .swiper-pagination {
-              bottom: -40px !important;
+            .scrollbar-hide {
+              -ms-overflow-style: none;
+              scrollbar-width: none;
             }
-            .swiper-pagination-bullet-custom {
-              width: 12px;
-              height: 12px;
-              background: rgb(148 163 184);
-              opacity: 0.5;
-              border-radius: 50%;
-              transition: all 0.3s ease;
-            }
-            .swiper-pagination-bullet-active-custom {
-              background: rgb(59 130 246);
-              opacity: 1;
-              transform: scale(1.2);
+            .scrollbar-hide::-webkit-scrollbar {
+              display: none;
             }
           `}</style>
         </div>
