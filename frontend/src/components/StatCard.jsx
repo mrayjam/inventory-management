@@ -41,13 +41,13 @@ export default function StatCard({ title, value, icon: Icon, color = 'blue', tre
     >
       <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-white/20 to-transparent rounded-full -mr-10 -mt-10"></div>
       
-      <div className="flex items-start justify-between relative">
+      <div className="flex items-center justify-between relative">
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium text-slate-600 mb-1">{title}</p>
+          <p className="text-sm font-medium text-slate-600 mb-2">{title}</p>
           <motion.p 
-            className="text-3xl font-bold text-slate-900 leading-none"
-            initial={{ scale: 0.8 }}
-            animate={{ scale: 1 }}
+            className="text-2xl md:text-3xl font-bold text-slate-900 leading-none"
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.5, type: "spring", damping: 15 }}
           >
             {displayValue}
@@ -69,13 +69,13 @@ export default function StatCard({ title, value, icon: Icon, color = 'blue', tre
           )}
         </div>
         <motion.div 
-          className={`flex-shrink-0 p-4 rounded-2xl bg-opacity-10 shadow-lg ${colorClasses[color]} self-start`}
+          className={`flex-shrink-0 p-3 md:p-4 rounded-2xl bg-opacity-10 shadow-lg ${colorClasses[color]} self-center`}
           initial={{ scale: 0, rotate: -180 }}
           animate={{ scale: 1, rotate: 0 }}
           transition={{ delay: 0.3, type: "spring", damping: 15 }}
           whileHover={{ scale: 1.1, rotate: 5 }}
         >
-          <Icon className={`h-7 w-7 ${colorClasses[color].split(' ')[1]} drop-shadow-sm`} />
+          <Icon className={`h-6 w-6 md:h-7 md:w-7 ${colorClasses[color].split(' ')[1]} drop-shadow-sm`} />
         </motion.div>
       </div>
     </motion.div>

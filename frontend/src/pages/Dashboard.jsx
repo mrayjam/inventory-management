@@ -34,7 +34,7 @@ const mockInventoryData = [
 
 export default function Dashboard() {
   return (
-    <div className="relative">
+    <div className="relative w-full max-w-full overflow-x-hidden">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-slate-900">Dashboard</h1>
           <p className="text-slate-600 mt-1">Welcome back! Here's what's happening with your inventory today.</p>

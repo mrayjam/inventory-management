@@ -210,7 +210,7 @@ export default function Suppliers() {
   }
 
   return (
-    <div>
+    <div className="w-full max-w-full overflow-x-hidden">
       <div className="flex justify-between items-center mb-8">
         <div>
           <h1 className="text-3xl font-bold text-slate-900">Suppliers</h1>
@@ -241,24 +241,24 @@ export default function Suppliers() {
           </div>
         </div>
 
-        <div className="px-4 py-6">
+        <div className="px-3 sm:px-4 lg:px-6 py-6">
           <Carousel
             opts={{
               align: "start",
               loop: true,
             }}
-            className="w-full"
+            className="w-full max-w-none"
           >
-            <CarouselContent className="-ml-2">
+            <CarouselContent className="-ml-4">
               {filteredSuppliers.map((supplier, index) => (
-                <CarouselItem key={supplier.id} className="pl-2 basis-full md:basis-1/2 lg:basis-1/3">
-                  <div className="p-1">
+                <CarouselItem key={supplier.id} className="pl-4 basis-[95%] sm:basis-[95%] md:basis-1/2 lg:basis-1/3">
+                  <div className="h-full">
                     <motion.div
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: index * 0.1 }}
                       whileHover={{ y: -8, scale: 1.02, boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)" }}
-                      className="bg-gradient-to-br from-white/95 to-slate-50/95 backdrop-blur-sm border border-white/40 rounded-2xl p-4 hover:shadow-2xl transition-all duration-500 h-full"
+                      className="bg-gradient-to-br from-white/95 to-slate-50/95 backdrop-blur-sm border border-white/40 rounded-2xl p-4 hover:shadow-2xl transition-all duration-500 h-full mx-auto max-w-sm"
                     >
                     <div className="flex justify-between items-start mb-4">
                       <div className="flex-1">
@@ -318,8 +318,8 @@ export default function Suppliers() {
                 </CarouselItem>
               ))}
             </CarouselContent>
-            <CarouselPrevious className="w-12 h-12 bg-white/95 backdrop-blur-sm border border-white/40 shadow-xl hover:bg-white hover:scale-110 transition-all duration-300 -left-6" />
-            <CarouselNext className="w-12 h-12 bg-white/95 backdrop-blur-sm border border-white/40 shadow-xl hover:bg-white hover:scale-110 transition-all duration-300 -right-6" />
+            <CarouselPrevious className="w-10 h-10 sm:w-12 sm:h-12 bg-white/95 backdrop-blur-sm border border-white/40 shadow-xl hover:bg-white hover:scale-110 transition-all duration-300 -left-2 sm:-left-4 md:-left-6" />
+            <CarouselNext className="w-10 h-10 sm:w-12 sm:h-12 bg-white/95 backdrop-blur-sm border border-white/40 shadow-xl hover:bg-white hover:scale-110 transition-all duration-300 -right-2 sm:-right-4 md:-right-6" />
           </Carousel>
         </div>
       </div>

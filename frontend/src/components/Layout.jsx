@@ -255,9 +255,9 @@ export default function Layout() {
         </AnimatePresence>
         
         {/* Main Content */}
-        <div className="flex-1 min-h-screen">
-          <main className="p-4 lg:p-8 min-h-full">
-            <div className="bg-white/50 backdrop-blur-sm rounded-2xl p-4 lg:p-6 shadow-sm border border-white/20 min-h-[calc(100vh-2rem)] lg:min-h-[calc(100vh-4rem)]">
+        <div className="flex-1 min-h-screen overflow-x-hidden">
+          <main className="p-3 sm:p-4 lg:p-8 min-h-full">
+            <div className="bg-white/50 backdrop-blur-sm rounded-2xl p-3 sm:p-4 lg:p-6 shadow-sm border border-white/20 min-h-[calc(100vh-1.5rem)] sm:min-h-[calc(100vh-2rem)] lg:min-h-[calc(100vh-4rem)] max-w-full">
               <Outlet />
             </div>
           </main>
