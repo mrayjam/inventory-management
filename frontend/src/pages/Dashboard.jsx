@@ -36,8 +36,8 @@ export default function Dashboard() {
   return (
     <div className="relative w-full max-w-full overflow-x-hidden">
         <div className="mb-6 sm:mb-8">
-          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">Dashboard</h1>
-          <p className="text-sm sm:text-base text-slate-600 mt-1">Welcome back! Here's what's happening with your inventory today.</p>
+          <h1 className="text-xl sm:text-2xl max-[1440px]:text-xl lg:text-3xl font-bold text-slate-900">Dashboard</h1>
+          <p className="text-xs sm:text-sm max-[1440px]:text-xs lg:text-base text-slate-600 mt-1">Welcome back! Here's what's happening with your inventory today.</p>
         </div>
 
         <motion.div 
@@ -101,24 +101,24 @@ export default function Dashboard() {
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.2 }}
-            className="bg-white/80 backdrop-blur-sm rounded-xl shadow-sm border border-white/30 p-3 sm:p-4 lg:p-6"
+            className="bg-white/80 backdrop-blur-sm rounded-xl shadow-sm border border-white/30 p-3 sm:p-4 max-[1440px]:p-3 lg:p-6"
           >
-            <h3 className="text-base sm:text-lg font-semibold text-slate-900 mb-3 sm:mb-4">Sales Trend</h3>
-            <div className="h-[250px] sm:h-[280px] lg:h-[300px]">
+            <h3 className="text-sm sm:text-base max-[1440px]:text-sm lg:text-lg font-semibold text-slate-900 mb-3 sm:mb-4">Sales Trend</h3>
+            <div className="h-[200px] sm:h-[220px] max-[1440px]:h-[200px] lg:h-[280px] xl:h-[300px]">
               <ResponsiveContainer width="100%" height="100%">
               <LineChart data={mockSalesData} margin={{ top: 10, right: 10, left: 0, bottom: 20 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
                 <XAxis 
                   dataKey="month" 
                   stroke="#64748b" 
-                  fontSize={10}
+                  fontSize={window.innerWidth <= 1440 ? 9 : 10}
                   tickMargin={5}
                 />
                 <YAxis 
                   stroke="#64748b" 
-                  fontSize={10}
+                  fontSize={window.innerWidth <= 1440 ? 9 : 10}
                   tickMargin={5}
-                  width={35}
+                  width={window.innerWidth <= 1440 ? 30 : 35}
                   tickFormatter={(value) => `${(value / 1000).toFixed(0)}K`}
                 />
                 <Tooltip 
@@ -126,7 +126,7 @@ export default function Dashboard() {
                     backgroundColor: 'white', 
                     border: '1px solid #e2e8f0',
                     borderRadius: '8px',
-                    fontSize: '12px'
+                    fontSize: window.innerWidth <= 1440 ? '11px' : '12px'
                   }}
                   formatter={(value) => [`$${value.toLocaleString()}`, 'Sales']}
                 />
@@ -146,10 +146,10 @@ export default function Dashboard() {
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.4 }}
-            className="bg-white/80 backdrop-blur-sm rounded-xl shadow-sm border border-white/30 p-3 sm:p-4 lg:p-6"
+            className="bg-white/80 backdrop-blur-sm rounded-xl shadow-sm border border-white/30 p-3 sm:p-4 max-[1440px]:p-3 lg:p-6"
           >
-            <h3 className="text-base sm:text-lg font-semibold text-slate-900 mb-3 sm:mb-4">Inventory by Category</h3>
-            <div className="h-[250px] sm:h-[280px] lg:h-[320px]">
+            <h3 className="text-sm sm:text-base max-[1440px]:text-sm lg:text-lg font-semibold text-slate-900 mb-3 sm:mb-4">Inventory by Category</h3>
+            <div className="h-[200px] sm:h-[220px] max-[1440px]:h-[200px] lg:h-[280px] xl:h-[320px]">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart 
                   data={mockInventoryData} 
@@ -162,22 +162,22 @@ export default function Dashboard() {
                   angle={-45}
                   textAnchor="end"
                   height={40}
-                  fontSize={9}
+                  fontSize={window.innerWidth <= 1440 ? 8 : 9}
                   interval={0}
                   tickMargin={5}
                 />
                 <YAxis 
                   stroke="#64748b" 
-                  fontSize={10}
+                  fontSize={window.innerWidth <= 1440 ? 9 : 10}
                   tickMargin={5}
-                  width={35}
+                  width={window.innerWidth <= 1440 ? 30 : 35}
                 />
                 <Tooltip 
                   contentStyle={{ 
                     backgroundColor: 'white', 
                     border: '1px solid #e2e8f0',
                     borderRadius: '8px',
-                    fontSize: '12px'
+                    fontSize: window.innerWidth <= 1440 ? '11px' : '12px'
                   }}
                   formatter={(value) => [value, 'Items']}
                 />

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
+import toast from 'react-hot-toast'
 import {
   Carousel,
   CarouselContent,
@@ -15,8 +16,11 @@ import {
   EnvelopeIcon,
   PhoneIcon,
   ChevronLeftIcon,
-  ChevronRightIcon 
+  ChevronRightIcon,
+  XMarkIcon
 } from '@heroicons/react/24/outline'
+import { FloatingLabelInput } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
 
 const mockSuppliers = [
   { 
@@ -91,62 +95,72 @@ const SupplierModal = ({ isOpen, onClose, supplier, mode }) => {
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.9, y: 20 }}
         transition={{ type: "spring", damping: 25, stiffness: 300 }}
-        className="bg-white/95 backdrop-blur-xl rounded-2xl p-4 sm:p-6 w-full max-w-sm sm:max-w-lg shadow-2xl border border-white/20 max-h-[90vh] overflow-y-auto"
+        className="bg-white/95 backdrop-blur-xl rounded-2xl p-4 sm:p-6 lg:p-8 w-full max-w-xs sm:max-w-lg xl:max-w-2xl shadow-2xl border border-white/20 max-h-[90vh] overflow-y-auto relative"
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="text-lg sm:text-xl font-bold text-slate-900 mb-3 sm:mb-4">
-          {mode === 'add' ? 'Add Supplier' : 'Edit Supplier'}
-        </h2>
-        <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
-          <div>
-            <label className="block text-xs sm:text-sm font-medium text-slate-700 mb-1">Company Name</label>
-            <input
-              name="name"
-              type="text"
-              defaultValue={supplier?.name || ''}
-              className="w-full border border-slate-300 rounded-lg px-2 sm:px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        {/* Close Button */}
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 p-2 rounded-lg hover:bg-gray-100 transition-colors z-10"
+        >
+          <XMarkIcon className="h-5 w-5 text-gray-600" />
+        </button>
+        
+        <div className="pr-8">
+          <h2 className="text-lg sm:text-xl xl:text-2xl font-bold text-slate-900 mb-4 sm:mb-6">
+            {mode === 'add' ? 'Add Supplier' : 'Edit Supplier'}
+          </h2>
+        </div>
+        <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+          <FloatingLabelInput
+            name="name"
+            type="text"
+            label="Company Name"
+            defaultValue={supplier?.name || ''}
+            required
+            className="text-sm sm:text-base"
+          />
+          
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6">
+            <FloatingLabelInput
+              name="email"
+              type="email"
+              label="Email Address"
+              defaultValue={supplier?.email || ''}
               required
+              className="text-sm sm:text-base"
+            />
+            
+            <FloatingLabelInput
+              name="phone"
+              type="tel"
+              label="Phone Number"
+              defaultValue={supplier?.phone || ''}
+              required
+              className="text-sm sm:text-base"
             />
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-            <div>
-              <label className="block text-xs sm:text-sm font-medium text-slate-700 mb-1">Email</label>
-              <input
-                name="email"
-                type="email"
-                defaultValue={supplier?.email || ''}
-                className="w-full border border-slate-300 rounded-lg px-2 sm:px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-xs sm:text-sm font-medium text-slate-700 mb-1">Phone</label>
-              <input
-                name="phone"
-                type="tel"
-                defaultValue={supplier?.phone || ''}
-                className="w-full border border-slate-300 rounded-lg px-2 sm:px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required
-              />
-            </div>
-          </div>
-          <div>
-            <label className="block text-xs sm:text-sm font-medium text-slate-700 mb-1">Address</label>
+          
+          <div className="relative">
             <textarea
               name="address"
               rows="3"
               defaultValue={supplier?.address || ''}
-              className="w-full border border-slate-300 rounded-lg px-2 sm:px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full border border-slate-300 bg-white/80 backdrop-blur-sm rounded-xl px-4 pt-6 pb-3 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 shadow-sm hover:bg-white hover:shadow-md resize-none placeholder:text-transparent"
+              placeholder="Address"
               required
             />
+            <label className="absolute left-4 top-2 text-xs font-medium text-slate-600 pointer-events-none">
+              Address
+            </label>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-            <div>
-              <label className="block text-xs sm:text-sm font-medium text-slate-700 mb-1">Category</label>
+          
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6">
+            <div className="relative">
               <select
                 name="category"
                 defaultValue={supplier?.category || ''}
-                className="w-full border border-slate-300 rounded-lg px-2 sm:px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full h-14 border border-slate-300 bg-white/80 backdrop-blur-sm rounded-xl px-4 pt-6 pb-2 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 shadow-sm hover:bg-white hover:shadow-md appearance-none"
                 required
               >
                 <option value="">Select Category</option>
@@ -155,34 +169,54 @@ const SupplierModal = ({ isOpen, onClose, supplier, mode }) => {
                 <option value="Books">Books</option>
                 <option value="Home & Garden">Home & Garden</option>
               </select>
+              <label className="absolute left-4 top-2 text-xs font-medium text-slate-600 pointer-events-none">
+                Category
+              </label>
+              <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
+                <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
             </div>
-            <div>
-              <label className="block text-xs sm:text-sm font-medium text-slate-700 mb-1">Status</label>
+            
+            <div className="relative">
               <select
                 name="status"
                 defaultValue={supplier?.status || 'Active'}
-                className="w-full border border-slate-300 rounded-lg px-2 sm:px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full h-14 border border-slate-300 bg-white/80 backdrop-blur-sm rounded-xl px-4 pt-6 pb-2 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 shadow-sm hover:bg-white hover:shadow-md appearance-none"
                 required
               >
                 <option value="Active">Active</option>
                 <option value="Inactive">Inactive</option>
               </select>
+              <label className="absolute left-4 top-2 text-xs font-medium text-slate-600 pointer-events-none">
+                Status
+              </label>
+              <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
+                <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
             </div>
           </div>
-          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 pt-3 sm:pt-4">
-            <button
+          
+          <div className="flex flex-col sm:flex-row gap-3 pt-6 border-t border-gray-200">
+            <Button
               type="submit"
-              className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors text-sm sm:text-base"
+              size="lg"
+              className="flex-1 text-sm sm:text-base"
             >
               {mode === 'add' ? 'Add Supplier' : 'Update Supplier'}
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
+              variant="secondary"
+              size="lg"
               onClick={onClose}
-              className="flex-1 bg-slate-200 text-slate-800 py-2 px-4 rounded-lg hover:bg-slate-300 transition-colors text-sm sm:text-base"
+              className="flex-1 text-sm sm:text-base"
             >
               Cancel
-            </button>
+            </Button>
           </div>
         </form>
       </motion.div>
@@ -200,27 +234,77 @@ export default function Suppliers() {
     supplier.category.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
-  const handleDelete = (supplierId) => {
-    console.log('API Call:', {
-      endpoint: `DELETE /api/suppliers/${supplierId}`,
-      headers: { 'Authorization': 'Bearer <token>' },
-      request: null,
-      response: { success: true, message: 'Supplier deleted successfully' }
+  const handleDelete = async (supplierId) => {
+    const supplier = mockSuppliers.find(s => s.id === supplierId)
+    const supplierName = supplier?.name || 'this supplier'
+    
+    const confirmed = await new Promise((resolve) => {
+      toast((t) => (
+        <div className="flex items-center gap-3">
+          <div>
+            <p className="font-semibold text-gray-900">Confirm Deletion</p>
+            <p className="text-sm text-gray-600">Delete "{supplierName}"?</p>
+          </div>
+          <div className="flex gap-2">
+            <button
+              onClick={() => {
+                toast.dismiss(t.id)
+                resolve(true)
+              }}
+              className="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700 transition-colors"
+            >
+              Delete
+            </button>
+            <button
+              onClick={() => {
+                toast.dismiss(t.id)
+                resolve(false)
+              }}
+              className="bg-gray-300 text-gray-700 px-3 py-1 rounded text-sm hover:bg-gray-400 transition-colors"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      ), {
+        duration: Infinity,
+        position: 'top-center',
+      })
     })
+
+    if (!confirmed) return
+
+    const loadingToast = toast.loading('Deleting supplier...')
+    
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      
+      console.log('API Call:', {
+        endpoint: `DELETE /api/suppliers/${supplierId}`,
+        headers: { 'Authorization': 'Bearer <token>' },
+        request: null,
+        response: { success: true, message: 'Supplier deleted successfully' }
+      })
+      
+      toast.success('Supplier deleted successfully!', { id: loadingToast })
+    } catch (error) {
+      toast.error('Failed to delete supplier', { id: loadingToast })
+    }
   }
 
   return (
     <div className="w-full max-w-full overflow-x-hidden">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-8">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">Suppliers</h1>
-          <p className="text-sm sm:text-base text-slate-600 mt-1">Manage your supplier relationships</p>
+          <h1 className="text-xl sm:text-2xl max-[1440px]:text-xl lg:text-3xl font-bold text-slate-900">Suppliers</h1>
+          <p className="text-xs sm:text-sm max-[1440px]:text-xs lg:text-base text-slate-600 mt-1">Manage your supplier relationships</p>
         </div>
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={() => setModalState({ isOpen: true, supplier: null, mode: 'add' })}
-          className="bg-blue-600 text-white px-3 sm:px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-700 transition-colors text-sm sm:text-base"
+          className="bg-blue-600 text-white px-3 sm:px-4 max-[1440px]:px-3 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-700 transition-colors text-xs sm:text-sm max-[1440px]:text-xs lg:text-base"
         >
           <PlusIcon className="h-4 w-4 sm:h-5 sm:w-5" />
           Add Supplier
@@ -251,7 +335,7 @@ export default function Suppliers() {
           >
             <CarouselContent className="-ml-4">
               {filteredSuppliers.map((supplier, index) => (
-                <CarouselItem key={supplier.id} className="pl-4 basis-[95%] sm:basis-[95%] md:basis-1/2 lg:basis-1/3">
+                <CarouselItem key={supplier.id} className="pl-4 basis-[95%] sm:basis-[95%] md:basis-1/2 min-[1246px]:basis-1/3 max-[1245px]:basis-1/2">
                   <div className="h-full">
                     <motion.div
                       initial={{ opacity: 0, y: 20 }}

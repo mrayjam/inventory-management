@@ -519,11 +519,12 @@ export default function Products() {
     <div className="w-full max-w-full overflow-x-hidden">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-8">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">Products</h1>
-          <p className="text-sm sm:text-base text-slate-600 mt-1">Manage your product inventory</p>
+          <h1 className="text-xl sm:text-2xl max-[1440px]:text-xl lg:text-3xl font-bold text-slate-900">Products</h1>
+          <p className="text-xs sm:text-sm max-[1440px]:text-xs lg:text-base text-slate-600 mt-1">Manage your product inventory</p>
         </div>
         <div className="flex items-center gap-3">
-          <div className="flex items-center bg-white/80 backdrop-blur-sm rounded-lg p-1 border border-white/30">
+          {/* View mode toggle - only show on screens wider than 1245px */}
+          <div className="hidden min-[1246px]:flex items-center bg-white/80 backdrop-blur-sm rounded-lg p-1 border border-white/30">
             <button
               onClick={() => setViewMode('table')}
               className={`p-2 rounded-md transition-colors ${
@@ -551,7 +552,7 @@ export default function Products() {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => setModalState({ isOpen: true, product: null, mode: 'add' })}
-            className="bg-blue-600 text-white px-3 sm:px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-700 transition-colors text-sm sm:text-base"
+            className="bg-blue-600 text-white px-3 sm:px-4 max-[1440px]:px-3 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-700 transition-colors text-xs sm:text-sm max-[1440px]:text-xs lg:text-base"
           >
             <PlusIcon className="h-4 w-4 sm:h-5 sm:w-5" />
             Add Product
@@ -575,8 +576,8 @@ export default function Products() {
 
 {viewMode === 'table' ? (
           <>
-            {/* Desktop Table View */}
-            <div className="hidden md:block overflow-x-auto">
+            {/* Desktop Table View - Hidden at 1245px and below */}
+            <div className="hidden min-[1246px]:block overflow-x-auto">
               <table className="w-full">
                 <thead className="bg-slate-50">
                   <tr>
@@ -650,8 +651,85 @@ export default function Products() {
               </table>
             </div>
 
-            {/* Mobile Card View */}
-            <div className="md:hidden p-4 space-y-4">
+            {/* Tablet Card View - Shows from 1245px to 601px */}
+            <div className="hidden min-[601px]:block min-[1246px]:hidden p-4 space-y-4">
+              {filteredProducts.map((product, index) => (
+                <motion.div
+                  key={product.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  className="bg-white rounded-xl p-4 shadow-sm border border-slate-200"
+                >
+                  <div className="flex items-start gap-3 mb-3">
+                    <img
+                      src={product.imageUrl}
+                      alt={product.name}
+                      className="h-16 w-16 rounded-lg object-cover cursor-pointer hover:opacity-80 transition-opacity"
+                      onClick={() => setDetailModal({ isOpen: true, product })}
+                    />
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-medium text-slate-900 mb-1 truncate">{product.name}</h3>
+                      <p className="text-sm text-slate-500 mb-2">SKU: {product.sku}</p>
+                      <div className="text-lg font-bold text-green-600">${product.price}</div>
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-3 mb-4">
+                    <div>
+                      <div className="text-xs text-slate-500 mb-1">Category</div>
+                      <div className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                        {product.category}
+                      </div>
+                    </div>
+                    <div>
+                      <div className="text-xs text-slate-500 mb-1">Stock</div>
+                      <div className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
+                        product.stock < 20 
+                          ? 'bg-red-100 text-red-800' 
+                          : product.stock < 50 
+                          ? 'bg-yellow-100 text-yellow-800' 
+                          : 'bg-green-100 text-green-800'
+                      }`}>
+                        {product.stock} units
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="mb-4">
+                    <div className="text-xs text-slate-500 mb-1">Supplier</div>
+                    <div className="text-sm text-slate-900">{product.supplier}</div>
+                  </div>
+                  
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => setDetailModal({ isOpen: true, product })}
+                      className="flex-1 bg-slate-100 text-slate-700 py-2 px-3 rounded-lg hover:bg-slate-200 transition-colors text-sm font-medium flex items-center justify-center gap-1"
+                    >
+                      <EyeIcon className="h-4 w-4" />
+                      View
+                    </button>
+                    <button
+                      onClick={() => setModalState({ isOpen: true, product, mode: 'edit' })}
+                      className="flex-1 bg-blue-600 text-white py-2 px-3 rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium flex items-center justify-center gap-1"
+                    >
+                      <PencilIcon className="h-4 w-4" />
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleDelete(product.id)}
+                      className="flex-1 bg-red-600 text-white py-2 px-3 rounded-lg hover:bg-red-700 transition-colors text-sm font-medium flex items-center justify-center gap-1"
+                    >
+                      <TrashIcon className="h-4 w-4" />
+                      Delete
+                    </button>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+
+            {/* Mobile Card View - Shows below 600px */}
+            <div className="min-[601px]:hidden p-4 space-y-4">
               {filteredProducts.map((product, index) => (
                 <motion.div
                   key={product.id}
