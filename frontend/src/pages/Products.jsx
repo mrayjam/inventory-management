@@ -652,7 +652,7 @@ export default function Products() {
             </table>
           </div>
         ) : (
-          <div className="p-6">
+          <div className="px-4 py-6">
             <Carousel
               opts={{
                 align: "start",
@@ -660,17 +660,18 @@ export default function Products() {
               }}
               className="w-full"
             >
-              <CarouselContent className="ml-0">
+              <CarouselContent className="-ml-2">
                 {filteredProducts.map((product, index) => (
-                  <CarouselItem key={product.id} className="pl-6 basis-full lg:basis-1/2">
-                    <motion.div
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.1 }}
-                      whileHover={{ y: -8, scale: 1.02, boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)" }}
-                      className="bg-gradient-to-br from-white/95 to-slate-50/95 backdrop-blur-sm border border-white/40 rounded-2xl overflow-hidden hover:shadow-2xl transition-all duration-500 flex flex-col h-[480px]"
-                    >
-                      <div className="relative h-48 flex-shrink-0">
+                  <CarouselItem key={product.id} className="pl-2 basis-full md:basis-1/2 lg:basis-1/3">
+                    <div className="p-1">
+                      <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.1 }}
+                        whileHover={{ y: -8, scale: 1.02, boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)" }}
+                        className="bg-gradient-to-br from-white/95 to-slate-50/95 backdrop-blur-sm border border-white/40 rounded-2xl overflow-hidden hover:shadow-2xl transition-all duration-500 flex flex-col h-[420px]"
+                      >
+                      <div className="relative h-40 flex-shrink-0">
                         <img
                           src={product.imageUrl}
                           alt={product.name}
@@ -690,15 +691,15 @@ export default function Products() {
                         </div>
                       </div>
                       
-                      <div className="p-4 flex flex-col justify-between flex-1">
+                      <div className="p-3 flex flex-col justify-between flex-1">
                         <div>
                           <div className="flex justify-between items-start mb-2">
                             <div className="flex-1 min-w-0">
-                              <h3 className="font-bold text-slate-900 text-lg truncate">{product.name}</h3>
-                              <p className="text-sm text-slate-500">SKU: {product.sku}</p>
+                              <h3 className="font-bold text-slate-900 text-base truncate">{product.name}</h3>
+                              <p className="text-xs text-slate-500">SKU: {product.sku}</p>
                             </div>
                             <div className="text-right ml-2">
-                              <p className="text-xl font-bold text-green-600">${product.price}</p>
+                              <p className="text-lg font-bold text-green-600">${product.price}</p>
                             </div>
                           </div>
                           
@@ -752,7 +753,8 @@ export default function Products() {
                           </motion.button>
                         </div>
                       </div>
-                    </motion.div>
+                      </motion.div>
+                    </div>
                   </CarouselItem>
                 ))}
               </CarouselContent>

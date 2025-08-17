@@ -241,7 +241,7 @@ export default function Suppliers() {
           </div>
         </div>
 
-        <div className="p-6">
+        <div className="px-4 py-6">
           <Carousel
             opts={{
               align: "start",
@@ -249,19 +249,20 @@ export default function Suppliers() {
             }}
             className="w-full"
           >
-            <CarouselContent className="ml-0">
+            <CarouselContent className="-ml-2">
               {filteredSuppliers.map((supplier, index) => (
-                <CarouselItem key={supplier.id} className="pl-6 basis-full lg:basis-1/2">
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                    whileHover={{ y: -8, scale: 1.02, boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)" }}
-                    className="bg-gradient-to-br from-white/95 to-slate-50/95 backdrop-blur-sm border border-white/40 rounded-2xl p-6 hover:shadow-2xl transition-all duration-500 h-full"
-                  >
+                <CarouselItem key={supplier.id} className="pl-2 basis-full md:basis-1/2 lg:basis-1/3">
+                  <div className="p-1">
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.1 }}
+                      whileHover={{ y: -8, scale: 1.02, boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)" }}
+                      className="bg-gradient-to-br from-white/95 to-slate-50/95 backdrop-blur-sm border border-white/40 rounded-2xl p-4 hover:shadow-2xl transition-all duration-500 h-full"
+                    >
                     <div className="flex justify-between items-start mb-4">
                       <div className="flex-1">
-                        <h3 className="font-bold text-slate-900 text-lg mb-2 truncate">{supplier.name}</h3>
+                        <h3 className="font-bold text-slate-900 text-base mb-2 truncate">{supplier.name}</h3>
                         <span className={`inline-flex px-3 py-1 text-xs font-semibold rounded-full ${
                           supplier.status === 'Active' 
                             ? 'bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 border border-green-200' 
@@ -312,7 +313,8 @@ export default function Suppliers() {
                         <p className="text-sm text-slate-600 leading-relaxed">{supplier.address}</p>
                       </div>
                     </div>
-                  </motion.div>
+                    </motion.div>
+                  </div>
                 </CarouselItem>
               ))}
             </CarouselContent>
