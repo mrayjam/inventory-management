@@ -8,6 +8,7 @@ import {
   XMarkIcon,
   EyeIcon
 } from '@heroicons/react/24/outline'
+import toast from 'react-hot-toast'
 import { useAuth } from '../contexts/AuthContext'
 import { mockApi } from '../services/mockApi'
 
@@ -84,10 +85,14 @@ const ProductDetailModal = ({ isOpen, onClose, product }) => {
             </div>
             
             <div className="flex gap-3">
-              <button className="flex-1 bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium">
+              <button className="flex-1 bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center justify-center gap-2">
+                <PencilIcon className="w-4 h-4" />
                 Edit Product
               </button>
-              <button className="flex-1 border border-gray-300 text-gray-700 py-3 px-4 rounded-lg hover:bg-gray-50 transition-colors font-medium">
+              <button className="flex-1 border border-gray-300 text-gray-700 py-3 px-4 rounded-lg hover:bg-gray-50 transition-colors font-medium flex items-center justify-center gap-2">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                </svg>
                 View History
               </button>
             </div>
@@ -282,28 +287,35 @@ export default function Products() {
   )
 
   const handleProductSaved = async (action, productId, productData) => {
+    const loadingToast = toast.loading(`${action === 'create' ? 'Creating' : 'Updating'} product...`)
+    
     try {
       if (action === 'create') {
         await mockApi.products.create(token, productData)
+        toast.success('Product created successfully!', { id: loadingToast })
       } else if (action === 'update') {
         await mockApi.products.update(token, productId, productData)
+        toast.success('Product updated successfully!', { id: loadingToast })
       }
       
       const updatedProducts = await mockApi.products.getAll(token)
       setProducts(updatedProducts)
     } catch (error) {
-      console.error('Failed to save product:', error)
+      toast.error(error.message || 'Failed to save product', { id: loadingToast })
       throw error
     }
   }
 
   const handleDelete = async (productId) => {
+    const loadingToast = toast.loading('Deleting product...')
+    
     try {
       await mockApi.products.delete(token, productId)
       const updatedProducts = await mockApi.products.getAll(token)
       setProducts(updatedProducts)
+      toast.success('Product deleted successfully!', { id: loadingToast })
     } catch (error) {
-      console.error('Failed to delete product:', error)
+      toast.error(error.message || 'Failed to delete product', { id: loadingToast })
     }
   }
 
@@ -333,8 +345,8 @@ export default function Products() {
         </motion.button>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-slate-200">
-        <div className="p-6 border-b border-slate-200">
+      <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-sm border border-white/30">
+        <div className="p-6 border-b border-white/20">
           <div className="relative">
             <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-slate-400" />
             <input

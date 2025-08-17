@@ -31,9 +31,9 @@ export default function Layout() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen">
       <div className="flex">
-        <div className="w-64 bg-white shadow-lg flex flex-col">
+        <div className="w-64 bg-white/80 backdrop-blur-sm shadow-lg border-r border-white/20 flex flex-col">
           <div className="p-6">
             <h1 className="text-xl font-bold text-slate-800">Inventory Pro</h1>
           </div>
@@ -99,9 +99,11 @@ export default function Layout() {
           </div>
         </div>
         
-        <div className="flex-1">
-          <main className="p-8">
-            <Outlet />
+        <div className="flex-1 min-h-screen">
+          <main className="p-8 min-h-full">
+            <div className="bg-white/50 backdrop-blur-sm rounded-2xl p-6 shadow-sm border border-white/20 min-h-[calc(100vh-4rem)]">
+              <Outlet />
+            </div>
           </main>
         </div>
       </div>

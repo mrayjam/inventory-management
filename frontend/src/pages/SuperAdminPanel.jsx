@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
+import toast from 'react-hot-toast'
 import { useAuth } from '../contexts/AuthContext'
 import { mockApi } from '../services/mockApi'
 
@@ -17,8 +18,6 @@ const SuperAdminPanel = () => {
   const [createErrors, setCreateErrors] = useState({})
   const [resetErrors, setResetErrors] = useState({})
   const [isLoading, setIsLoading] = useState(false)
-  const [message, setMessage] = useState('')
-  const [messageType, setMessageType] = useState('')
   const [admins, setAdmins] = useState([])
 
   const { createAdmin, resetAdminPassword, token } = useAuth()
@@ -92,7 +91,6 @@ const SuperAdminPanel = () => {
       }))
     }
     
-    clearMessage()
   }
 
   const handleResetChange = (e) => {
@@ -109,76 +107,71 @@ const SuperAdminPanel = () => {
       }))
     }
     
-    clearMessage()
   }
 
-  const clearMessage = () => {
-    if (message) {
-      setMessage('')
-      setMessageType('')
-    }
-  }
 
   const handleCreateSubmit = async (e) => {
     e.preventDefault()
     
     if (!validateCreateForm()) {
+      toast.error('Please fix the form errors')
       return
     }
 
     setIsLoading(true)
-    setMessage('')
+    const loadingToast = toast.loading('Creating admin user...')
 
-    const result = await createAdmin(createForm.name, createForm.email, createForm.password)
+    try {
+      const result = await createAdmin(createForm.name, createForm.email, createForm.password)
 
-    if (result.success) {
-      setMessage('Admin created successfully')
-      setMessageType('success')
-      setCreateForm({
-        name: '',
-        email: '',
-        password: '',
-      })
-      
-      try {
+      if (result.success) {
+        toast.success('Admin created successfully!', { id: loadingToast })
+        setCreateForm({
+          name: '',
+          email: '',
+          password: '',
+        })
+        
         const adminList = await mockApi.users.getAdmins(token)
         setAdmins(adminList)
-      } catch (error) {
-        console.error('Failed to refresh admin list:', error)
+      } else {
+        toast.error(result.error, { id: loadingToast })
       }
-    } else {
-      setMessage(result.error)
-      setMessageType('error')
+    } catch (error) {
+      toast.error('Failed to create admin', { id: loadingToast })
+    } finally {
+      setIsLoading(false)
     }
-
-    setIsLoading(false)
   }
 
   const handleResetSubmit = async (e) => {
     e.preventDefault()
     
     if (!validateResetForm()) {
+      toast.error('Please fix the form errors')
       return
     }
 
     setIsLoading(true)
-    setMessage('')
+    const loadingToast = toast.loading('Resetting admin password...')
 
-    const result = await resetAdminPassword(resetForm.adminId, resetForm.newPassword)
+    try {
+      const result = await resetAdminPassword(resetForm.adminId, resetForm.newPassword)
 
-    if (result.success) {
-      setMessage(result.message || 'Password reset successfully')
-      setMessageType('success')
-      setResetForm({
-        adminId: '',
-        newPassword: '',
-      })
-    } else {
-      setMessage(result.error)
-      setMessageType('error')
+      if (result.success) {
+        toast.success(result.message || 'Password reset successfully!', { id: loadingToast })
+        setResetForm({
+          adminId: '',
+          newPassword: '',
+        })
+      } else {
+        toast.error(result.error, { id: loadingToast })
+      }
+    } catch (error) {
+      toast.error('Failed to reset password', { id: loadingToast })
+    } finally {
+      setIsLoading(false)
     }
-
-    setIsLoading(false)
   }
 
   return (
@@ -218,19 +211,6 @@ const SuperAdminPanel = () => {
               </nav>
             </div>
 
-            {message && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className={`mb-6 rounded-md p-4 ${
-                  messageType === 'success' 
-                    ? 'bg-green-50 text-green-700' 
-                    : 'bg-red-50 text-red-700'
-                }`}
-              >
-                <div className="text-sm">{message}</div>
-              </motion.div>
-            )}
 
             {activeTab === 'create' && (
               <motion.div

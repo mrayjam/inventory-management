@@ -1,5 +1,7 @@
 import { useState } from 'react'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
+import { EyeIcon, EyeSlashIcon, LockClosedIcon, ShieldCheckIcon } from '@heroicons/react/24/outline'
+import toast from 'react-hot-toast'
 import { useAuth } from '../contexts/AuthContext'
 
 const ChangePasswordPage = () => {
@@ -10,8 +12,12 @@ const ChangePasswordPage = () => {
   })
   const [errors, setErrors] = useState({})
   const [isLoading, setIsLoading] = useState(false)
-  const [message, setMessage] = useState('')
-  const [messageType, setMessageType] = useState('')
+  const [showPasswords, setShowPasswords] = useState({
+    current: false,
+    new: false,
+    confirm: false,
+  })
+  const [focusedField, setFocusedField] = useState('')
 
   const { changePassword, user } = useAuth()
 
@@ -66,144 +72,253 @@ const ChangePasswordPage = () => {
     e.preventDefault()
     
     if (!validateForm()) {
+      toast.error('Please fix the form errors')
       return
     }
 
     setIsLoading(true)
-    setMessage('')
+    const loadingToast = toast.loading('Changing your password...')
 
-    const result = await changePassword(formData.currentPassword, formData.newPassword)
+    try {
+      const result = await changePassword(formData.currentPassword, formData.newPassword)
 
-    if (result.success) {
-      setMessage(result.message || 'Password changed successfully')
-      setMessageType('success')
-      setFormData({
-        currentPassword: '',
-        newPassword: '',
-        confirmPassword: '',
-      })
-    } else {
-      setMessage(result.error)
-      setMessageType('error')
+      if (result.success) {
+        toast.success(result.message || 'Password changed successfully!', { id: loadingToast })
+        setFormData({
+          currentPassword: '',
+          newPassword: '',
+          confirmPassword: '',
+        })
+      } else {
+        toast.error(result.error, { id: loadingToast })
+      }
+    } catch (error) {
+      toast.error('An unexpected error occurred', { id: loadingToast })
+    } finally {
+      setIsLoading(false)
     }
+  }
 
-    setIsLoading(false)
+  const togglePasswordVisibility = (field) => {
+    setShowPasswords(prev => ({
+      ...prev,
+      [field]: !prev[field]
+    }))
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="max-w-md mx-auto"
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.6, type: "spring", damping: 25 }}
+        className="w-full max-w-md"
       >
-        <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-          <div className="mb-6">
-            <h2 className="text-2xl font-bold text-gray-900">Change Password</h2>
-            <p className="mt-2 text-sm text-gray-600">
+        <motion.div
+          className="bg-white/90 backdrop-blur-xl shadow-2xl rounded-3xl p-8 border border-white/20"
+          initial={{ y: 50, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.2, duration: 0.6 }}
+        >
+          <div className="text-center mb-8">
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: 0.4, type: "spring", damping: 15 }}
+              className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-emerald-600 to-teal-600 rounded-full mb-4"
+            >
+              <ShieldCheckIcon className="w-8 h-8 text-white" />
+            </motion.div>
+            <motion.h2
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.5, duration: 0.5 }}
+              className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent"
+            >
+              Change Password
+            </motion.h2>
+            <motion.p
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.6, duration: 0.5 }}
+              className="mt-2 text-gray-600"
+            >
               Update your password for {user?.email}
-            </p>
+            </motion.p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label htmlFor="currentPassword" className="block text-sm font-medium text-gray-700">
+            <motion.div
+              initial={{ x: -20, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              transition={{ delay: 0.7, duration: 0.5 }}
+            >
+              <label htmlFor="currentPassword" className="block text-sm font-medium text-gray-700 mb-2">
                 Current Password
               </label>
-              <input
-                type="password"
-                name="currentPassword"
-                id="currentPassword"
-                required
-                className={`mt-1 block w-full px-3 py-2 border ${
-                  errors.currentPassword ? 'border-red-300' : 'border-gray-300'
-                } rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
-                value={formData.currentPassword}
-                onChange={handleChange}
-              />
-              {errors.currentPassword && (
-                <motion.p
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="mt-1 text-sm text-red-600"
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <LockClosedIcon className={`h-5 w-5 transition-colors duration-200 ${
+                    focusedField === 'currentPassword' ? 'text-emerald-600' : 'text-gray-400'
+                  }`} />
+                </div>
+                <input
+                  type={showPasswords.current ? 'text' : 'password'}
+                  name="currentPassword"
+                  id="currentPassword"
+                  required
+                  className={`block w-full pl-10 pr-10 py-3 border rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-200 ${
+                    errors.currentPassword ? 'border-red-300 bg-red-50' : 'border-gray-200 bg-gray-50 hover:bg-white focus:bg-white'
+                  }`}
+                  placeholder="Enter current password"
+                  value={formData.currentPassword}
+                  onChange={handleChange}
+                  onFocus={() => setFocusedField('currentPassword')}
+                  onBlur={() => setFocusedField('')}
+                />
+                <button
+                  type="button"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  onClick={() => togglePasswordVisibility('current')}
                 >
-                  {errors.currentPassword}
-                </motion.p>
-              )}
-            </div>
+                  {showPasswords.current ? (
+                    <EyeSlashIcon className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                  ) : (
+                    <EyeIcon className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                  )}
+                </button>
+              </div>
+              <AnimatePresence>
+                {errors.currentPassword && (
+                  <motion.p
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="mt-2 text-sm text-red-600"
+                  >
+                    {errors.currentPassword}
+                  </motion.p>
+                )}
+              </AnimatePresence>
+            </motion.div>
 
-            <div>
-              <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700">
+            <motion.div
+              initial={{ x: -20, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              transition={{ delay: 0.8, duration: 0.5 }}
+            >
+              <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700 mb-2">
                 New Password
               </label>
-              <input
-                type="password"
-                name="newPassword"
-                id="newPassword"
-                required
-                className={`mt-1 block w-full px-3 py-2 border ${
-                  errors.newPassword ? 'border-red-300' : 'border-gray-300'
-                } rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
-                value={formData.newPassword}
-                onChange={handleChange}
-              />
-              {errors.newPassword && (
-                <motion.p
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="mt-1 text-sm text-red-600"
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <LockClosedIcon className={`h-5 w-5 transition-colors duration-200 ${
+                    focusedField === 'newPassword' ? 'text-emerald-600' : 'text-gray-400'
+                  }`} />
+                </div>
+                <input
+                  type={showPasswords.new ? 'text' : 'password'}
+                  name="newPassword"
+                  id="newPassword"
+                  required
+                  className={`block w-full pl-10 pr-10 py-3 border rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-200 ${
+                    errors.newPassword ? 'border-red-300 bg-red-50' : 'border-gray-200 bg-gray-50 hover:bg-white focus:bg-white'
+                  }`}
+                  placeholder="Enter new password"
+                  value={formData.newPassword}
+                  onChange={handleChange}
+                  onFocus={() => setFocusedField('newPassword')}
+                  onBlur={() => setFocusedField('')}
+                />
+                <button
+                  type="button"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  onClick={() => togglePasswordVisibility('new')}
                 >
-                  {errors.newPassword}
-                </motion.p>
-              )}
-            </div>
+                  {showPasswords.new ? (
+                    <EyeSlashIcon className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                  ) : (
+                    <EyeIcon className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                  )}
+                </button>
+              </div>
+              <AnimatePresence>
+                {errors.newPassword && (
+                  <motion.p
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="mt-2 text-sm text-red-600"
+                  >
+                    {errors.newPassword}
+                  </motion.p>
+                )}
+              </AnimatePresence>
+            </motion.div>
 
-            <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
+            <motion.div
+              initial={{ x: -20, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              transition={{ delay: 0.9, duration: 0.5 }}
+            >
+              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
                 Confirm New Password
               </label>
-              <input
-                type="password"
-                name="confirmPassword"
-                id="confirmPassword"
-                required
-                className={`mt-1 block w-full px-3 py-2 border ${
-                  errors.confirmPassword ? 'border-red-300' : 'border-gray-300'
-                } rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
-                value={formData.confirmPassword}
-                onChange={handleChange}
-              />
-              {errors.confirmPassword && (
-                <motion.p
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="mt-1 text-sm text-red-600"
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <LockClosedIcon className={`h-5 w-5 transition-colors duration-200 ${
+                    focusedField === 'confirmPassword' ? 'text-emerald-600' : 'text-gray-400'
+                  }`} />
+                </div>
+                <input
+                  type={showPasswords.confirm ? 'text' : 'password'}
+                  name="confirmPassword"
+                  id="confirmPassword"
+                  required
+                  className={`block w-full pl-10 pr-10 py-3 border rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-200 ${
+                    errors.confirmPassword ? 'border-red-300 bg-red-50' : 'border-gray-200 bg-gray-50 hover:bg-white focus:bg-white'
+                  }`}
+                  placeholder="Confirm new password"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  onFocus={() => setFocusedField('confirmPassword')}
+                  onBlur={() => setFocusedField('')}
+                />
+                <button
+                  type="button"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  onClick={() => togglePasswordVisibility('confirm')}
                 >
-                  {errors.confirmPassword}
-                </motion.p>
-              )}
-            </div>
+                  {showPasswords.confirm ? (
+                    <EyeSlashIcon className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                  ) : (
+                    <EyeIcon className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                  )}
+                </button>
+              </div>
+              <AnimatePresence>
+                {errors.confirmPassword && (
+                  <motion.p
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="mt-2 text-sm text-red-600"
+                  >
+                    {errors.confirmPassword}
+                  </motion.p>
+                )}
+              </AnimatePresence>
+            </motion.div>
 
-            {message && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className={`rounded-md p-4 ${
-                  messageType === 'success' 
-                    ? 'bg-green-50 text-green-700' 
-                    : 'bg-red-50 text-red-700'
-                }`}
-              >
-                <div className="text-sm">{message}</div>
-              </motion.div>
-            )}
-
-            <div>
+            <motion.div
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 1.0, duration: 0.5 }}
+            >
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-xl text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98]"
               >
                 {isLoading ? (
                   <motion.div
@@ -215,9 +330,9 @@ const ChangePasswordPage = () => {
                   'Change Password'
                 )}
               </button>
-            </div>
+            </motion.div>
           </form>
-        </div>
+        </motion.div>
       </motion.div>
     </div>
   )

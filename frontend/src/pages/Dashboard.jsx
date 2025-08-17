@@ -31,33 +31,10 @@ const mockInventoryData = [
   { category: 'Home & Garden', count: 197 }
 ]
 
-const FloatingParticle = ({ delay = 0 }) => (
-  <motion.div
-    className="absolute w-2 h-2 bg-blue-200 rounded-full opacity-30"
-    initial={{ x: Math.random() * window.innerWidth, y: window.innerHeight + 100 }}
-    animate={{ 
-      y: -100,
-      x: Math.random() * window.innerWidth
-    }}
-    transition={{
-      duration: 20 + Math.random() * 10,
-      delay,
-      repeat: Infinity,
-      ease: 'linear'
-    }}
-  />
-)
 
 export default function Dashboard() {
   return (
-    <div className="relative overflow-hidden">
-      <div className="fixed inset-0 pointer-events-none">
-        {[...Array(8)].map((_, i) => (
-          <FloatingParticle key={i} delay={i * 2.5} />
-        ))}
-      </div>
-
-      <div className="relative z-10">
+    <div className="relative">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-slate-900">Dashboard</h1>
           <p className="text-slate-600 mt-1">Welcome back! Here's what's happening with your inventory today.</p>
@@ -99,7 +76,7 @@ export default function Dashboard() {
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.2 }}
-            className="bg-white rounded-xl shadow-sm border border-slate-200 p-6"
+            className="bg-white/80 backdrop-blur-sm rounded-xl shadow-sm border border-white/30 p-6"
           >
             <h3 className="text-lg font-semibold text-slate-900 mb-4">Sales Trend</h3>
             <ResponsiveContainer width="100%" height={300}>
@@ -129,7 +106,7 @@ export default function Dashboard() {
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.4 }}
-            className="bg-white rounded-xl shadow-sm border border-slate-200 p-6"
+            className="bg-white/80 backdrop-blur-sm rounded-xl shadow-sm border border-white/30 p-6"
           >
             <h3 className="text-lg font-semibold text-slate-900 mb-4">Inventory by Category</h3>
             <ResponsiveContainer width="100%" height={300}>
@@ -149,7 +126,6 @@ export default function Dashboard() {
             </ResponsiveContainer>
           </motion.div>
         </div>
-      </div>
     </div>
   )
 }
