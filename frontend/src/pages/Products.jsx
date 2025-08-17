@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Swiper, SwiperSlide } from 'swiper/react'
-import { Navigation, Pagination, Autoplay } from 'swiper/modules'
-import 'swiper/css'
-import 'swiper/css/navigation'
-import 'swiper/css/pagination'
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel"
 import { 
   PlusIcon, 
   PencilIcon, 
@@ -651,44 +653,22 @@ export default function Products() {
           </div>
         ) : (
           <div className="p-6">
-            <div className="relative">
-              <Swiper
-                modules={[Navigation, Pagination, Autoplay]}
-                spaceBetween={24}
-                slidesPerView={1}
-                navigation={{
-                  prevEl: '.product-swiper-button-prev',
-                  nextEl: '.product-swiper-button-next',
-                }}
-                pagination={{
-                  clickable: true,
-                  bulletClass: 'swiper-pagination-bullet-custom',
-                  bulletActiveClass: 'swiper-pagination-bullet-active-custom',
-                }}
-                breakpoints={{
-                  640: {
-                    slidesPerView: 1,
-                  },
-                  768: {
-                    slidesPerView: 2,
-                  },
-                  1024: {
-                    slidesPerView: 3,
-                  },
-                  1280: {
-                    slidesPerView: 4,
-                  }
-                }}
-                className="product-swiper"
-              >
-                {filteredProducts.map((product) => (
-                  <SwiperSlide key={product.id}>
+            <Carousel
+              opts={{
+                align: "start",
+                loop: true,
+              }}
+              className="w-full"
+            >
+              <CarouselContent className="ml-0">
+                {filteredProducts.map((product, index) => (
+                  <CarouselItem key={product.id} className="pl-6 basis-full lg:basis-1/2">
                     <motion.div
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
-                      whileHover={{ y: -8, scale: 1.02 }}
-                      transition={{ duration: 0.3, type: "spring", damping: 20 }}
-                      className="bg-white/90 backdrop-blur-sm border border-white/30 rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-300 flex flex-col max-w-sm mx-auto h-[480px]"
+                      transition={{ delay: index * 0.1 }}
+                      whileHover={{ y: -8, scale: 1.02, boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)" }}
+                      className="bg-gradient-to-br from-white/95 to-slate-50/95 backdrop-blur-sm border border-white/40 rounded-2xl overflow-hidden hover:shadow-2xl transition-all duration-500 flex flex-col h-[480px]"
                     >
                       <div className="relative h-48 flex-shrink-0">
                         <img
@@ -744,28 +724,28 @@ export default function Products() {
                         
                         <div className="flex gap-2 mt-auto">
                           <motion.button
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
+                            whileHover={{ scale: 1.15 }}
+                            whileTap={{ scale: 0.9 }}
                             onClick={() => setDetailModal({ isOpen: true, product })}
-                            className="flex-1 text-gray-600 hover:text-gray-800 py-2 px-3 rounded-lg hover:bg-gray-50 transition-colors flex items-center justify-center gap-1"
+                            className="flex-1 text-gray-600 hover:text-gray-800 py-2 px-3 rounded-lg hover:bg-gray-50 transition-all duration-200 flex items-center justify-center gap-1"
                             title="View Details"
                           >
                             <EyeIcon className="h-4 w-4" />
                           </motion.button>
                           <motion.button
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
+                            whileHover={{ scale: 1.15 }}
+                            whileTap={{ scale: 0.9 }}
                             onClick={() => setModalState({ isOpen: true, product, mode: 'edit' })}
-                            className="flex-1 text-blue-600 hover:text-blue-800 py-2 px-3 rounded-lg hover:bg-blue-50 transition-colors flex items-center justify-center gap-1"
+                            className="flex-1 text-blue-600 hover:text-blue-800 py-2 px-3 rounded-lg hover:bg-blue-50 transition-all duration-200 flex items-center justify-center gap-1"
                             title="Edit Product"
                           >
                             <PencilIcon className="h-4 w-4" />
                           </motion.button>
                           <motion.button
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
+                            whileHover={{ scale: 1.15 }}
+                            whileTap={{ scale: 0.9 }}
                             onClick={() => handleDelete(product.id)}
-                            className="flex-1 text-red-600 hover:text-red-800 py-2 px-3 rounded-lg hover:bg-red-50 transition-colors flex items-center justify-center gap-1"
+                            className="flex-1 text-red-600 hover:text-red-800 py-2 px-3 rounded-lg hover:bg-red-50 transition-all duration-200 flex items-center justify-center gap-1"
                             title="Delete Product"
                           >
                             <TrashIcon className="h-4 w-4" />
@@ -773,36 +753,12 @@ export default function Products() {
                         </div>
                       </div>
                     </motion.div>
-                  </SwiperSlide>
+                  </CarouselItem>
                 ))}
-              </Swiper>
-              
-              <button className="product-swiper-button-prev absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full shadow-lg border border-white/30 flex items-center justify-center text-slate-600 hover:text-slate-900 hover:bg-white transition-all duration-200 -ml-5">
-                <ChevronLeftIcon className="w-5 h-5" />
-              </button>
-              <button className="product-swiper-button-next absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full shadow-lg border border-white/30 flex items-center justify-center text-slate-600 hover:text-slate-900 hover:bg-white transition-all duration-200 -mr-5">
-                <ChevronRightIcon className="w-5 h-5" />
-              </button>
-            </div>
-            
-            <style jsx>{`
-              .product-swiper .swiper-pagination {
-                bottom: -40px !important;
-              }
-              .swiper-pagination-bullet-custom {
-                width: 12px;
-                height: 12px;
-                background: rgb(148 163 184);
-                opacity: 0.5;
-                border-radius: 50%;
-                transition: all 0.3s ease;
-              }
-              .swiper-pagination-bullet-active-custom {
-                background: rgb(59 130 246);
-                opacity: 1;
-                transform: scale(1.2);
-              }
-            `}</style>
+              </CarouselContent>
+              <CarouselPrevious className="w-12 h-12 bg-white/95 backdrop-blur-sm border border-white/40 shadow-xl hover:bg-white hover:scale-110 transition-all duration-300 -left-6" />
+              <CarouselNext className="w-12 h-12 bg-white/95 backdrop-blur-sm border border-white/40 shadow-xl hover:bg-white hover:scale-110 transition-all duration-300 -right-6" />
+            </Carousel>
           </div>
         )}
       </div>

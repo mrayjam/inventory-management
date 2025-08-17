@@ -1,5 +1,12 @@
-import { useState, useRef } from 'react'
+import { useState } from 'react'
 import { motion } from 'framer-motion'
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel"
 import { 
   PlusIcon, 
   PencilIcon, 
@@ -186,7 +193,6 @@ const SupplierModal = ({ isOpen, onClose, supplier, mode }) => {
 export default function Suppliers() {
   const [searchTerm, setSearchTerm] = useState('')
   const [modalState, setModalState] = useState({ isOpen: false, supplier: null, mode: 'add' })
-  const scrollContainerRef = useRef(null)
 
   const filteredSuppliers = mockSuppliers.filter(supplier =>
     supplier.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -201,18 +207,6 @@ export default function Suppliers() {
       request: null,
       response: { success: true, message: 'Supplier deleted successfully' }
     })
-  }
-
-  const scrollLeft = () => {
-    if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollBy({ left: -320, behavior: 'smooth' })
-    }
-  }
-
-  const scrollRight = () => {
-    if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollBy({ left: 320, behavior: 'smooth' })
-    }
   }
 
   return (
@@ -248,25 +242,22 @@ export default function Suppliers() {
         </div>
 
         <div className="p-6">
-          <div className="relative">
-            <div className="overflow-hidden">
-              <div 
-                ref={scrollContainerRef}
-                className="flex gap-6 overflow-x-auto scrollbar-hide pb-4"
-                style={{
-                  scrollSnapType: 'x mandatory',
-                  scrollBehavior: 'smooth'
-                }}
-              >
-                {filteredSuppliers.map((supplier, index) => (
+          <Carousel
+            opts={{
+              align: "start",
+              loop: true,
+            }}
+            className="w-full"
+          >
+            <CarouselContent className="ml-0">
+              {filteredSuppliers.map((supplier, index) => (
+                <CarouselItem key={supplier.id} className="pl-6 basis-full lg:basis-1/2">
                   <motion.div
-                    key={supplier.id}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.1 }}
-                    whileHover={{ y: -8, scale: 1.02 }}
-                    className="bg-white/90 backdrop-blur-sm border border-white/30 rounded-2xl p-6 hover:shadow-xl transition-all duration-300 flex-shrink-0 w-80 max-w-sm"
-                    style={{ scrollSnapAlign: 'start' }}
+                    whileHover={{ y: -8, scale: 1.02, boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)" }}
+                    className="bg-gradient-to-br from-white/95 to-slate-50/95 backdrop-blur-sm border border-white/40 rounded-2xl p-6 hover:shadow-2xl transition-all duration-500 h-full"
                   >
                     <div className="flex justify-between items-start mb-4">
                       <div className="flex-1">
@@ -281,18 +272,18 @@ export default function Suppliers() {
                       </div>
                       <div className="flex gap-2 ml-2">
                         <motion.button
-                          whileHover={{ scale: 1.1 }}
+                          whileHover={{ scale: 1.15 }}
                           whileTap={{ scale: 0.9 }}
                           onClick={() => setModalState({ isOpen: true, supplier, mode: 'edit' })}
-                          className="text-blue-600 hover:text-blue-800 p-2 rounded-lg hover:bg-blue-50 transition-colors"
+                          className="text-blue-600 hover:text-blue-800 p-2 rounded-lg hover:bg-blue-50 transition-all duration-200"
                         >
                           <PencilIcon className="h-4 w-4" />
                         </motion.button>
                         <motion.button
-                          whileHover={{ scale: 1.1 }}
+                          whileHover={{ scale: 1.15 }}
                           whileTap={{ scale: 0.9 }}
                           onClick={() => handleDelete(supplier.id)}
-                          className="text-red-600 hover:text-red-800 p-2 rounded-lg hover:bg-red-50 transition-colors"
+                          className="text-red-600 hover:text-red-800 p-2 rounded-lg hover:bg-red-50 transition-all duration-200"
                         >
                           <TrashIcon className="h-4 w-4" />
                         </motion.button>
@@ -312,51 +303,22 @@ export default function Suppliers() {
                         </div>
                         <span className="truncate flex-1">{supplier.phone}</span>
                       </div>
-                      <div className="bg-slate-50 rounded-lg p-3 border border-slate-100">
+                      <div className="bg-slate-50/70 backdrop-blur-sm rounded-lg p-3 border border-slate-200/50">
                         <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Category</p>
                         <p className="text-sm font-medium text-slate-700">{supplier.category}</p>
                       </div>
-                      <div className="bg-slate-50 rounded-lg p-3 border border-slate-100">
+                      <div className="bg-slate-50/70 backdrop-blur-sm rounded-lg p-3 border border-slate-200/50">
                         <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Address</p>
                         <p className="text-sm text-slate-600 leading-relaxed">{supplier.address}</p>
                       </div>
                     </div>
                   </motion.div>
-                ))}
-              </div>
-            </div>
-            
-            {filteredSuppliers.length > 1 && (
-              <>
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={scrollLeft}
-                  className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full shadow-lg border border-white/30 flex items-center justify-center text-slate-600 hover:text-slate-900 hover:bg-white transition-all duration-200 -ml-5"
-                >
-                  <ChevronLeftIcon className="w-5 h-5" />
-                </motion.button>
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={scrollRight}
-                  className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full shadow-lg border border-white/30 flex items-center justify-center text-slate-600 hover:text-slate-900 hover:bg-white transition-all duration-200 -mr-5"
-                >
-                  <ChevronRightIcon className="w-5 h-5" />
-                </motion.button>
-              </>
-            )}
-          </div>
-          
-          <style jsx>{`
-            .scrollbar-hide {
-              -ms-overflow-style: none;
-              scrollbar-width: none;
-            }
-            .scrollbar-hide::-webkit-scrollbar {
-              display: none;
-            }
-          `}</style>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <CarouselPrevious className="w-12 h-12 bg-white/95 backdrop-blur-sm border border-white/40 shadow-xl hover:bg-white hover:scale-110 transition-all duration-300 -left-6" />
+            <CarouselNext className="w-12 h-12 bg-white/95 backdrop-blur-sm border border-white/40 shadow-xl hover:bg-white hover:scale-110 transition-all duration-300 -right-6" />
+          </Carousel>
         </div>
       </div>
 
