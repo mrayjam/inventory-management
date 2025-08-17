@@ -7,6 +7,8 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel"
+import { FloatingLabelInput } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
 import { 
   PlusIcon, 
   PencilIcon, 
@@ -236,7 +238,7 @@ const ProductModal = ({ isOpen, onClose, product, mode, onProductSaved }) => {
     
     try {
       if (mode === 'add') {
-        await onProductSaved('create', productData)
+        await onProductSaved('create', null, productData)
       } else {
         await onProductSaved('update', product.id, productData)
       }
@@ -272,24 +274,21 @@ const ProductModal = ({ isOpen, onClose, product, mode, onProductSaved }) => {
         </div>
         <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-            <div className="space-y-4">
-              <div>
-                <label className="block text-xs sm:text-sm font-medium text-slate-700 mb-1">Product Name</label>
-                <input
-                  name="name"
-                  type="text"
-                  defaultValue={product?.name || ''}
-                  className="w-full border border-slate-300 rounded-lg px-2 sm:px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  required
-                />
-              </div>
+            <div className="space-y-6">
+              <FloatingLabelInput
+                name="name"
+                type="text"
+                label="Product Name"
+                defaultValue={product?.name || ''}
+                required
+              />
+              
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs sm:text-sm font-medium text-slate-700 mb-1">Category</label>
+                <div className="relative">
                   <select
                     name="category"
                     defaultValue={product?.category || ''}
-                    className="w-full border border-slate-300 rounded-lg px-2 sm:px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full h-14 border border-slate-300 bg-white/80 backdrop-blur-sm rounded-xl px-4 pt-6 pb-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 shadow-sm hover:bg-white hover:shadow-md appearance-none"
                     required
                   >
                     <option value="">Select Category</option>
@@ -298,91 +297,93 @@ const ProductModal = ({ isOpen, onClose, product, mode, onProductSaved }) => {
                     <option value="Books">Books</option>
                     <option value="Home & Garden">Home & Garden</option>
                   </select>
+                  <label className="absolute left-4 top-2 text-xs font-medium text-slate-600 pointer-events-none">
+                    Category
+                  </label>
+                  <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
+                    <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
                 </div>
-                <div>
-                  <label className="block text-xs sm:text-sm font-medium text-slate-700 mb-1">SKU</label>
-                  <input
-                    name="sku"
-                    type="text"
-                    defaultValue={product?.sku || ''}
-                    className="w-full border border-slate-300 rounded-lg px-2 sm:px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    required
-                  />
-                </div>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs sm:text-sm font-medium text-slate-700 mb-1">Price ($)</label>
-                  <input
-                    name="price"
-                    type="number"
-                    step="0.01"
-                    defaultValue={product?.price || ''}
-                    className="w-full border border-slate-300 rounded-lg px-2 sm:px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs sm:text-sm font-medium text-slate-700 mb-1">Stock Quantity</label>
-                  <input
-                    name="stock"
-                    type="number"
-                    defaultValue={product?.stock || ''}
-                    className="w-full border border-slate-300 rounded-lg px-2 sm:px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    required
-                  />
-                </div>
-              </div>
-            </div>
-            
-            <div className="space-y-4">
-              <div>
-                <label className="block text-xs sm:text-sm font-medium text-slate-700 mb-1">Supplier</label>
-                <input
-                  name="supplier"
+                
+                <FloatingLabelInput
+                  name="sku"
                   type="text"
-                  defaultValue={product?.supplier || ''}
-                  className="w-full border border-slate-300 rounded-lg px-2 sm:px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  label="SKU"
+                  defaultValue={product?.sku || ''}
                   required
                 />
               </div>
-              <div>
-                <label className="block text-xs sm:text-sm font-medium text-slate-700 mb-1">Product Image URL</label>
-                <input
-                  name="imageUrl"
-                  type="url"
-                  defaultValue={product?.imageUrl || ''}
-                  className="w-full border border-slate-300 rounded-lg px-2 sm:px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="https://example.com/image.jpg"
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <FloatingLabelInput
+                  name="price"
+                  type="number"
+                  step="0.01"
+                  label="Price ($)"
+                  defaultValue={product?.price || ''}
+                  required
+                />
+                
+                <FloatingLabelInput
+                  name="stock"
+                  type="number"
+                  label="Stock Quantity"
+                  defaultValue={product?.stock || ''}
+                  required
                 />
               </div>
-              <div>
-                <label className="block text-xs sm:text-sm font-medium text-slate-700 mb-1">Description</label>
+            </div>
+            
+            <div className="space-y-6">
+              <FloatingLabelInput
+                name="supplier"
+                type="text"
+                label="Supplier"
+                defaultValue={product?.supplier || ''}
+                required
+              />
+              
+              <FloatingLabelInput
+                name="imageUrl"
+                type="url"
+                label="Product Image URL"
+                defaultValue={product?.imageUrl || ''}
+              />
+              
+              <div className="relative">
                 <textarea
                   name="description"
                   rows="4"
                   defaultValue={product?.description || ''}
-                  className="w-full border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-                  placeholder="Enter product description..."
+                  className="w-full border border-slate-300 bg-white/80 backdrop-blur-sm rounded-xl px-4 pt-6 pb-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 shadow-sm hover:bg-white hover:shadow-md resize-none placeholder:text-transparent"
+                  placeholder="Description"
                 />
+                <label className="absolute left-4 top-2 text-xs font-medium text-slate-600 pointer-events-none">
+                  Description
+                </label>
               </div>
             </div>
           </div>
           
-          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 pt-3 sm:pt-4 border-t border-gray-200">
-            <button
+          <div className="flex flex-col sm:flex-row gap-3 pt-6 border-t border-gray-200">
+            <Button
               type="submit"
-              className="flex-1 bg-blue-600 text-white py-2 sm:py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm sm:text-base"
+              size="lg"
+              className="flex-1"
             >
               {mode === 'add' ? 'Add Product' : 'Update Product'}
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
+              variant="secondary"
+              size="lg"
               onClick={onClose}
-              className="flex-1 bg-slate-200 text-slate-800 py-2 sm:py-3 px-4 rounded-lg hover:bg-slate-300 transition-colors font-medium text-sm sm:text-base"
+              className="flex-1"
             >
               Cancel
-            </button>
+            </Button>
           </div>
         </form>
       </motion.div>
@@ -573,44 +574,116 @@ export default function Products() {
         </div>
 
 {viewMode === 'table' ? (
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-slate-50">
-                <tr>
-                  <th className="text-left px-6 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider">Product</th>
-                  <th className="text-left px-6 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider">Category</th>
-                  <th className="text-left px-6 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider">Price</th>
-                  <th className="text-left px-6 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider">Stock</th>
-                  <th className="text-left px-6 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider">Supplier</th>
-                  <th className="text-left px-6 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-200">
-                {filteredProducts.map((product) => (
-                  <motion.tr
-                    key={product.id}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="hover:bg-slate-50"
-                  >
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-3">
-                        <img
-                          src={product.imageUrl}
-                          alt={product.name}
-                          className="h-12 w-12 rounded-lg object-cover cursor-pointer hover:opacity-80 transition-opacity"
-                          onClick={() => setDetailModal({ isOpen: true, product })}
-                        />
-                        <div>
-                          <div className="font-medium text-slate-900">{product.name}</div>
-                          <div className="text-sm text-slate-500">SKU: {product.sku}</div>
+          <>
+            {/* Desktop Table View */}
+            <div className="hidden md:block overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-slate-50">
+                  <tr>
+                    <th className="text-left px-6 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider">Product</th>
+                    <th className="text-left px-6 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider">Category</th>
+                    <th className="text-left px-6 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider">Price</th>
+                    <th className="text-left px-6 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider">Stock</th>
+                    <th className="text-left px-6 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider">Supplier</th>
+                    <th className="text-left px-6 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-200">
+                  {filteredProducts.map((product) => (
+                    <motion.tr
+                      key={product.id}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="hover:bg-slate-50"
+                    >
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-3">
+                          <img
+                            src={product.imageUrl}
+                            alt={product.name}
+                            className="h-12 w-12 rounded-lg object-cover cursor-pointer hover:opacity-80 transition-opacity"
+                            onClick={() => setDetailModal({ isOpen: true, product })}
+                          />
+                          <div>
+                            <div className="font-medium text-slate-900">{product.name}</div>
+                            <div className="text-sm text-slate-500">SKU: {product.sku}</div>
+                          </div>
                         </div>
+                      </td>
+                      <td className="px-6 py-4 text-sm text-slate-900">{product.category}</td>
+                      <td className="px-6 py-4 text-sm text-slate-900">${product.price}</td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-1">
+                          <span className="font-medium text-slate-900">{product.stock}</span>
+                          <span className="text-xs text-slate-500">units</span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 text-sm text-slate-900">{product.supplier}</td>
+                      <td className="px-6 py-4">
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => setDetailModal({ isOpen: true, product })}
+                            className="text-gray-600 hover:text-gray-800 p-1"
+                            title="View Details"
+                          >
+                            <EyeIcon className="h-4 w-4" />
+                          </button>
+                          <button
+                            onClick={() => setModalState({ isOpen: true, product, mode: 'edit' })}
+                            className="text-blue-600 hover:text-blue-800 p-1"
+                            title="Edit Product"
+                          >
+                            <PencilIcon className="h-4 w-4" />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(product.id)}
+                            className="text-red-600 hover:text-red-800 p-1"
+                            title="Delete Product"
+                          >
+                            <TrashIcon className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </td>
+                    </motion.tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Mobile Card View */}
+            <div className="md:hidden p-4 space-y-4">
+              {filteredProducts.map((product, index) => (
+                <motion.div
+                  key={product.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  className="bg-white rounded-xl p-4 shadow-sm border border-slate-200"
+                >
+                  <div className="flex items-start gap-3 mb-3">
+                    <img
+                      src={product.imageUrl}
+                      alt={product.name}
+                      className="h-16 w-16 rounded-lg object-cover cursor-pointer hover:opacity-80 transition-opacity"
+                      onClick={() => setDetailModal({ isOpen: true, product })}
+                    />
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-medium text-slate-900 mb-1 truncate">{product.name}</h3>
+                      <p className="text-sm text-slate-500 mb-2">SKU: {product.sku}</p>
+                      <div className="text-lg font-bold text-green-600">${product.price}</div>
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-3 mb-4">
+                    <div>
+                      <div className="text-xs text-slate-500 mb-1">Category</div>
+                      <div className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                        {product.category}
                       </div>
-                    </td>
-                    <td className="px-6 py-4 text-sm text-slate-900">{product.category}</td>
-                    <td className="px-6 py-4 text-sm text-slate-900">${product.price}</td>
-                    <td className="px-6 py-4">
-                      <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
+                    </div>
+                    <div>
+                      <div className="text-xs text-slate-500 mb-1">Stock</div>
+                      <div className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
                         product.stock < 20 
                           ? 'bg-red-100 text-red-800' 
                           : product.stock < 50 
@@ -618,39 +691,42 @@ export default function Products() {
                           : 'bg-green-100 text-green-800'
                       }`}>
                         {product.stock} units
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-sm text-slate-900">{product.supplier}</td>
-                    <td className="px-6 py-4">
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => setDetailModal({ isOpen: true, product })}
-                          className="text-gray-600 hover:text-gray-800 p-1"
-                          title="View Details"
-                        >
-                          <EyeIcon className="h-4 w-4" />
-                        </button>
-                        <button
-                          onClick={() => setModalState({ isOpen: true, product, mode: 'edit' })}
-                          className="text-blue-600 hover:text-blue-800 p-1"
-                          title="Edit Product"
-                        >
-                          <PencilIcon className="h-4 w-4" />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(product.id)}
-                          className="text-red-600 hover:text-red-800 p-1"
-                          title="Delete Product"
-                        >
-                          <TrashIcon className="h-4 w-4" />
-                        </button>
                       </div>
-                    </td>
-                  </motion.tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                    </div>
+                  </div>
+                  
+                  <div className="mb-4">
+                    <div className="text-xs text-slate-500 mb-1">Supplier</div>
+                    <div className="text-sm text-slate-900">{product.supplier}</div>
+                  </div>
+                  
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => setDetailModal({ isOpen: true, product })}
+                      className="flex-1 bg-slate-100 text-slate-700 py-2 px-3 rounded-lg hover:bg-slate-200 transition-colors text-sm font-medium flex items-center justify-center gap-1"
+                    >
+                      <EyeIcon className="h-4 w-4" />
+                      View
+                    </button>
+                    <button
+                      onClick={() => setModalState({ isOpen: true, product, mode: 'edit' })}
+                      className="flex-1 bg-blue-600 text-white py-2 px-3 rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium flex items-center justify-center gap-1"
+                    >
+                      <PencilIcon className="h-4 w-4" />
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleDelete(product.id)}
+                      className="flex-1 bg-red-600 text-white py-2 px-3 rounded-lg hover:bg-red-700 transition-colors text-sm font-medium flex items-center justify-center gap-1"
+                    >
+                      <TrashIcon className="h-4 w-4" />
+                      Delete
+                    </button>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </>
         ) : (
           <div className="px-3 sm:px-4 lg:px-6 py-6">
             <Carousel

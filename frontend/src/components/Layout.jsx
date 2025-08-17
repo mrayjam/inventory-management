@@ -40,9 +40,96 @@ export default function Layout() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 relative overflow-hidden">
+      {/* Animated Background Shapes */}
+      <div className="fixed inset-0 pointer-events-none z-0">
+        <motion.div
+          className="absolute -top-24 -left-24 w-96 h-96 bg-gradient-to-br from-blue-200/20 to-purple-200/20 rounded-full blur-3xl"
+          animate={{
+            x: [0, 100, 0],
+            y: [0, -50, 0],
+            scale: [1, 1.2, 1],
+          }}
+          transition={{
+            duration: 20,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+        />
+        <motion.div
+          className="absolute top-1/4 -right-32 w-80 h-80 bg-gradient-to-br from-indigo-200/25 to-blue-200/25 rounded-full blur-2xl"
+          animate={{
+            x: [0, -80, 0],
+            y: [0, 60, 0],
+            scale: [1, 0.8, 1],
+          }}
+          transition={{
+            duration: 25,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 5
+          }}
+        />
+        <motion.div
+          className="absolute bottom-1/4 -left-20 w-64 h-64 bg-gradient-to-br from-purple-200/20 to-pink-200/20 rounded-full blur-2xl"
+          animate={{
+            x: [0, 120, 0],
+            y: [0, -40, 0],
+            rotate: [0, 180, 360],
+          }}
+          transition={{
+            duration: 30,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 10
+          }}
+        />
+        <motion.div
+          className="absolute top-3/4 right-1/4 w-40 h-40 bg-gradient-to-br from-teal-200/25 to-green-200/25 rounded-full blur-xl"
+          animate={{
+            x: [0, -60, 0],
+            y: [0, -80, 0],
+            scale: [0.8, 1.3, 0.8],
+          }}
+          transition={{
+            duration: 18,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 8
+          }}
+        />
+        
+        {/* Floating Polygons */}
+        <motion.div
+          className="absolute top-1/3 left-1/3 w-16 h-16 bg-gradient-to-br from-blue-300/30 to-indigo-300/30 rounded-lg"
+          animate={{
+            x: [0, 40, -20, 0],
+            y: [0, -30, 20, 0],
+            rotate: [0, 90, 180, 270, 360],
+          }}
+          transition={{
+            duration: 35,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+        />
+        <motion.div
+          className="absolute bottom-1/3 right-1/3 w-12 h-12 bg-gradient-to-br from-purple-300/25 to-pink-300/25 rounded-full"
+          animate={{
+            x: [0, -30, 50, 0],
+            y: [0, 40, -60, 0],
+            scale: [1, 1.5, 0.7, 1],
+          }}
+          transition={{
+            duration: 28,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 15
+          }}
+        />
+      </div>
       {/* Mobile header */}
-      <div className="lg:hidden bg-white/90 backdrop-blur-sm shadow-sm border-b border-white/20 px-4 py-3 flex items-center justify-between">
+      <div className="lg:hidden bg-white/90 backdrop-blur-sm shadow-sm border-b border-white/20 px-4 py-3 flex items-center justify-between relative z-10">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 bg-gradient-to-br from-indigo-600 via-purple-600 to-blue-600 rounded-lg flex items-center justify-center shadow-lg">
             <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -63,9 +150,9 @@ export default function Layout() {
         </button>
       </div>
 
-      <div className="flex">
+      <div className="flex relative z-10">
         {/* Desktop Sidebar */}
-        <div className="hidden lg:flex w-64 bg-white/80 backdrop-blur-sm shadow-lg border-r border-white/20 flex-col">
+        <div className="hidden lg:flex w-64 bg-white/80 backdrop-blur-sm shadow-lg border-r border-white/20 flex-col relative z-10">
           <div className="p-6">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-gradient-to-br from-indigo-600 via-purple-600 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">

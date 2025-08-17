@@ -11,6 +11,7 @@ const LoginPage = () => {
     password: '',
   })
   const [errors, setErrors] = useState({})
+  const [serverError, setServerError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [focusedField, setFocusedField] = useState('')

@@ -152,12 +152,14 @@ export default function Analytics() {
           className="lg:col-span-2 bg-white rounded-xl shadow-sm border border-slate-200 p-6"
         >
           <h3 className="text-lg font-semibold text-slate-900 mb-4">Top Performing Products</h3>
-          <div className="overflow-x-auto">
+          
+          {/* Desktop Table View */}
+          <div className="hidden sm:block overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr className="border-b border-slate-200">
                   <th className="text-left py-3 text-sm font-medium text-slate-600">Product</th>
-                  <th className="text-right py-3 text-sm font-medium text-slate-600">Units Sold</th>
+                  <th className="text-right py-3 text-sm font-medium text-slate-600 px-4">Units Sold</th>
                   <th className="text-right py-3 text-sm font-medium text-slate-600">Revenue</th>
                 </tr>
               </thead>
@@ -181,7 +183,7 @@ export default function Analytics() {
                         <span className="font-medium text-slate-900">{product.name}</span>
                       </div>
                     </td>
-                    <td className="py-3 text-right text-slate-900">{product.sales}</td>
+                    <td className="py-3 text-right text-slate-900 px-4">{product.sales}</td>
                     <td className="py-3 text-right font-medium text-slate-900">
                       ${product.revenue.toLocaleString()}
                     </td>
@@ -189,6 +191,49 @@ export default function Analytics() {
                 ))}
               </tbody>
             </table>
+          </div>
+          
+          {/* Mobile Card View */}
+          <div className="sm:hidden space-y-3">
+            {mockTopProducts.map((product, index) => (
+              <motion.div
+                key={product.name}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 * index }}
+                className="bg-slate-50 rounded-xl p-4 border border-slate-200"
+              >
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center">
+                    <div className={`w-3 h-3 rounded-full mr-3 ${
+                      index === 0 ? 'bg-yellow-400' :
+                      index === 1 ? 'bg-slate-400' :
+                      index === 2 ? 'bg-amber-600' :
+                      'bg-slate-300'
+                    }`} />
+                    <span className="font-medium text-slate-900 text-sm">{product.name}</span>
+                  </div>
+                  <span className="text-xs text-slate-500">#{index + 1}</span>
+                </div>
+                
+                <div className="flex justify-between items-center">
+                  <div className="flex space-x-4">
+                    <div className="text-center">
+                      <div className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                        {product.sales} units
+                      </div>
+                      <div className="text-xs text-slate-500 mt-1">Units Sold</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        ${product.revenue.toLocaleString()}
+                      </div>
+                      <div className="text-xs text-slate-500 mt-1">Revenue</div>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
           </div>
         </motion.div>
 

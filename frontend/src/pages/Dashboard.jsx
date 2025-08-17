@@ -40,40 +40,61 @@ export default function Dashboard() {
           <p className="text-sm sm:text-base text-slate-600 mt-1">Welcome back! Here's what's happening with your inventory today.</p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 mb-6 lg:mb-8">
-          <StatCard
-            title="Total Products"
-            value={mockStats.totalProducts.toLocaleString()}
-            rawValue={mockStats.totalProducts}
-            icon={CubeIcon}
-            color="blue"
-            trend={12}
-          />
-          <StatCard
-            title="Low Stock Items"
-            value={mockStats.lowStockItems}
-            rawValue={mockStats.lowStockItems}
-            icon={ExclamationTriangleIcon}
-            color="red"
-            trend={-8}
-          />
-          <StatCard
-            title="Active Suppliers"
-            value={mockStats.totalSuppliers}
-            rawValue={mockStats.totalSuppliers}
-            icon={BuildingStorefrontIcon}
-            color="green"
-            trend={5}
-          />
-          <StatCard
-            title="Monthly Revenue"
-            value={`$${(mockStats.monthlyRevenue / 1000).toFixed(0)}K`}
-            rawValue={mockStats.monthlyRevenue}
-            icon={CurrencyDollarIcon}
-            color="purple"
-            trend={18}
-          />
-        </div>
+        <motion.div 
+          className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-4 gap-4 sm:gap-6 mb-6 lg:mb-8"
+          variants={{
+            hidden: { opacity: 0 },
+            show: {
+              opacity: 1,
+              transition: {
+                staggerChildren: 0.1
+              }
+            }
+          }}
+          initial="hidden"
+          animate="show"
+        >
+          <motion.div variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } }}>
+            <StatCard
+              title="Total Products"
+              value={mockStats.totalProducts.toLocaleString()}
+              rawValue={mockStats.totalProducts}
+              icon={CubeIcon}
+              color="blue"
+              trend={12}
+            />
+          </motion.div>
+          <motion.div variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } }}>
+            <StatCard
+              title="Low Stock Items"
+              value={mockStats.lowStockItems}
+              rawValue={mockStats.lowStockItems}
+              icon={ExclamationTriangleIcon}
+              color="red"
+              trend={-8}
+            />
+          </motion.div>
+          <motion.div variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } }}>
+            <StatCard
+              title="Active Suppliers"
+              value={mockStats.totalSuppliers}
+              rawValue={mockStats.totalSuppliers}
+              icon={BuildingStorefrontIcon}
+              color="green"
+              trend={5}
+            />
+          </motion.div>
+          <motion.div variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } }}>
+            <StatCard
+              title="Monthly Revenue"
+              value={`$${(mockStats.monthlyRevenue / 1000).toFixed(0)}K`}
+              rawValue={mockStats.monthlyRevenue}
+              icon={CurrencyDollarIcon}
+              color="purple"
+              trend={18}
+            />
+          </motion.div>
+        </motion.div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 lg:gap-8">
           <motion.div

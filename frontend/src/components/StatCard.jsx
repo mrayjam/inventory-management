@@ -33,13 +33,19 @@ export default function StatCard({ title, value, icon: Icon, color = 'blue', tre
       animate={{ opacity: 1, y: 0, scale: 1 }}
       whileHover={{ 
         scale: 1.03,
-        y: -2,
-        boxShadow: '0 20px 40px rgba(0,0,0,0.1)'
+        y: -4,
+        boxShadow: `0 25px 50px rgba(0,0,0,0.15), 0 0 20px ${color === 'blue' ? 'rgba(59, 130, 246, 0.3)' : 
+          color === 'green' ? 'rgba(16, 185, 129, 0.3)' : 
+          color === 'yellow' ? 'rgba(245, 158, 11, 0.3)' : 
+          color === 'red' ? 'rgba(239, 68, 68, 0.3)' : 
+          'rgba(147, 51, 234, 0.3)'}`
       }}
       transition={{ duration: 0.3, type: "spring", damping: 20 }}
-      className={`bg-white/90 backdrop-blur-sm rounded-xl lg:rounded-2xl shadow-lg border ${bgClasses[color]} p-3 sm:p-4 lg:p-6 relative overflow-hidden`}
+      className={`bg-white/90 backdrop-blur-sm rounded-xl lg:rounded-2xl shadow-lg border-2 ${bgClasses[color]} p-3 sm:p-4 lg:p-6 relative overflow-hidden group hover:border-opacity-60 transition-all duration-300`}
     >
       <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-white/20 to-transparent rounded-full -mr-10 -mt-10"></div>
+      
+      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 opacity-0 group-hover:opacity-100 transition-opacity duration-700 group-hover:animate-pulse"></div>
       
       <div className="flex items-center justify-between relative">
         <div className="flex-1 min-w-0">
