@@ -49,7 +49,7 @@ export default function Layout() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
             </svg>
           </div>
-          <h1 className="text-lg font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">InventFlow</h1>
+          <h1 className="text-base sm:text-lg font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">InventFlow</h1>
         </div>
         <button
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -74,8 +74,8 @@ export default function Layout() {
                 </svg>
               </div>
               <div>
-                <h1 className="text-xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">InventFlow</h1>
-                <p className="text-xs text-slate-500">Management Suite</p>
+                <h1 className="text-lg sm:text-xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">InventFlow</h1>
+                <p className="text-[10px] sm:text-xs text-slate-500">Management Suite</p>
               </div>
             </div>
           </div>
@@ -88,13 +88,13 @@ export default function Layout() {
                 <Link
                   key={item.name}
                   to={item.href}
-                  className={`flex items-center px-6 py-3 text-sm font-medium transition-colors ${
+                  className={`flex items-center px-4 sm:px-6 py-2 sm:py-3 text-xs sm:text-sm font-medium transition-colors ${
                     isActive
                       ? 'bg-blue-50 text-blue-700 border-r-2 border-blue-700'
                       : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
                   }`}
                 >
-                  <Icon className="mr-3 h-5 w-5" />
+                  <Icon className="mr-2 sm:mr-3 h-4 w-4 sm:h-5 sm:w-5" />
                   {item.name}
                 </Link>
               )
@@ -104,9 +104,9 @@ export default function Layout() {
           <div className="border-t border-slate-200 p-4">
             <div className="flex items-center mb-4">
               <div className="flex-1">
-                <p className="text-sm font-medium text-slate-700">{user?.name}</p>
-                <p className="text-xs text-slate-500">{user?.email}</p>
-                <p className="text-xs text-slate-400 capitalize">{user?.role?.replace('_', ' ')}</p>
+                <p className="text-xs sm:text-sm font-medium text-slate-700">{user?.name}</p>
+                <p className="text-[10px] sm:text-xs text-slate-500">{user?.email}</p>
+                <p className="text-[10px] sm:text-xs text-slate-400 capitalize">{user?.role?.replace('_', ' ')}</p>
               </div>
             </div>
             
@@ -118,13 +118,13 @@ export default function Layout() {
                   <Link
                     key={item.name}
                     to={item.href}
-                    className={`flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                    className={`flex items-center px-2 sm:px-3 py-1 sm:py-2 text-xs sm:text-sm font-medium rounded-md transition-colors ${
                       isActive
                         ? 'bg-blue-50 text-blue-700'
                         : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
                     }`}
                   >
-                    <Icon className="mr-3 h-4 w-4" />
+                    <Icon className="mr-2 sm:mr-3 h-3 w-3 sm:h-4 sm:w-4" />
                     {item.name}
                   </Link>
                 )
@@ -132,9 +132,9 @@ export default function Layout() {
               
               <button
                 onClick={handleLogout}
-                className="w-full flex items-center px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-md transition-colors"
+                className="w-full flex items-center px-2 sm:px-3 py-1 sm:py-2 text-xs sm:text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-md transition-colors"
               >
-                <ArrowRightOnRectangleIcon className="mr-3 h-4 w-4" />
+                <ArrowRightOnRectangleIcon className="mr-2 sm:mr-3 h-3 w-3 sm:h-4 sm:w-4" />
                 Logout
               </button>
             </div>
@@ -169,8 +169,8 @@ export default function Layout() {
                         </svg>
                       </div>
                       <div>
-                        <h1 className="text-xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">InventFlow</h1>
-                        <p className="text-xs text-slate-500">Management Suite</p>
+                        <h1 className="text-lg sm:text-xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">InventFlow</h1>
+                        <p className="text-[10px] sm:text-xs text-slate-500">Management Suite</p>
                       </div>
                     </div>
                     <button
@@ -196,13 +196,13 @@ export default function Layout() {
                         <Link
                           to={item.href}
                           onClick={closeMobileMenu}
-                          className={`flex items-center px-6 py-3 text-sm font-medium transition-colors ${
+                          className={`flex items-center px-4 sm:px-6 py-2 sm:py-3 text-sm font-medium transition-colors ${
                             isActive
                               ? 'bg-blue-50 text-blue-700 border-r-2 border-blue-700'
                               : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
                           }`}
                         >
-                          <Icon className="mr-3 h-5 w-5" />
+                          <Icon className="mr-3 h-4 w-4 sm:h-5 sm:w-5" />
                           {item.name}
                         </Link>
                       </motion.div>

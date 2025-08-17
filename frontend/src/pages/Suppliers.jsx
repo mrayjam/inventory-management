@@ -83,7 +83,7 @@ const SupplierModal = ({ isOpen, onClose, supplier, mode }) => {
 
   return (
     <div 
-      className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+      className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-3 sm:p-4"
       onClick={onClose}
     >
       <motion.div
@@ -91,62 +91,62 @@ const SupplierModal = ({ isOpen, onClose, supplier, mode }) => {
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.9, y: 20 }}
         transition={{ type: "spring", damping: 25, stiffness: 300 }}
-        className="bg-white/95 backdrop-blur-xl rounded-2xl p-6 w-full max-w-lg shadow-2xl border border-white/20"
+        className="bg-white/95 backdrop-blur-xl rounded-2xl p-4 sm:p-6 w-full max-w-sm sm:max-w-lg shadow-2xl border border-white/20 max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="text-xl font-bold text-slate-900 mb-4">
+        <h2 className="text-lg sm:text-xl font-bold text-slate-900 mb-3 sm:mb-4">
           {mode === 'add' ? 'Add Supplier' : 'Edit Supplier'}
         </h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Company Name</label>
+            <label className="block text-xs sm:text-sm font-medium text-slate-700 mb-1">Company Name</label>
             <input
               name="name"
               type="text"
               defaultValue={supplier?.name || ''}
-              className="w-full border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full border border-slate-300 rounded-lg px-2 sm:px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
             />
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Email</label>
+              <label className="block text-xs sm:text-sm font-medium text-slate-700 mb-1">Email</label>
               <input
                 name="email"
                 type="email"
                 defaultValue={supplier?.email || ''}
-                className="w-full border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full border border-slate-300 rounded-lg px-2 sm:px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Phone</label>
+              <label className="block text-xs sm:text-sm font-medium text-slate-700 mb-1">Phone</label>
               <input
                 name="phone"
                 type="tel"
                 defaultValue={supplier?.phone || ''}
-                className="w-full border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full border border-slate-300 rounded-lg px-2 sm:px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
               />
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Address</label>
+            <label className="block text-xs sm:text-sm font-medium text-slate-700 mb-1">Address</label>
             <textarea
               name="address"
               rows="3"
               defaultValue={supplier?.address || ''}
-              className="w-full border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full border border-slate-300 rounded-lg px-2 sm:px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
             />
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Category</label>
+              <label className="block text-xs sm:text-sm font-medium text-slate-700 mb-1">Category</label>
               <select
                 name="category"
                 defaultValue={supplier?.category || ''}
-                className="w-full border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full border border-slate-300 rounded-lg px-2 sm:px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
               >
                 <option value="">Select Category</option>
@@ -157,11 +157,11 @@ const SupplierModal = ({ isOpen, onClose, supplier, mode }) => {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Status</label>
+              <label className="block text-xs sm:text-sm font-medium text-slate-700 mb-1">Status</label>
               <select
                 name="status"
                 defaultValue={supplier?.status || 'Active'}
-                className="w-full border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full border border-slate-300 rounded-lg px-2 sm:px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
               >
                 <option value="Active">Active</option>
@@ -169,17 +169,17 @@ const SupplierModal = ({ isOpen, onClose, supplier, mode }) => {
               </select>
             </div>
           </div>
-          <div className="flex gap-3 pt-4">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 pt-3 sm:pt-4">
             <button
               type="submit"
-              className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
+              className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors text-sm sm:text-base"
             >
               {mode === 'add' ? 'Add Supplier' : 'Update Supplier'}
             </button>
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 bg-slate-200 text-slate-800 py-2 px-4 rounded-lg hover:bg-slate-300 transition-colors"
+              className="flex-1 bg-slate-200 text-slate-800 py-2 px-4 rounded-lg hover:bg-slate-300 transition-colors text-sm sm:text-base"
             >
               Cancel
             </button>
@@ -211,18 +211,18 @@ export default function Suppliers() {
 
   return (
     <div className="w-full max-w-full overflow-x-hidden">
-      <div className="flex justify-between items-center mb-8">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900">Suppliers</h1>
-          <p className="text-slate-600 mt-1">Manage your supplier relationships</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">Suppliers</h1>
+          <p className="text-sm sm:text-base text-slate-600 mt-1">Manage your supplier relationships</p>
         </div>
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={() => setModalState({ isOpen: true, supplier: null, mode: 'add' })}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-700 transition-colors"
+          className="bg-blue-600 text-white px-3 sm:px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-700 transition-colors text-sm sm:text-base"
         >
-          <PlusIcon className="h-5 w-5" />
+          <PlusIcon className="h-4 w-4 sm:h-5 sm:w-5" />
           Add Supplier
         </motion.button>
       </div>

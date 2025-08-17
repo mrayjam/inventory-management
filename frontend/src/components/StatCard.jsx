@@ -37,15 +37,15 @@ export default function StatCard({ title, value, icon: Icon, color = 'blue', tre
         boxShadow: '0 20px 40px rgba(0,0,0,0.1)'
       }}
       transition={{ duration: 0.3, type: "spring", damping: 20 }}
-      className={`bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg border ${bgClasses[color]} p-6 relative overflow-hidden`}
+      className={`bg-white/90 backdrop-blur-sm rounded-xl lg:rounded-2xl shadow-lg border ${bgClasses[color]} p-3 sm:p-4 lg:p-6 relative overflow-hidden`}
     >
       <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-white/20 to-transparent rounded-full -mr-10 -mt-10"></div>
       
       <div className="flex items-center justify-between relative">
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium text-slate-600 mb-2">{title}</p>
+          <p className="text-xs sm:text-sm font-medium text-slate-600 mb-1 sm:mb-2">{title}</p>
           <motion.p 
-            className="text-2xl md:text-3xl font-bold text-slate-900 leading-none"
+            className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-slate-900 leading-none"
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.5, type: "spring", damping: 15 }}
@@ -57,7 +57,7 @@ export default function StatCard({ title, value, icon: Icon, color = 'blue', tre
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.8 }}
-              className={`inline-flex items-center text-xs mt-2 px-2 py-1 rounded-full ${
+              className={`inline-flex items-center text-xs mt-2 sm:mt-3 px-2 py-1 rounded-full ${
                 trend > 0 ? 'text-green-700 bg-green-100' : 'text-red-700 bg-red-100'
               }`}
             >

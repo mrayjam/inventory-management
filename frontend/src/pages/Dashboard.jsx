@@ -35,12 +35,12 @@ const mockInventoryData = [
 export default function Dashboard() {
   return (
     <div className="relative w-full max-w-full overflow-x-hidden">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-slate-900">Dashboard</h1>
-          <p className="text-slate-600 mt-1">Welcome back! Here's what's happening with your inventory today.</p>
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">Dashboard</h1>
+          <p className="text-sm sm:text-base text-slate-600 mt-1">Welcome back! Here's what's happening with your inventory today.</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 mb-6 lg:mb-8">
           <StatCard
             title="Total Products"
             value={mockStats.totalProducts.toLocaleString()}
@@ -75,69 +75,95 @@ export default function Dashboard() {
           />
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 lg:gap-8">
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.2 }}
-            className="bg-white/80 backdrop-blur-sm rounded-xl shadow-sm border border-white/30 p-6"
+            className="bg-white/80 backdrop-blur-sm rounded-xl shadow-sm border border-white/30 p-3 sm:p-4 lg:p-6"
           >
-            <h3 className="text-lg font-semibold text-slate-900 mb-4">Sales Trend</h3>
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={mockSalesData}>
+            <h3 className="text-base sm:text-lg font-semibold text-slate-900 mb-3 sm:mb-4">Sales Trend</h3>
+            <div className="h-[250px] sm:h-[280px] lg:h-[300px]">
+              <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={mockSalesData} margin={{ top: 10, right: 10, left: 0, bottom: 20 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                <XAxis dataKey="month" stroke="#64748b" />
-                <YAxis stroke="#64748b" />
+                <XAxis 
+                  dataKey="month" 
+                  stroke="#64748b" 
+                  fontSize={10}
+                  tickMargin={5}
+                />
+                <YAxis 
+                  stroke="#64748b" 
+                  fontSize={10}
+                  tickMargin={5}
+                  width={35}
+                  tickFormatter={(value) => `${(value / 1000).toFixed(0)}K`}
+                />
                 <Tooltip 
                   contentStyle={{ 
                     backgroundColor: 'white', 
                     border: '1px solid #e2e8f0',
-                    borderRadius: '8px'
-                  }} 
+                    borderRadius: '8px',
+                    fontSize: '12px'
+                  }}
+                  formatter={(value) => [`$${value.toLocaleString()}`, 'Sales']}
                 />
                 <Line 
                   type="monotone" 
                   dataKey="sales" 
                   stroke="#3b82f6" 
-                  strokeWidth={3}
-                  dot={{ fill: '#3b82f6', strokeWidth: 2, r: 6 }}
+                  strokeWidth={2}
+                  dot={{ fill: '#3b82f6', strokeWidth: 2, r: 3 }}
                 />
               </LineChart>
-            </ResponsiveContainer>
+              </ResponsiveContainer>
+            </div>
           </motion.div>
 
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.4 }}
-            className="bg-white/80 backdrop-blur-sm rounded-xl shadow-sm border border-white/30 p-6"
+            className="bg-white/80 backdrop-blur-sm rounded-xl shadow-sm border border-white/30 p-3 sm:p-4 lg:p-6"
           >
-            <h3 className="text-lg font-semibold text-slate-900 mb-4">Inventory by Category</h3>
-            <ResponsiveContainer width="100%" height={320}>
-              <BarChart 
-                data={mockInventoryData} 
-                margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
-              >
+            <h3 className="text-base sm:text-lg font-semibold text-slate-900 mb-3 sm:mb-4">Inventory by Category</h3>
+            <div className="h-[250px] sm:h-[280px] lg:h-[320px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart 
+                  data={mockInventoryData} 
+                  margin={{ top: 10, right: 10, left: 0, bottom: 45 }}
+                >
                 <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
                 <XAxis 
                   dataKey="category" 
                   stroke="#64748b" 
                   angle={-45}
                   textAnchor="end"
-                  height={60}
+                  height={40}
+                  fontSize={9}
                   interval={0}
+                  tickMargin={5}
                 />
-                <YAxis stroke="#64748b" />
+                <YAxis 
+                  stroke="#64748b" 
+                  fontSize={10}
+                  tickMargin={5}
+                  width={35}
+                />
                 <Tooltip 
                   contentStyle={{ 
                     backgroundColor: 'white', 
                     border: '1px solid #e2e8f0',
-                    borderRadius: '8px'
-                  }} 
+                    borderRadius: '8px',
+                    fontSize: '12px'
+                  }}
+                  formatter={(value) => [value, 'Items']}
                 />
                 <Bar dataKey="count" fill="#10b981" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
           </motion.div>
         </div>
     </div>

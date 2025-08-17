@@ -42,7 +42,7 @@ const ProductDetailModal = ({ isOpen, onClose, product, onEditProduct, onViewHis
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-black/20 backdrop-blur-md flex items-center justify-center z-50 p-4"
+      className="fixed inset-0 bg-black/20 backdrop-blur-md flex items-center justify-center z-50 p-3 sm:p-4"
       onClick={onClose}
     >
       <motion.div
@@ -50,7 +50,7 @@ const ProductDetailModal = ({ isOpen, onClose, product, onEditProduct, onViewHis
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.8, y: 50 }}
         transition={{ type: "spring", damping: 25, stiffness: 300 }}
-        className="bg-white/95 backdrop-blur-xl rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-white/20"
+        className="bg-white/95 backdrop-blur-xl rounded-2xl max-w-sm sm:max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-white/20"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="relative">
@@ -65,18 +65,18 @@ const ProductDetailModal = ({ isOpen, onClose, product, onEditProduct, onViewHis
             <img
               src={product.imageUrl}
               alt={product.name}
-              className="w-full h-64 object-cover rounded-t-xl"
+              className="w-full h-48 sm:h-64 object-cover rounded-t-xl"
             />
           </div>
           
-          <div className="p-6">
+          <div className="p-4 sm:p-6">
             <div className="flex justify-between items-start mb-4">
               <div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">{product.name}</h2>
+                <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">{product.name}</h2>
                 <p className="text-sm text-gray-500">SKU: {product.sku}</p>
               </div>
               <div className="text-right">
-                <p className="text-3xl font-bold text-green-600">${product.price}</p>
+                <p className="text-2xl sm:text-3xl font-bold text-green-600">${product.price}</p>
                 <span className={`inline-flex px-3 py-1 text-sm font-medium rounded-full ${
                   product.stock < 20 
                     ? 'bg-red-100 text-red-800' 
@@ -89,7 +89,7 @@ const ProductDetailModal = ({ isOpen, onClose, product, onEditProduct, onViewHis
               </div>
             </div>
             
-            <div className="grid grid-cols-2 gap-4 mb-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-4 sm:mb-6">
               <div>
                 <p className="text-sm font-medium text-gray-500">Category</p>
                 <p className="text-lg text-gray-900">{product.category}</p>
@@ -105,12 +105,12 @@ const ProductDetailModal = ({ isOpen, onClose, product, onEditProduct, onViewHis
               <p className="text-gray-700 leading-relaxed">{product.description}</p>
             </div>
             
-            <div className="flex gap-3">
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
               <motion.button 
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={handleEditClick}
-                className="flex-1 bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center justify-center gap-2"
+                className="flex-1 bg-blue-600 text-white py-2 sm:py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center justify-center gap-2 text-sm sm:text-base"
               >
                 <PencilIcon className="w-4 h-4" />
                 Edit Product
@@ -119,7 +119,7 @@ const ProductDetailModal = ({ isOpen, onClose, product, onEditProduct, onViewHis
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={handleViewHistoryClick}
-                className="flex-1 border border-gray-300 text-gray-700 py-3 px-4 rounded-lg hover:bg-gray-50 transition-colors font-medium flex items-center justify-center gap-2"
+                className="flex-1 border border-gray-300 text-gray-700 py-2 sm:py-3 px-4 rounded-lg hover:bg-gray-50 transition-colors font-medium flex items-center justify-center gap-2 text-sm sm:text-base"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
@@ -149,7 +149,7 @@ const ProductHistoryModal = ({ isOpen, onClose, product }) => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-black/20 backdrop-blur-md flex items-center justify-center z-50 p-4"
+      className="fixed inset-0 bg-black/20 backdrop-blur-md flex items-center justify-center z-50 p-3 sm:p-4"
       onClick={onClose}
     >
       <motion.div
@@ -157,17 +157,17 @@ const ProductHistoryModal = ({ isOpen, onClose, product }) => {
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.9, y: 20 }}
         transition={{ type: "spring", damping: 25, stiffness: 300 }}
-        className="bg-white/95 backdrop-blur-xl rounded-2xl p-6 w-full max-w-2xl max-h-[80vh] overflow-y-auto shadow-2xl border border-white/20"
+        className="bg-white/95 backdrop-blur-xl rounded-2xl p-4 sm:p-6 w-full max-w-sm sm:max-w-2xl max-h-[80vh] overflow-y-auto shadow-2xl border border-white/20"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between mb-4 sm:mb-6">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-              <ClockIcon className="w-5 h-5 text-blue-600" />
+            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+              <ClockIcon className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-slate-900">Product History</h2>
-              <p className="text-sm text-slate-600">{product.name}</p>
+              <h2 className="text-lg sm:text-xl font-bold text-slate-900">Product History</h2>
+              <p className="text-xs sm:text-sm text-slate-600">{product.name}</p>
             </div>
           </div>
           <button
@@ -203,10 +203,10 @@ const ProductHistoryModal = ({ isOpen, onClose, product }) => {
           ))}
         </div>
 
-        <div className="mt-6 flex justify-end">
+        <div className="mt-4 sm:mt-6 flex justify-end">
           <button
             onClick={onClose}
-            className="px-4 py-2 bg-slate-200 text-slate-800 rounded-lg hover:bg-slate-300 transition-colors"
+            className="px-4 py-2 bg-slate-200 text-slate-800 rounded-lg hover:bg-slate-300 transition-colors text-sm sm:text-base"
           >
             Close
           </button>
@@ -248,7 +248,7 @@ const ProductModal = ({ isOpen, onClose, product, mode, onProductSaved }) => {
 
   return (
     <div 
-      className="fixed inset-0 bg-black/20 backdrop-blur-md flex items-center justify-center z-50 p-4"
+      className="fixed inset-0 bg-black/20 backdrop-blur-md flex items-center justify-center z-50 p-3 sm:p-4"
       onClick={onClose}
     >
       <motion.div
@@ -256,11 +256,11 @@ const ProductModal = ({ isOpen, onClose, product, mode, onProductSaved }) => {
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.9, y: 20 }}
         transition={{ type: "spring", damping: 25, stiffness: 300 }}
-        className="bg-white/95 backdrop-blur-xl rounded-2xl p-6 w-full max-w-4xl max-h-[85vh] overflow-y-auto shadow-2xl border border-white/20"
+        className="bg-white/95 backdrop-blur-xl rounded-2xl p-4 sm:p-6 w-full max-w-sm sm:max-w-4xl max-h-[85vh] overflow-y-auto shadow-2xl border border-white/20"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-bold text-slate-900">
+        <div className="flex items-center justify-between mb-4 sm:mb-6">
+          <h2 className="text-lg sm:text-xl font-bold text-slate-900">
             {mode === 'add' ? 'Add Product' : 'Edit Product'}
           </h2>
           <button
@@ -270,26 +270,26 @@ const ProductModal = ({ isOpen, onClose, product, mode, onProductSaved }) => {
             <XMarkIcon className="h-5 w-5 text-gray-600" />
           </button>
         </div>
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Product Name</label>
+                <label className="block text-xs sm:text-sm font-medium text-slate-700 mb-1">Product Name</label>
                 <input
                   name="name"
                   type="text"
                   defaultValue={product?.name || ''}
-                  className="w-full border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full border border-slate-300 rounded-lg px-2 sm:px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
                 />
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Category</label>
+                  <label className="block text-xs sm:text-sm font-medium text-slate-700 mb-1">Category</label>
                   <select
                     name="category"
                     defaultValue={product?.category || ''}
-                    className="w-full border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full border border-slate-300 rounded-lg px-2 sm:px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                     required
                   >
                     <option value="">Select Category</option>
@@ -300,35 +300,35 @@ const ProductModal = ({ isOpen, onClose, product, mode, onProductSaved }) => {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">SKU</label>
+                  <label className="block text-xs sm:text-sm font-medium text-slate-700 mb-1">SKU</label>
                   <input
                     name="sku"
                     type="text"
                     defaultValue={product?.sku || ''}
-                    className="w-full border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full border border-slate-300 rounded-lg px-2 sm:px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                     required
                   />
                 </div>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Price ($)</label>
+                  <label className="block text-xs sm:text-sm font-medium text-slate-700 mb-1">Price ($)</label>
                   <input
                     name="price"
                     type="number"
                     step="0.01"
                     defaultValue={product?.price || ''}
-                    className="w-full border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full border border-slate-300 rounded-lg px-2 sm:px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Stock Quantity</label>
+                  <label className="block text-xs sm:text-sm font-medium text-slate-700 mb-1">Stock Quantity</label>
                   <input
                     name="stock"
                     type="number"
                     defaultValue={product?.stock || ''}
-                    className="w-full border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full border border-slate-300 rounded-lg px-2 sm:px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                     required
                   />
                 </div>
@@ -337,27 +337,27 @@ const ProductModal = ({ isOpen, onClose, product, mode, onProductSaved }) => {
             
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Supplier</label>
+                <label className="block text-xs sm:text-sm font-medium text-slate-700 mb-1">Supplier</label>
                 <input
                   name="supplier"
                   type="text"
                   defaultValue={product?.supplier || ''}
-                  className="w-full border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full border border-slate-300 rounded-lg px-2 sm:px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Product Image URL</label>
+                <label className="block text-xs sm:text-sm font-medium text-slate-700 mb-1">Product Image URL</label>
                 <input
                   name="imageUrl"
                   type="url"
                   defaultValue={product?.imageUrl || ''}
-                  className="w-full border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full border border-slate-300 rounded-lg px-2 sm:px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="https://example.com/image.jpg"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Description</label>
+                <label className="block text-xs sm:text-sm font-medium text-slate-700 mb-1">Description</label>
                 <textarea
                   name="description"
                   rows="4"
@@ -369,17 +369,17 @@ const ProductModal = ({ isOpen, onClose, product, mode, onProductSaved }) => {
             </div>
           </div>
           
-          <div className="flex gap-3 pt-4 border-t border-gray-200">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 pt-3 sm:pt-4 border-t border-gray-200">
             <button
               type="submit"
-              className="flex-1 bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium"
+              className="flex-1 bg-blue-600 text-white py-2 sm:py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm sm:text-base"
             >
               {mode === 'add' ? 'Add Product' : 'Update Product'}
             </button>
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 bg-slate-200 text-slate-800 py-3 px-4 rounded-lg hover:bg-slate-300 transition-colors font-medium"
+              className="flex-1 bg-slate-200 text-slate-800 py-2 sm:py-3 px-4 rounded-lg hover:bg-slate-300 transition-colors font-medium text-sm sm:text-base"
             >
               Cancel
             </button>
@@ -516,10 +516,10 @@ export default function Products() {
 
   return (
     <div className="w-full max-w-full overflow-x-hidden">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900">Products</h1>
-          <p className="text-slate-600 mt-1">Manage your product inventory</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">Products</h1>
+          <p className="text-sm sm:text-base text-slate-600 mt-1">Manage your product inventory</p>
         </div>
         <div className="flex items-center gap-3">
           <div className="flex items-center bg-white/80 backdrop-blur-sm rounded-lg p-1 border border-white/30">
@@ -550,9 +550,9 @@ export default function Products() {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => setModalState({ isOpen: true, product: null, mode: 'add' })}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-700 transition-colors"
+            className="bg-blue-600 text-white px-3 sm:px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-700 transition-colors text-sm sm:text-base"
           >
-            <PlusIcon className="h-5 w-5" />
+            <PlusIcon className="h-4 w-4 sm:h-5 sm:w-5" />
             Add Product
           </motion.button>
         </div>
