@@ -346,7 +346,7 @@ export default function Suppliers() {
                     >
                     <div className="flex justify-between items-start mb-4">
                       <div className="flex-1">
-                        <h3 className="font-bold text-slate-900 text-base mb-2 truncate">{supplier.name}</h3>
+                        <h3 className="font-bold text-slate-900 text-base mb-2">{supplier.name}</h3>
                         <span className={`inline-flex px-3 py-1 text-xs font-semibold rounded-full ${
                           supplier.status === 'Active' 
                             ? 'bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 border border-green-200' 

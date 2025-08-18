@@ -393,14 +393,13 @@ const ProductModal = ({ isOpen, onClose, product, mode, onProductSaved }) => {
 
 export default function Products() {
   const [searchTerm, setSearchTerm] = useState('')
-  const [viewMode, setViewMode] = useState('table') // 'table' or 'cards'
   const [modalState, setModalState] = useState({ isOpen: false, product: null, mode: 'add' })
   const [detailModal, setDetailModal] = useState({ isOpen: false, product: null })
   const [historyModal, setHistoryModal] = useState({ isOpen: false, product: null })
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
-  const [currentPage, setCurrentPage] = useState(1)
-  const productsPerPage = 2
+  const [currentTablePage, setCurrentTablePage] = useState(1)
+  const tableProductsPerPage = 3
 
   const { token } = useAuth()
 
@@ -428,13 +427,14 @@ export default function Products() {
     product.supplier.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
-  const totalPages = Math.ceil(filteredProducts.length / productsPerPage)
-  const startIndex = (currentPage - 1) * productsPerPage
-  const endIndex = startIndex + productsPerPage
-  const currentProducts = filteredProducts.slice(startIndex, endIndex)
+  // Table view pagination (3 rows per page)
+  const totalTablePages = Math.ceil(filteredProducts.length / tableProductsPerPage)
+  const tableStartIndex = (currentTablePage - 1) * tableProductsPerPage
+  const tableEndIndex = tableStartIndex + tableProductsPerPage
+  const currentTableProducts = filteredProducts.slice(tableStartIndex, tableEndIndex)
 
   useEffect(() => {
-    setCurrentPage(1)
+    setCurrentTablePage(1)
   }, [searchTerm])
 
   const handleProductSaved = async (action, productId, productData) => {
@@ -528,47 +528,20 @@ export default function Products() {
 
   return (
     <div className="w-full max-w-full overflow-x-hidden min-w-0">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-8">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-8 pr-2">
         <div>
           <h1 className="text-xl sm:text-2xl max-[1440px]:text-xl lg:text-3xl font-bold text-slate-900">Products</h1>
           <p className="text-xs sm:text-sm max-[1440px]:text-xs lg:text-base text-slate-600 mt-1">Manage your product inventory</p>
         </div>
-        <div className="flex items-center gap-3">
-          {/* View mode toggle - only show on screens wider than 1245px */}
-          <div className="hidden min-[1246px]:flex items-center bg-white/80 backdrop-blur-sm rounded-lg p-1 border border-white/30">
-            <button
-              onClick={() => setViewMode('table')}
-              className={`p-2 rounded-md transition-colors ${
-                viewMode === 'table'
-                  ? 'bg-blue-600 text-white shadow-sm'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
-              }`}
-              title="Table view"
-            >
-              <Squares2X2Icon className="h-4 w-4" />
-            </button>
-            <button
-              onClick={() => setViewMode('cards')}
-              className={`p-2 rounded-md transition-colors ${
-                viewMode === 'cards'
-                  ? 'bg-blue-600 text-white shadow-sm'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
-              }`}
-              title="Card view"
-            >
-              <RectangleGroupIcon className="h-4 w-4" />
-            </button>
-          </div>
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => setModalState({ isOpen: true, product: null, mode: 'add' })}
-            className="bg-blue-600 text-white px-3 sm:px-4 max-[1440px]:px-3 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-700 transition-colors text-xs sm:text-sm max-[1440px]:text-xs lg:text-base"
-          >
-            <PlusIcon className="h-4 w-4 sm:h-5 sm:w-5" />
-            Add Product
-          </motion.button>
-        </div>
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => setModalState({ isOpen: true, product: null, mode: 'add' })}
+          className="bg-blue-600 text-white px-3 sm:px-4 max-[1440px]:px-3 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-700 transition-colors text-xs sm:text-sm max-[1440px]:text-xs lg:text-base"
+        >
+          <PlusIcon className="h-4 w-4 sm:h-5 sm:w-5" />
+          Add Product
+        </motion.button>
       </div>
 
       <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-sm border border-white/30">
@@ -585,256 +558,129 @@ export default function Products() {
           </div>
         </div>
 
-{viewMode === 'table' ? (
-          <>
-            {/* Desktop Table View - Hidden at 1245px and below */}
-            <div className="hidden min-[1246px]:block overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-slate-50">
-                  <tr>
-                    <th className="text-left px-6 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider">Product</th>
-                    <th className="text-left px-6 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider">Category</th>
-                    <th className="text-left px-6 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider">Price</th>
-                    <th className="text-left px-6 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider">Stock</th>
-                    <th className="text-left px-6 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider">Supplier</th>
-                    <th className="text-left px-6 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-200">
-                  {filteredProducts.map((product) => (
-                    <motion.tr
-                      key={product.id}
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      className="hover:bg-slate-50"
-                    >
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-3">
-                          <img
-                            src={product.imageUrl}
-                            alt={product.name}
-                            className="h-12 w-12 rounded-lg object-cover cursor-pointer hover:opacity-80 transition-opacity"
-                            onClick={() => setDetailModal({ isOpen: true, product })}
-                          />
-                          <div>
-                            <div className="font-medium text-slate-900">{product.name}</div>
-                            <div className="text-sm text-slate-500">SKU: {product.sku}</div>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 text-sm text-slate-900">{product.category}</td>
-                      <td className="px-6 py-4 text-sm text-slate-900">${product.price}</td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-1">
-                          <span className="font-medium text-slate-900">{product.stock}</span>
-                          <span className="text-xs text-slate-500">units</span>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 text-sm text-slate-900">{product.supplier}</td>
-                      <td className="px-6 py-4">
-                        <div className="flex gap-2 max-[420px]:gap-1">
-                          <button
-                            onClick={() => setDetailModal({ isOpen: true, product })}
-                            className="text-gray-600 hover:text-gray-800 p-1"
-                            title="View Details"
-                          >
-                            <EyeIcon className="h-4 w-4" />
-                          </button>
-                          <button
-                            onClick={() => setModalState({ isOpen: true, product, mode: 'edit' })}
-                            className="text-blue-600 hover:text-blue-800 p-1"
-                            title="Edit Product"
-                          >
-                            <PencilIcon className="h-4 w-4" />
-                          </button>
-                          <button
-                            onClick={() => handleDelete(product.id)}
-                            className="text-red-600 hover:text-red-800 p-1"
-                            title="Delete Product"
-                          >
-                            <TrashIcon className="h-4 w-4" />
-                          </button>
-                        </div>
-                      </td>
-                    </motion.tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            {/* Tablet Card View - Shows from 1245px to 601px */}
-            <div className="hidden min-[601px]:block min-[1246px]:hidden p-4 space-y-4">
-              {filteredProducts.map((product, index) => (
-                <motion.div
+        {/* Table View - Shows above 900px */}
+        <div className="hidden min-[900px]:block overflow-x-auto">
+          <table className="w-full">
+            <thead className="bg-slate-50">
+              <tr>
+                <th className="text-left px-6 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider">Product</th>
+                <th className="text-left px-6 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider">Category</th>
+                <th className="text-left px-6 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider">Price</th>
+                <th className="text-left px-6 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider">Stock</th>
+                <th className="text-left px-6 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider">Supplier</th>
+                <th className="text-left px-6 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-200">
+              {currentTableProducts.map((product) => (
+                <motion.tr
                   key={product.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                  className="bg-white rounded-xl p-4 shadow-sm border border-slate-200"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="hover:bg-slate-50"
                 >
-                  <div className="flex items-start gap-3 mb-3">
-                    <img
-                      src={product.imageUrl}
-                      alt={product.name}
-                      className="h-16 w-16 rounded-lg object-cover cursor-pointer hover:opacity-80 transition-opacity"
-                      onClick={() => setDetailModal({ isOpen: true, product })}
-                    />
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-medium text-slate-900 mb-1 truncate">{product.name}</h3>
-                      <p className="text-sm text-slate-500 mb-2">SKU: {product.sku}</p>
-                      <div className="text-lg font-bold text-green-600">${product.price}</div>
-                    </div>
-                  </div>
-                  
-                  <div className="grid grid-cols-2 gap-3 mb-4">
-                    <div>
-                      <div className="text-xs text-slate-500 mb-1">Category</div>
-                      <div className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                        {product.category}
+                  <td className="px-6 py-4">
+                    <div className="flex items-center gap-3">
+                      <img
+                        src={product.imageUrl}
+                        alt={product.name}
+                        className="h-12 w-12 rounded-lg object-cover cursor-pointer hover:opacity-80 transition-opacity"
+                        onClick={() => setDetailModal({ isOpen: true, product })}
+                      />
+                      <div>
+                        <div className="font-medium text-slate-900">{product.name}</div>
+                        <div className="text-sm text-slate-500">SKU: {product.sku}</div>
                       </div>
                     </div>
-                    <div>
-                      <div className="text-xs text-slate-500 mb-1">Stock</div>
-                      <div className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
-                        product.stock < 20 
-                          ? 'bg-red-100 text-red-800' 
-                          : product.stock < 50 
-                          ? 'bg-yellow-100 text-yellow-800' 
-                          : 'bg-green-100 text-green-800'
-                      }`}>
-                        {product.stock} units
-                      </div>
+                  </td>
+                  <td className="px-6 py-4 text-sm text-slate-900">{product.category}</td>
+                  <td className="px-6 py-4 text-sm text-slate-900">${product.price}</td>
+                  <td className="px-6 py-4">
+                    <div className="flex items-center gap-1">
+                      <span className="font-medium text-slate-900">{product.stock}</span>
+                      <span className="text-xs text-slate-500">units</span>
                     </div>
-                  </div>
-                  
-                  <div className="mb-4">
-                    <div className="text-xs text-slate-500 mb-1">Supplier</div>
-                    <div className="text-sm text-slate-900">{product.supplier}</div>
-                  </div>
-                  
-                  <div className="flex gap-2 max-[420px]:gap-1">
-                    <button
-                      onClick={() => setDetailModal({ isOpen: true, product })}
-                      className="flex-1 bg-slate-100 text-slate-700 py-2 px-3 rounded-lg hover:bg-slate-200 transition-colors text-sm font-medium flex items-center justify-center gap-1"
-                      title="View Details"
-                    >
-                      <EyeIcon className="h-4 w-4" />
-                      <span className="max-[420px]:hidden">View</span>
-                    </button>
-                    <button
-                      onClick={() => setModalState({ isOpen: true, product, mode: 'edit' })}
-                      className="flex-1 bg-blue-600 text-white py-2 px-3 rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium flex items-center justify-center gap-1"
-                      title="Edit Product"
-                    >
-                      <PencilIcon className="h-4 w-4" />
-                      <span className="max-[420px]:hidden">Edit</span>
-                    </button>
-                    <button
-                      onClick={() => handleDelete(product.id)}
-                      className="flex-1 bg-red-600 text-white py-2 px-3 rounded-lg hover:bg-red-700 transition-colors text-sm font-medium flex items-center justify-center gap-1"
-                      title="Delete Product"
-                    >
-                      <TrashIcon className="h-4 w-4" />
-                      <span className="max-[420px]:hidden">Delete</span>
-                    </button>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-
-            {/* Mobile Card View - Shows below 600px */}
-            <div className="min-[601px]:hidden p-4 space-y-4">
-              {filteredProducts.map((product, index) => (
-                <motion.div
-                  key={product.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                  className="bg-white rounded-xl p-4 shadow-sm border border-slate-200"
-                >
-                  <div className="flex items-start gap-3 mb-3">
-                    <img
-                      src={product.imageUrl}
-                      alt={product.name}
-                      className="h-16 w-16 rounded-lg object-cover cursor-pointer hover:opacity-80 transition-opacity"
-                      onClick={() => setDetailModal({ isOpen: true, product })}
-                    />
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-medium text-slate-900 mb-1 truncate">{product.name}</h3>
-                      <p className="text-sm text-slate-500 mb-2">SKU: {product.sku}</p>
-                      <div className="text-lg font-bold text-green-600">${product.price}</div>
-                    </div>
-                  </div>
-                  
-                  <div className="grid grid-cols-2 gap-3 mb-4">
-                    <div>
-                      <div className="text-xs text-slate-500 mb-1">Category</div>
-                      <div className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                        {product.category}
-                      </div>
-                    </div>
-                    <div>
-                      <div className="text-xs text-slate-500 mb-1">Stock</div>
-                      <div className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
-                        product.stock < 20 
-                          ? 'bg-red-100 text-red-800' 
-                          : product.stock < 50 
-                          ? 'bg-yellow-100 text-yellow-800' 
-                          : 'bg-green-100 text-green-800'
-                      }`}>
-                        {product.stock} units
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="mb-4">
-                    <div className="text-xs text-slate-500 mb-1">Supplier</div>
-                    <div className="text-sm text-slate-900">{product.supplier}</div>
-                  </div>
-                  
-                  <div className="flex gap-2 max-[420px]:gap-1">
-                    <button
-                      onClick={() => setDetailModal({ isOpen: true, product })}
-                      className="flex-1 bg-slate-100 text-slate-700 py-2 px-3 rounded-lg hover:bg-slate-200 transition-colors text-sm font-medium flex items-center justify-center gap-1"
-                      title="View Details"
-                    >
-                      <EyeIcon className="h-4 w-4" />
-                      <span className="max-[420px]:hidden">View</span>
-                    </button>
-                    <button
-                      onClick={() => setModalState({ isOpen: true, product, mode: 'edit' })}
-                      className="flex-1 bg-blue-600 text-white py-2 px-3 rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium flex items-center justify-center gap-1"
-                      title="Edit Product"
-                    >
-                      <PencilIcon className="h-4 w-4" />
-                      <span className="max-[420px]:hidden">Edit</span>
-                    </button>
-                    <button
-                      onClick={() => handleDelete(product.id)}
-                      className="flex-1 bg-red-600 text-white py-2 px-3 rounded-lg hover:bg-red-700 transition-colors text-sm font-medium flex items-center justify-center gap-1"
-                      title="Delete Product"
-                    >
-                      <TrashIcon className="h-4 w-4" />
-                      <span className="max-[420px]:hidden">Delete</span>
-                    </button>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </>
-        ) : (
-          <div className="px-3 sm:px-4 lg:px-6 py-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-              {currentProducts.map((product, index) => (
-                <div key={product.id} className="h-full">
-                    <div className="h-full">
-                      <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: index * 0.1 }}
-                        whileHover={{ y: -8, scale: 1.02, boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)" }}
-                        className="bg-gradient-to-br from-white/95 to-slate-50/95 backdrop-blur-sm border border-white/40 rounded-2xl overflow-hidden hover:shadow-2xl transition-all duration-500 flex flex-col h-[420px] mx-auto max-w-sm min-w-0"
+                  </td>
+                  <td className="px-6 py-4 text-sm text-slate-900">{product.supplier}</td>
+                  <td className="px-6 py-4">
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => setDetailModal({ isOpen: true, product })}
+                        className="text-gray-600 hover:text-gray-800 p-1"
+                        title="View Details"
                       >
+                        <EyeIcon className="h-4 w-4" />
+                      </button>
+                      <button
+                        onClick={() => setModalState({ isOpen: true, product, mode: 'edit' })}
+                        className="text-blue-600 hover:text-blue-800 p-1"
+                        title="Edit Product"
+                      >
+                        <PencilIcon className="h-4 w-4" />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(product.id)}
+                        className="text-red-600 hover:text-red-800 p-1"
+                        title="Delete Product"
+                      >
+                        <TrashIcon className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </td>
+                </motion.tr>
+              ))}
+            </tbody>
+          </table>
+          
+          {/* Pagination Controls - Only shows above 900px */}
+          {totalTablePages > 1 && (
+            <div className="px-6 py-4 border-t border-slate-200 flex items-center justify-between">
+              <div className="text-sm text-slate-500">
+                Showing {tableStartIndex + 1} to {Math.min(tableEndIndex, filteredProducts.length)} of {filteredProducts.length} products
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setCurrentTablePage(prev => Math.max(prev - 1, 1))}
+                  disabled={currentTablePage === 1}
+                  className="p-2 rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  <ChevronLeftIcon className="h-4 w-4" />
+                </button>
+                <span className="text-sm text-slate-600">
+                  Page {currentTablePage} of {totalTablePages}
+                </span>
+                <button
+                  onClick={() => setCurrentTablePage(prev => Math.min(prev + 1, totalTablePages))}
+                  disabled={currentTablePage === totalTablePages}
+                  className="p-2 rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  <ChevronRightIcon className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+        
+        {/* Carousel View - Shows at 900px and below */}
+        <div className="max-[900px]:block min-[901px]:hidden px-3 sm:px-4 lg:px-6 py-6">
+          <Carousel
+            opts={{
+              align: "start",
+              loop: true,
+            }}
+            className="w-full max-w-none"
+          >
+            <CarouselContent className="-ml-4">
+              {filteredProducts.map((product, index) => (
+                <CarouselItem key={product.id} className="pl-4 basis-full min-[694px]:basis-1/2">
+                  <div className="h-full">
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.1 }}
+                      whileHover={{ y: -8, scale: 1.02, boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)" }}
+                      className="bg-gradient-to-br from-white/95 to-slate-50/95 backdrop-blur-sm border border-white/40 rounded-2xl overflow-hidden hover:shadow-2xl transition-all duration-500 flex flex-col h-[420px] mx-auto max-w-sm min-w-0"
+                    >
                       <div className="relative h-40 flex-shrink-0">
                         <img
                           src={product.imageUrl}
@@ -855,125 +701,77 @@ export default function Products() {
                         </div>
                       </div>
                       
-                      <div className="p-3 flex flex-col justify-between flex-1">
+                      <div className="p-4 flex flex-col justify-between flex-1">
                         <div>
-                          <div className="flex justify-between items-start mb-2">
+                          <div className="flex justify-between items-start mb-3">
                             <div className="flex-1 min-w-0">
-                              <h3 className="font-bold text-slate-900 text-base truncate">{product.name}</h3>
-                              <p className="text-xs text-slate-500">SKU: {product.sku}</p>
+                              <h3 className="font-bold text-slate-900 text-lg truncate">{product.name}</h3>
+                              <p className="text-sm text-slate-500">SKU: {product.sku}</p>
                             </div>
-                            <div className="text-right ml-2">
-                              <p className="text-lg font-bold text-green-600">${product.price}</p>
+                            <div className="text-right ml-3">
+                              <p className="text-xl font-bold text-green-600">${product.price}</p>
                             </div>
                           </div>
                           
-                          <div className="space-y-2 mb-4">
+                          <div className="space-y-3 mb-4">
                             <div className="flex items-center text-sm text-slate-600">
-                              <div className="w-6 h-6 bg-blue-100 rounded-lg flex items-center justify-center mr-2">
-                                <svg className="w-3 h-3 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                              <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
+                                <svg className="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
                                   <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm0 4a1 1 0 011-1h12a1 1 0 011 1v8a1 1 0 01-1 1H4a1 1 0 01-1-1V8z" clipRule="evenodd" />
                                 </svg>
                               </div>
-                              <span className="truncate">{product.category}</span>
+                              <span className="truncate font-medium">{product.category}</span>
                             </div>
                             <div className="flex items-center text-sm text-slate-600">
-                              <div className="w-6 h-6 bg-green-100 rounded-lg flex items-center justify-center mr-2">
-                                <svg className="w-3 h-3 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                              <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center mr-3">
+                                <svg className="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
                                   <path fillRule="evenodd" d="M4 4a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2H4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1z" clipRule="evenodd" />
                                 </svg>
                               </div>
-                              <span className="truncate">{product.supplier}</span>
+                              <span className="truncate font-medium">{product.supplier}</span>
                             </div>
                           </div>
                         </div>
                         
                         <div className="flex gap-2 mt-auto">
                           <motion.button
-                            whileHover={{ scale: 1.15 }}
-                            whileTap={{ scale: 0.9 }}
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
                             onClick={() => setDetailModal({ isOpen: true, product })}
-                            className="flex-1 text-gray-600 hover:text-gray-800 py-2 px-3 rounded-lg hover:bg-gray-50 transition-all duration-200 flex items-center justify-center gap-1"
+                            className="flex-1 bg-slate-100 text-slate-700 py-3 px-4 rounded-lg hover:bg-slate-200 transition-colors text-sm font-medium flex items-center justify-center gap-2"
                             title="View Details"
                           >
                             <EyeIcon className="h-4 w-4" />
                           </motion.button>
                           <motion.button
-                            whileHover={{ scale: 1.15 }}
-                            whileTap={{ scale: 0.9 }}
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
                             onClick={() => setModalState({ isOpen: true, product, mode: 'edit' })}
-                            className="flex-1 text-blue-600 hover:text-blue-800 py-2 px-3 rounded-lg hover:bg-blue-50 transition-all duration-200 flex items-center justify-center gap-1"
+                            className="flex-1 bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium flex items-center justify-center gap-2"
                             title="Edit Product"
                           >
                             <PencilIcon className="h-4 w-4" />
                           </motion.button>
                           <motion.button
-                            whileHover={{ scale: 1.15 }}
-                            whileTap={{ scale: 0.9 }}
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
                             onClick={() => handleDelete(product.id)}
-                            className="flex-1 text-red-600 hover:text-red-800 py-2 px-3 rounded-lg hover:bg-red-50 transition-all duration-200 flex items-center justify-center gap-1"
+                            className="flex-1 bg-red-600 text-white py-3 px-4 rounded-lg hover:bg-red-700 transition-colors text-sm font-medium flex items-center justify-center gap-2"
                             title="Delete Product"
                           >
                             <TrashIcon className="h-4 w-4" />
                           </motion.button>
                         </div>
                       </div>
-                      </motion.div>
-                    </div>
-                </div>
+                    </motion.div>
+                  </div>
+                </CarouselItem>
               ))}
-            </div>
-            
-            {totalPages > 1 && (
-              <div className="flex items-center justify-center gap-2">
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                  disabled={currentPage === 1}
-                  className={`p-2 rounded-lg transition-all duration-200 ${
-                    currentPage === 1
-                      ? 'text-gray-400 cursor-not-allowed'
-                      : 'text-gray-600 hover:text-gray-800 hover:bg-gray-50'
-                  }`}
-                >
-                  <ChevronLeftIcon className="h-5 w-5" />
-                </motion.button>
-                
-                <div className="flex items-center gap-2">
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                    <motion.button
-                      key={page}
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      onClick={() => setCurrentPage(page)}
-                      className={`w-10 h-10 rounded-lg font-medium transition-all duration-200 ${
-                        currentPage === page
-                          ? 'bg-blue-600 text-white shadow-md'
-                          : 'text-gray-600 hover:text-gray-800 hover:bg-gray-50'
-                      }`}
-                    >
-                      {page}
-                    </motion.button>
-                  ))}
-                </div>
-                
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                  disabled={currentPage === totalPages}
-                  className={`p-2 rounded-lg transition-all duration-200 ${
-                    currentPage === totalPages
-                      ? 'text-gray-400 cursor-not-allowed'
-                      : 'text-gray-600 hover:text-gray-800 hover:bg-gray-50'
-                  }`}
-                >
-                  <ChevronRightIcon className="h-5 w-5" />
-                </motion.button>
-              </div>
-            )}
-          </div>
-        )}
+            </CarouselContent>
+            <CarouselPrevious className="w-12 h-12 bg-white/95 backdrop-blur-sm border border-white/40 shadow-xl hover:bg-white hover:scale-110 transition-all duration-300 -left-6" />
+            <CarouselNext className="w-12 h-12 bg-white/95 backdrop-blur-sm border border-white/40 shadow-xl hover:bg-white hover:scale-110 transition-all duration-300 -right-6" />
+          </Carousel>
+        </div>
       </div>
 
       <AnimatePresence>
