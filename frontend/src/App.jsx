@@ -7,6 +7,7 @@ import LoginPage from './pages/LoginPage'
 import Dashboard from './pages/Dashboard'
 import Products from './pages/Products'
 import Suppliers from './pages/Suppliers'
+import PurchaseRegistration from './pages/PurchaseRegistration'
 import Analytics from './pages/Analytics'
 import ChangePasswordPage from './pages/ChangePasswordPage'
 import SuperAdminPanel from './pages/SuperAdminPanel'
@@ -31,6 +32,7 @@ function App() {
                 <Route index element={<Dashboard />} />
                 <Route path="products" element={<Products />} />
                 <Route path="suppliers" element={<Suppliers />} />
+                <Route path="purchase-registration" element={<PurchaseRegistration />} />
                 <Route path="analytics" element={<Analytics />} />
                 <Route path="change-password" element={<ChangePasswordPage />} />
                 <Route 

@@ -10,7 +10,8 @@ import {
   UserPlusIcon,
   ArrowRightOnRectangleIcon,
   Bars3Icon,
-  XMarkIcon
+  XMarkIcon,
+  ShoppingCartIcon
 } from '@heroicons/react/24/outline'
 import { useAuth } from '../contexts/AuthContext'
 
@@ -23,6 +24,7 @@ export default function Layout() {
     { name: 'Dashboard', href: '/', icon: HomeIcon },
     { name: 'Products', href: '/products', icon: CubeIcon },
     { name: 'Suppliers', href: '/suppliers', icon: BuildingStorefrontIcon },
+    { name: 'Purchase', href: '/purchase-registration', icon: ShoppingCartIcon },
     { name: 'Analytics', href: '/analytics', icon: ChartBarIcon },
   ]
 

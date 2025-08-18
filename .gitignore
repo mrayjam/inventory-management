@@ -2,3 +2,5 @@ CLAUDE.md
 # OpenAPI/Swagger specification files
 openapi.yaml
 openapi.yml
+PURCHASE_SYSTEM_IMPLEMENTATION.md
+purchase-api-spec.yaml

@@ -229,8 +229,6 @@ const ProductModal = ({ isOpen, onClose, product, mode, onProductSaved }) => {
       name: formData.get('name'),
       category: formData.get('category'),
       price: parseFloat(formData.get('price')),
-      stock: parseInt(formData.get('stock')),
-      supplier: formData.get('supplier'),
       sku: formData.get('sku'),
       description: formData.get('description') || '',
       imageUrl: formData.get('imageUrl') || 'https://via.placeholder.com/300'
@@ -316,32 +314,22 @@ const ProductModal = ({ isOpen, onClose, product, mode, onProductSaved }) => {
                 />
               </div>
               
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <FloatingLabelInput
-                  name="price"
-                  type="number"
-                  step="0.01"
-                  label="Price ($)"
-                  defaultValue={product?.price || ''}
-                  required
-                />
-                
-                <FloatingLabelInput
-                  name="stock"
-                  type="number"
-                  label="Stock Quantity"
-                  defaultValue={product?.stock || ''}
-                  required
-                />
-              </div>
+              <FloatingLabelInput
+                name="price"
+                type="number"
+                step="0.01"
+                label="Price ($)"
+                defaultValue={product?.price || ''}
+                required
+              />
             </div>
             
             <div className="space-y-6">
               <FloatingLabelInput
-                name="supplier"
+                name="sku"
                 type="text"
-                label="Supplier"
-                defaultValue={product?.supplier || ''}
+                label="SKU"
+                defaultValue={product?.sku || ''}
                 required
               />
               

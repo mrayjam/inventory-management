@@ -29,6 +29,8 @@ const mockUsers = [
 
 let nextUserId = 5
 let nextProductId = 5
+let nextSupplierId = 5
+let nextPurchaseId = 1
 
 const mockProducts = [
   { 
@@ -76,6 +78,47 @@ const mockProducts = [
     description: 'Professional 5-piece garden tools set with ergonomic handles and carrying case'
   }
 ]
+
+const mockSuppliers = [
+  { 
+    id: 1, 
+    name: 'TechCorp Solutions', 
+    email: 'contact@techcorp.com', 
+    phone: '+1 (555) 123-4567',
+    address: '123 Tech Street, Silicon Valley, CA 94000',
+    category: 'Electronics',
+    status: 'Active'
+  },
+  { 
+    id: 2, 
+    name: 'FashionHub Inc', 
+    email: 'orders@fashionhub.com', 
+    phone: '+1 (555) 234-5678',
+    address: '456 Fashion Ave, New York, NY 10001',
+    category: 'Clothing',
+    status: 'Active'
+  },
+  { 
+    id: 3, 
+    name: 'BookWorld Publishing', 
+    email: 'sales@bookworld.com', 
+    phone: '+1 (555) 345-6789',
+    address: '789 Literature Blvd, Boston, MA 02101',
+    category: 'Books',
+    status: 'Inactive'
+  },
+  { 
+    id: 4, 
+    name: 'GreenThumb Gardens', 
+    email: 'info@greenthumb.com', 
+    phone: '+1 (555) 456-7890',
+    address: '321 Garden Way, Portland, OR 97201',
+    category: 'Home & Garden',
+    status: 'Active'
+  }
+]
+
+const mockPurchases = []
 
 const generateToken = (user) => {
   return `mock-jwt-token-${user.id}-${Date.now()}`
@@ -251,7 +294,7 @@ export const mockApi = {
         throw new Error('Unauthorized')
       }
       
-      if (!productData.name || !productData.category || !productData.price || !productData.stock || !productData.supplier || !productData.sku) {
+      if (!productData.name || !productData.category || !productData.price || !productData.sku) {
         throw new Error('All required fields must be provided')
       }
       
@@ -263,7 +306,7 @@ export const mockApi = {
         id: nextProductId++,
         ...productData,
         price: parseFloat(productData.price),
-        stock: parseInt(productData.stock),
+        stock: 0,
         imageUrl: productData.imageUrl || 'https://via.placeholder.com/300',
         description: productData.description || 'No description provided'
       }
@@ -356,6 +399,213 @@ export const mockApi = {
       return {
         url: randomUrl
       }
+    }
+  },
+
+  suppliers: {
+    getAll: async (token) => {
+      await delay(400)
+      
+      const user = verifyToken(token)
+      if (!user) {
+        throw new Error('Unauthorized')
+      }
+      
+      return [...mockSuppliers]
+    },
+
+    getById: async (token, id) => {
+      await delay(300)
+      
+      const user = verifyToken(token)
+      if (!user) {
+        throw new Error('Unauthorized')
+      }
+      
+      const supplier = mockSuppliers.find(s => s.id === parseInt(id))
+      if (!supplier) {
+        throw new Error('Supplier not found')
+      }
+      
+      return supplier
+    },
+
+    create: async (token, supplierData) => {
+      await delay(700)
+      
+      const user = verifyToken(token)
+      if (!user) {
+        throw new Error('Unauthorized')
+      }
+      
+      if (!supplierData.name || !supplierData.email || !supplierData.category) {
+        throw new Error('Name, email and category are required')
+      }
+      
+      if (mockSuppliers.find(s => s.email === supplierData.email)) {
+        throw new Error('Email already exists')
+      }
+      
+      const newSupplier = {
+        id: nextSupplierId++,
+        ...supplierData,
+        status: supplierData.status || 'Active'
+      }
+      
+      mockSuppliers.push(newSupplier)
+      
+      return {
+        success: true,
+        data: newSupplier
+      }
+    },
+
+    update: async (token, id, supplierData) => {
+      await delay(600)
+      
+      const user = verifyToken(token)
+      if (!user) {
+        throw new Error('Unauthorized')
+      }
+      
+      const supplierIndex = mockSuppliers.findIndex(s => s.id === parseInt(id))
+      if (supplierIndex === -1) {
+        throw new Error('Supplier not found')
+      }
+      
+      if (supplierData.email && mockSuppliers.find(s => s.email === supplierData.email && s.id !== parseInt(id))) {
+        throw new Error('Email already exists')
+      }
+      
+      const updatedSupplier = {
+        ...mockSuppliers[supplierIndex],
+        ...supplierData
+      }
+      
+      mockSuppliers[supplierIndex] = updatedSupplier
+      
+      return {
+        success: true,
+        data: updatedSupplier
+      }
+    },
+
+    delete: async (token, id) => {
+      await delay(500)
+      
+      const user = verifyToken(token)
+      if (!user) {
+        throw new Error('Unauthorized')
+      }
+      
+      const supplierIndex = mockSuppliers.findIndex(s => s.id === parseInt(id))
+      if (supplierIndex === -1) {
+        throw new Error('Supplier not found')
+      }
+      
+      mockSuppliers.splice(supplierIndex, 1)
+      
+      return {
+        success: true,
+        message: 'Supplier deleted successfully'
+      }
+    }
+  },
+
+  purchases: {
+    getAll: async (token) => {
+      await delay(400)
+      
+      const user = verifyToken(token)
+      if (!user) {
+        throw new Error('Unauthorized')
+      }
+      
+      return [...mockPurchases]
+    },
+
+    create: async (token, purchaseData) => {
+      await delay(1000)
+      
+      const user = verifyToken(token)
+      if (!user) {
+        throw new Error('Unauthorized')
+      }
+      
+      if (!purchaseData.productId || !purchaseData.quantity || !purchaseData.supplierId) {
+        throw new Error('Product, quantity and supplier are required')
+      }
+      
+      const product = mockProducts.find(p => p.id === parseInt(purchaseData.productId))
+      if (!product) {
+        throw new Error('Product not found')
+      }
+      
+      const supplier = mockSuppliers.find(s => s.id === parseInt(purchaseData.supplierId))
+      if (!supplier) {
+        throw new Error('Supplier not found')
+      }
+      
+      if (supplier.status !== 'Active') {
+        throw new Error('Cannot purchase from inactive supplier')
+      }
+      
+      const quantity = parseInt(purchaseData.quantity)
+      const unitPrice = parseFloat(purchaseData.unitPrice) || product.price
+      const totalAmount = (quantity * unitPrice).toFixed(2)
+      
+      const purchase = {
+        id: nextPurchaseId++,
+        productId: product.id,
+        productName: purchaseData.productName || product.name,
+        productSku: purchaseData.productSku || product.sku,
+        supplierId: supplier.id,
+        supplierName: purchaseData.supplierName || supplier.name,
+        quantity,
+        unitPrice,
+        totalAmount: parseFloat(totalAmount),
+        purchaseDate: new Date().toISOString().split('T')[0],
+        createdAt: new Date().toISOString(),
+        createdBy: user.name
+      }
+      
+      mockPurchases.push(purchase)
+      
+      const productIndex = mockProducts.findIndex(p => p.id === product.id)
+      mockProducts[productIndex].stock += quantity
+      
+      const invoice = {
+        id: `INV-${Date.now()}`,
+        purchaseId: purchase.id,
+        date: new Date().toLocaleDateString(),
+        totalAmount: totalAmount,
+        status: 'Paid',
+        generatedBy: user.name,
+        generatedAt: new Date().toISOString()
+      }
+      
+      return {
+        success: true,
+        purchase,
+        invoice,
+        message: 'Purchase registered successfully'
+      }
+    },
+
+    getById: async (token, id) => {
+      await delay(300)
+      
+      const user = verifyToken(token)
+      if (!user) {
+        throw new Error('Unauthorized')
+      }
+      
+      const purchase = mockPurchases.find(p => p.id === parseInt(id))
+      if (!purchase) {
+        throw new Error('Purchase not found')
+      }
+      
+      return purchase
     }
   }
 }
