@@ -1,12 +1,16 @@
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { 
   CubeIcon, 
   ExclamationTriangleIcon, 
   BuildingStorefrontIcon,
-  CurrencyDollarIcon 
+  CurrencyDollarIcon,
+  ReceiptPercentIcon 
 } from '@heroicons/react/24/outline'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts'
 import StatCard from '../components/StatCard'
+import { useAuth } from '../contexts/AuthContext'
+import { mockApi } from '../services/mockApi'
 
 const mockStats = {
   totalProducts: 1247,
@@ -33,6 +37,57 @@ const mockInventoryData = [
 
 
 export default function Dashboard() {
+  const [stats, setStats] = useState({
+    totalProducts: 0,
+    lowStockItems: 0,
+    totalSuppliers: 0,
+    totalSales: 0,
+    totalRevenue: 0
+  })
+  const [loading, setLoading] = useState(true)
+  
+  const { token } = useAuth()
+
+  useEffect(() => {
+    const loadDashboardData = async () => {
+      try {
+        setLoading(true)
+        const [products, suppliers, revenueData] = await Promise.all([
+          mockApi.products.getAll(token),
+          mockApi.suppliers.getAll(token),
+          mockApi.analytics.getRevenue(token)
+        ])
+        
+        const lowStockProducts = products.filter(p => p.stock < 20)
+        const activeSuppliers = suppliers.filter(s => s.status === 'Active')
+        
+        setStats({
+          totalProducts: products.length,
+          lowStockItems: lowStockProducts.length,
+          totalSuppliers: activeSuppliers.length,
+          totalSales: revenueData.totalSales,
+          totalRevenue: revenueData.totalRevenue
+        })
+      } catch (error) {
+        console.error('Failed to load dashboard data:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    if (token) {
+      loadDashboardData()
+    }
+  }, [token])
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+      </div>
+    )
+  }
+
   return (
     <div className="relative w-full max-w-full overflow-x-hidden">
         <div className="mb-6 sm:mb-8">
@@ -41,7 +96,7 @@ export default function Dashboard() {
         </div>
 
         <motion.div 
-          className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-4 gap-4 sm:gap-6 mb-6 lg:mb-8 px-3"
+          className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-5 gap-4 sm:gap-6 mb-6 lg:mb-8 px-3"
           variants={{
             hidden: { opacity: 0 },
             show: {
@@ -57,8 +112,8 @@ export default function Dashboard() {
           <motion.div variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } }}>
             <StatCard
               title="Total Products"
-              value={mockStats.totalProducts.toLocaleString()}
-              rawValue={mockStats.totalProducts}
+              value={stats.totalProducts.toLocaleString()}
+              rawValue={stats.totalProducts}
               icon={CubeIcon}
               color="blue"
               trend={12}
@@ -67,8 +122,8 @@ export default function Dashboard() {
           <motion.div variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } }}>
             <StatCard
               title="Low Stock Items"
-              value={mockStats.lowStockItems}
-              rawValue={mockStats.lowStockItems}
+              value={stats.lowStockItems}
+              rawValue={stats.lowStockItems}
               icon={ExclamationTriangleIcon}
               color="red"
               trend={-8}
@@ -77,8 +132,8 @@ export default function Dashboard() {
           <motion.div variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } }}>
             <StatCard
               title="Active Suppliers"
-              value={mockStats.totalSuppliers}
-              rawValue={mockStats.totalSuppliers}
+              value={stats.totalSuppliers}
+              rawValue={stats.totalSuppliers}
               icon={BuildingStorefrontIcon}
               color="green"
               trend={5}
@@ -86,11 +141,21 @@ export default function Dashboard() {
           </motion.div>
           <motion.div variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } }}>
             <StatCard
-              title="Monthly Revenue"
-              value={`$${(mockStats.monthlyRevenue / 1000).toFixed(0)}K`}
-              rawValue={mockStats.monthlyRevenue}
-              icon={CurrencyDollarIcon}
+              title="Total Sales"
+              value={stats.totalSales}
+              rawValue={stats.totalSales}
+              icon={ReceiptPercentIcon}
               color="purple"
+              trend={25}
+            />
+          </motion.div>
+          <motion.div variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } }}>
+            <StatCard
+              title="Total Revenue"
+              value={stats.totalRevenue > 0 ? `$${(stats.totalRevenue / 1000).toFixed(1)}K` : '$0'}
+              rawValue={stats.totalRevenue}
+              icon={CurrencyDollarIcon}
+              color="green"
               trend={18}
             />
           </motion.div>

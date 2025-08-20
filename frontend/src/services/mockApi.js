@@ -31,6 +31,7 @@ let nextUserId = 5
 let nextProductId = 5
 let nextSupplierId = 5
 let nextPurchaseId = 1
+let nextSaleId = 1
 
 const mockProducts = [
   { 
@@ -119,6 +120,10 @@ const mockSuppliers = [
 ]
 
 const mockPurchases = []
+
+const mockSales = []
+
+let totalRevenue = 0
 
 const generateToken = (user) => {
   return `mock-jwt-token-${user.id}-${Date.now()}`
@@ -609,6 +614,234 @@ export const mockApi = {
       }
       
       return purchase
+    }
+  },
+
+  sales: {
+    getAll: async (token) => {
+      await delay(400)
+      
+      const user = verifyToken(token)
+      if (!user) {
+        throw new Error('Unauthorized')
+      }
+      
+      return [...mockSales]
+    },
+
+    getById: async (token, id) => {
+      await delay(300)
+      
+      const user = verifyToken(token)
+      if (!user) {
+        throw new Error('Unauthorized')
+      }
+      
+      const sale = mockSales.find(s => s.id === parseInt(id))
+      if (!sale) {
+        throw new Error('Sale not found')
+      }
+      
+      return sale
+    },
+
+    create: async (token, saleData) => {
+      await delay(800)
+      
+      const user = verifyToken(token)
+      if (!user) {
+        throw new Error('Unauthorized')
+      }
+      
+      if (!saleData.productId || !saleData.quantity || !saleData.salePrice) {
+        throw new Error('Product, quantity, and sale price are required')
+      }
+      
+      const product = mockProducts.find(p => p.id === parseInt(saleData.productId))
+      if (!product) {
+        throw new Error('Product not found')
+      }
+      
+      const quantity = parseInt(saleData.quantity)
+      const salePrice = parseFloat(saleData.salePrice)
+      
+      if (quantity <= 0) {
+        throw new Error('Quantity must be greater than 0')
+      }
+      
+      if (salePrice <= 0) {
+        throw new Error('Sale price must be greater than 0')
+      }
+      
+      if (product.stock < quantity) {
+        throw new Error(`Insufficient stock. Available: ${product.stock}, Requested: ${quantity}`)
+      }
+      
+      const totalAmount = (quantity * salePrice).toFixed(2)
+      
+      const sale = {
+        id: nextSaleId++,
+        productId: product.id,
+        productName: saleData.productName || product.name,
+        productSku: saleData.productSku || product.sku,
+        quantity,
+        salePrice,
+        totalAmount: parseFloat(totalAmount),
+        customer: saleData.customer || '',
+        saleDate: saleData.saleDate || new Date().toISOString(),
+        createdAt: new Date().toISOString(),
+        createdBy: user.name
+      }
+      
+      mockSales.push(sale)
+      
+      const productIndex = mockProducts.findIndex(p => p.id === product.id)
+      mockProducts[productIndex].stock -= quantity
+      
+      totalRevenue += parseFloat(totalAmount)
+      
+      return {
+        success: true,
+        sale,
+        message: 'Sale recorded successfully'
+      }
+    },
+
+    update: async (token, id, saleData) => {
+      await delay(700)
+      
+      const user = verifyToken(token)
+      if (!user) {
+        throw new Error('Unauthorized')
+      }
+      
+      const saleIndex = mockSales.findIndex(s => s.id === parseInt(id))
+      if (saleIndex === -1) {
+        throw new Error('Sale not found')
+      }
+      
+      const oldSale = mockSales[saleIndex]
+      const oldProduct = mockProducts.find(p => p.id === oldSale.productId)
+      
+      if (oldProduct) {
+        oldProduct.stock += oldSale.quantity
+        totalRevenue -= oldSale.totalAmount
+      }
+      
+      if (saleData.productId && saleData.productId !== oldSale.productId) {
+        const newProduct = mockProducts.find(p => p.id === parseInt(saleData.productId))
+        if (!newProduct) {
+          throw new Error('Product not found')
+        }
+        
+        const quantity = parseInt(saleData.quantity || oldSale.quantity)
+        if (newProduct.stock < quantity) {
+          throw new Error(`Insufficient stock. Available: ${newProduct.stock}, Requested: ${quantity}`)
+        }
+      }
+      
+      const updatedSale = {
+        ...oldSale,
+        ...saleData,
+        quantity: parseInt(saleData.quantity || oldSale.quantity),
+        salePrice: parseFloat(saleData.salePrice || oldSale.salePrice),
+        totalAmount: parseFloat((parseInt(saleData.quantity || oldSale.quantity) * parseFloat(saleData.salePrice || oldSale.salePrice)).toFixed(2)),
+        updatedAt: new Date().toISOString(),
+        updatedBy: user.name
+      }
+      
+      const product = mockProducts.find(p => p.id === updatedSale.productId)
+      if (product) {
+        product.stock -= updatedSale.quantity
+        totalRevenue += updatedSale.totalAmount
+      }
+      
+      mockSales[saleIndex] = updatedSale
+      
+      return {
+        success: true,
+        sale: updatedSale
+      }
+    },
+
+    delete: async (token, id) => {
+      await delay(500)
+      
+      const user = verifyToken(token)
+      if (!user) {
+        throw new Error('Unauthorized')
+      }
+      
+      const saleIndex = mockSales.findIndex(s => s.id === parseInt(id))
+      if (saleIndex === -1) {
+        throw new Error('Sale not found')
+      }
+      
+      const sale = mockSales[saleIndex]
+      const product = mockProducts.find(p => p.id === sale.productId)
+      
+      if (product) {
+        product.stock += sale.quantity
+      }
+      
+      totalRevenue -= sale.totalAmount
+      
+      mockSales.splice(saleIndex, 1)
+      
+      return {
+        success: true,
+        message: 'Sale deleted successfully'
+      }
+    }
+  },
+
+  analytics: {
+    getRevenue: async (token) => {
+      await delay(300)
+      
+      const user = verifyToken(token)
+      if (!user) {
+        throw new Error('Unauthorized')
+      }
+      
+      return {
+        totalRevenue,
+        totalSales: mockSales.length,
+        salesThisMonth: mockSales.filter(sale => {
+          const saleDate = new Date(sale.saleDate)
+          const now = new Date()
+          return saleDate.getMonth() === now.getMonth() && saleDate.getFullYear() === now.getFullYear()
+        }).length
+      }
+    },
+
+    getTopSellingProducts: async (token) => {
+      await delay(400)
+      
+      const user = verifyToken(token)
+      if (!user) {
+        throw new Error('Unauthorized')
+      }
+      
+      const productSales = {}
+      
+      mockSales.forEach(sale => {
+        if (!productSales[sale.productId]) {
+          productSales[sale.productId] = {
+            productId: sale.productId,
+            productName: sale.productName,
+            totalQuantity: 0,
+            totalRevenue: 0
+          }
+        }
+        
+        productSales[sale.productId].totalQuantity += sale.quantity
+        productSales[sale.productId].totalRevenue += sale.totalAmount
+      })
+      
+      return Object.values(productSales)
+        .sort((a, b) => b.totalQuantity - a.totalQuantity)
+        .slice(0, 5)
     }
   }
 }
