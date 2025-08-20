@@ -228,7 +228,6 @@ const ProductModal = ({ isOpen, onClose, product, mode, onProductSaved }) => {
     const productData = {
       name: formData.get('name'),
       category: formData.get('category'),
-      price: parseFloat(formData.get('price')),
       sku: formData.get('sku'),
       description: formData.get('description') || '',
       imageUrl: formData.get('imageUrl') || 'https://via.placeholder.com/300'
@@ -315,30 +314,14 @@ const ProductModal = ({ isOpen, onClose, product, mode, onProductSaved }) => {
               </div>
               
               <FloatingLabelInput
-                name="price"
-                type="number"
-                step="0.01"
-                label="Price ($)"
-                defaultValue={product?.price || ''}
-                required
-              />
-            </div>
-            
-            <div className="space-y-6">
-              <FloatingLabelInput
-                name="sku"
-                type="text"
-                label="SKU"
-                defaultValue={product?.sku || ''}
-                required
-              />
-              
-              <FloatingLabelInput
                 name="imageUrl"
                 type="url"
                 label="Product Image URL"
                 defaultValue={product?.imageUrl || ''}
               />
+            </div>
+            
+            <div className="space-y-6">
               
               <div className="relative">
                 <textarea

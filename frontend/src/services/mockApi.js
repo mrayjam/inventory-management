@@ -294,7 +294,7 @@ export const mockApi = {
         throw new Error('Unauthorized')
       }
       
-      if (!productData.name || !productData.category || !productData.price || !productData.sku) {
+      if (!productData.name || !productData.category || !productData.sku) {
         throw new Error('All required fields must be provided')
       }
       
@@ -305,7 +305,6 @@ export const mockApi = {
       const newProduct = {
         id: nextProductId++,
         ...productData,
-        price: parseFloat(productData.price),
         stock: 0,
         imageUrl: productData.imageUrl || 'https://via.placeholder.com/300',
         description: productData.description || 'No description provided'
@@ -339,7 +338,6 @@ export const mockApi = {
       const updatedProduct = {
         ...mockProducts[productIndex],
         ...productData,
-        price: productData.price ? parseFloat(productData.price) : mockProducts[productIndex].price,
         stock: productData.stock ? parseInt(productData.stock) : mockProducts[productIndex].stock
       }
       
@@ -532,8 +530,8 @@ export const mockApi = {
         throw new Error('Unauthorized')
       }
       
-      if (!purchaseData.productId || !purchaseData.quantity || !purchaseData.supplierId) {
-        throw new Error('Product, quantity and supplier are required')
+      if (!purchaseData.productId || !purchaseData.quantity || !purchaseData.supplierId || !purchaseData.unitPrice) {
+        throw new Error('Product, quantity, supplier and unit price are required')
       }
       
       const product = mockProducts.find(p => p.id === parseInt(purchaseData.productId))
@@ -551,7 +549,12 @@ export const mockApi = {
       }
       
       const quantity = parseInt(purchaseData.quantity)
-      const unitPrice = parseFloat(purchaseData.unitPrice) || product.price
+      const unitPrice = parseFloat(purchaseData.unitPrice)
+      
+      if (unitPrice <= 0) {
+        throw new Error('Unit price must be greater than 0')
+      }
+      
       const totalAmount = (quantity * unitPrice).toFixed(2)
       
       const purchase = {

@@ -172,13 +172,18 @@ export default function PurchaseRegistration() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     
-    if (!formData.productId || !formData.quantity || !formData.supplierId) {
+    if (!formData.productId || !formData.quantity || !formData.supplierId || !formData.unitPrice) {
       toast.error('Please fill in all required fields')
       return
     }
 
     if (parseInt(formData.quantity) <= 0) {
       toast.error('Quantity must be greater than 0')
+      return
+    }
+
+    if (parseFloat(formData.unitPrice) <= 0) {
+      toast.error('Unit price must be greater than 0')
       return
     }
 
@@ -190,7 +195,7 @@ export default function PurchaseRegistration() {
         productId: formData.productId,
         quantity: parseInt(formData.quantity),
         supplierId: formData.supplierId,
-        unitPrice: parseFloat(formData.unitPrice) || selectedProduct?.price || 0,
+        unitPrice: parseFloat(formData.unitPrice),
         productName: selectedProduct?.name,
         productSku: selectedProduct?.sku,
         supplierName: selectedSupplier?.name
@@ -315,10 +320,11 @@ export default function PurchaseRegistration() {
                 name="unitPrice"
                 type="number"
                 step="0.01"
-                label="Unit Price (Optional)"
+                min="0.01"
+                label="Unit Price *"
                 value={formData.unitPrice}
                 onChange={handleInputChange}
-                placeholder={selectedProduct ? `Default: $${selectedProduct.price}` : ''}
+                required
               />
             </div>
 
