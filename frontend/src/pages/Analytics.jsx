@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { 
   PieChart, 
@@ -13,32 +14,55 @@ import {
   AreaChart,
   Area 
 } from 'recharts'
-
-const mockRevenueData = [
-  { month: 'Jan', revenue: 45000, profit: 12000 },
-  { month: 'Feb', revenue: 52000, profit: 15600 },
-  { month: 'Mar', revenue: 48000, profit: 14400 },
-  { month: 'Apr', revenue: 61000, profit: 18300 },
-  { month: 'May', revenue: 55000, profit: 16500 },
-  { month: 'Jun', revenue: 67000, profit: 20100 }
-]
-
-const mockCategoryData = [
-  { name: 'Electronics', value: 450, color: '#3b82f6' },
-  { name: 'Clothing', value: 320, color: '#10b981' },
-  { name: 'Books', value: 280, color: '#f59e0b' },
-  { name: 'Home & Garden', value: 197, color: '#ef4444' }
-]
-
-const mockTopProducts = [
-  { name: 'Wireless Headphones', sales: 245, revenue: 24500 },
-  { name: 'Cotton T-Shirt', sales: 189, revenue: 4725 },
-  { name: 'Programming Guide', sales: 156, revenue: 7800 },
-  { name: 'Garden Tools Set', sales: 87, revenue: 13913 },
-  { name: 'Bluetooth Speaker', sales: 134, revenue: 10720 }
-]
+import toast from 'react-hot-toast'
+import { useAuth } from '../contexts/AuthContext'
+import { analyticsApi } from '../services/api'
 
 export default function Analytics() {
+  const [revenueData, setRevenueData] = useState(null)
+  const [topProducts, setTopProducts] = useState([])
+  const [loading, setLoading] = useState(true)
+  const { token } = useAuth()
+
+  const categoryData = [
+    { name: 'Electronics', value: 450, color: '#3b82f6' },
+    { name: 'Clothing', value: 320, color: '#10b981' },
+    { name: 'Books', value: 280, color: '#f59e0b' },
+    { name: 'Home & Garden', value: 197, color: '#ef4444' }
+  ]
+
+  useEffect(() => {
+    const loadAnalyticsData = async () => {
+      if (!token) return
+      
+      try {
+        setLoading(true)
+        const [revenueResponse, topProductsResponse] = await Promise.all([
+          analyticsApi.getRevenue(),
+          analyticsApi.getTopSellingProducts()
+        ])
+        
+        setRevenueData(revenueResponse)
+        setTopProducts(topProductsResponse)
+      } catch (error) {
+        console.error('Failed to load analytics data:', error)
+        const message = error.response?.data?.message || error.message || 'Failed to load analytics data'
+        toast.error(message)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    loadAnalyticsData()
+  }, [token])
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+      </div>
+    )
+  }
   return (
     <div>
       <div className="mb-8">
@@ -52,37 +76,29 @@ export default function Analytics() {
           animate={{ opacity: 1, x: 0 }}
           className="bg-white rounded-xl shadow-sm border border-slate-200 p-6"
         >
-          <h3 className="text-lg font-semibold text-slate-900 mb-4">Revenue & Profit Trend</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <AreaChart data={mockRevenueData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-              <XAxis dataKey="month" stroke="#64748b" />
-              <YAxis stroke="#64748b" />
-              <Tooltip 
-                contentStyle={{ 
-                  backgroundColor: 'white', 
-                  border: '1px solid #e2e8f0',
-                  borderRadius: '8px'
-                }} 
-              />
-              <Area 
-                type="monotone" 
-                dataKey="revenue" 
-                stackId="1"
-                stroke="#3b82f6" 
-                fill="#3b82f6"
-                fillOpacity={0.6}
-              />
-              <Area 
-                type="monotone" 
-                dataKey="profit" 
-                stackId="2"
-                stroke="#10b981" 
-                fill="#10b981"
-                fillOpacity={0.8}
-              />
-            </AreaChart>
-          </ResponsiveContainer>
+          <h3 className="text-lg font-semibold text-slate-900 mb-4">Revenue Summary</h3>
+          {revenueData ? (
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-blue-50 rounded-lg p-4">
+                <p className="text-sm text-blue-600 font-medium">Total Revenue</p>
+                <p className="text-2xl font-bold text-blue-800">${revenueData.totalRevenue?.toFixed(2) || '0.00'}</p>
+              </div>
+              <div className="bg-green-50 rounded-lg p-4">
+                <p className="text-sm text-green-600 font-medium">Total Sales</p>
+                <p className="text-2xl font-bold text-green-800">{revenueData.totalSales || 0}</p>
+              </div>
+              <div className="bg-purple-50 rounded-lg p-4">
+                <p className="text-sm text-purple-600 font-medium">Total Purchases</p>
+                <p className="text-2xl font-bold text-purple-800">{revenueData.totalPurchases || 0}</p>
+              </div>
+              <div className="bg-orange-50 rounded-lg p-4">
+                <p className="text-sm text-orange-600 font-medium">Sales This Month</p>
+                <p className="text-2xl font-bold text-orange-800">{revenueData.salesThisMonth || 0}</p>
+              </div>
+            </div>
+          ) : (
+            <div className="text-center py-8 text-gray-500">No data available</div>
+          )}
         </motion.div>
 
         <motion.div
@@ -96,7 +112,7 @@ export default function Analytics() {
               <ResponsiveContainer width="100%" height={250}>
                 <PieChart>
                   <Pie
-                    data={mockCategoryData}
+                    data={categoryData}
                     cx="50%"
                     cy="50%"
                     innerRadius={40}
@@ -105,7 +121,7 @@ export default function Analytics() {
                     fill="#8884d8"
                     dataKey="value"
                   >
-                    {mockCategoryData.map((entry, index) => (
+                    {categoryData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.color} />
                     ))}
                   </Pie>
@@ -115,7 +131,7 @@ export default function Analytics() {
             </div>
             <div className="w-full xl:w-1/2 lg:pl-4">
               <div className="space-y-3">
-                {mockCategoryData.map((category, index) => (
+                {categoryData.map((category, index) => (
                   <motion.div
                     key={category.name}
                     initial={{ opacity: 0, x: 20 }}
@@ -133,7 +149,7 @@ export default function Analytics() {
                     <div className="text-right">
                       <div className="font-bold text-slate-900">{category.value}</div>
                       <div className="text-xs text-slate-500">
-                        {((category.value / mockCategoryData.reduce((sum, cat) => sum + cat.value, 0)) * 100).toFixed(1)}%
+                        {((category.value / categoryData.reduce((sum, cat) => sum + cat.value, 0)) * 100).toFixed(1)}%
                       </div>
                     </div>
                   </motion.div>
@@ -164,9 +180,9 @@ export default function Analytics() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {mockTopProducts.map((product, index) => (
+                {topProducts.map((product, index) => (
                   <motion.tr
-                    key={product.name}
+                    key={product.productName}
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.1 * index }}
@@ -180,12 +196,12 @@ export default function Analytics() {
                           index === 2 ? 'bg-amber-600' :
                           'bg-slate-300'
                         }`} />
-                        <span className="font-medium text-slate-900">{product.name}</span>
+                        <span className="font-medium text-slate-900">{product.productName}</span>
                       </div>
                     </td>
-                    <td className="py-3 text-right text-slate-900 px-4">{product.sales}</td>
+                    <td className="py-3 text-right text-slate-900 px-4">{product.totalQuantity}</td>
                     <td className="py-3 text-right font-medium text-slate-900">
-                      ${product.revenue.toLocaleString()}
+                      ${product.totalRevenue.toLocaleString()}
                     </td>
                   </motion.tr>
                 ))}
@@ -195,9 +211,9 @@ export default function Analytics() {
           
           {/* Mobile Card View */}
           <div className="sm:hidden space-y-3">
-            {mockTopProducts.map((product, index) => (
+            {topProducts.map((product, index) => (
               <motion.div
-                key={product.name}
+                key={product.productName}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 * index }}
@@ -211,7 +227,7 @@ export default function Analytics() {
                       index === 2 ? 'bg-amber-600' :
                       'bg-slate-300'
                     }`} />
-                    <span className="font-medium text-slate-900 text-sm">{product.name}</span>
+                    <span className="font-medium text-slate-900 text-sm">{product.productName}</span>
                   </div>
                   <span className="text-xs text-slate-500">#{index + 1}</span>
                 </div>
@@ -220,13 +236,13 @@ export default function Analytics() {
                   <div className="flex space-x-4">
                     <div className="text-center">
                       <div className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                        {product.sales} units
+                        {product.totalQuantity} units
                       </div>
                       <div className="text-xs text-slate-500 mt-1">Units Sold</div>
                     </div>
                     <div className="text-center">
                       <div className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                        ${product.revenue.toLocaleString()}
+                        ${product.totalRevenue.toLocaleString()}
                       </div>
                       <div className="text-xs text-slate-500 mt-1">Revenue</div>
                     </div>

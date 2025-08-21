@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react'
 import { useAuth } from './AuthContext'
-import { mockApi } from '../services/mockApi'
+import { productsApi, suppliersApi, analyticsApi } from '../services/apiClient'
 
 const DashboardContext = createContext()
 
@@ -31,9 +31,9 @@ export const DashboardProvider = ({ children }) => {
     
     try {
       const [products, suppliers, revenueData] = await Promise.all([
-        mockApi.products.getAll(token),
-        mockApi.suppliers.getAll(token),
-        mockApi.analytics.getRevenue(token)
+        productsApi.getAll(),
+        suppliersApi.getAll(),
+        analyticsApi.getRevenue()
       ])
       
       const lowStockProducts = products.filter(p => p.stock < 20)
@@ -50,6 +50,9 @@ export const DashboardProvider = ({ children }) => {
       })
     } catch (error) {
       console.error('Failed to refresh dashboard stats:', error)
+      if (error.response?.status === 401) {
+        return
+      }
       setStats(prev => ({
         ...prev,
         totalSales: 0,
