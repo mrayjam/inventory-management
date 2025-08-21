@@ -73,12 +73,54 @@ export const productsApi = {
   },
   
   create: async (productData) => {
-    const response = await apiClient.post('/products', productData)
+    console.log('Creating product with data:', productData)
+    const formData = new FormData()
+    
+    Object.keys(productData).forEach(key => {
+      if (key === 'images' && productData[key] && Array.isArray(productData[key])) {
+        console.log(`Adding ${productData[key].length} images to FormData`)
+        productData[key].forEach((file, index) => {
+          console.log(`Adding image ${index}:`, file.name || file)
+          formData.append('images', file)
+        })
+      } else if (productData[key] !== undefined && productData[key] !== null && productData[key] !== '') {
+        console.log(`Adding ${key}:`, productData[key])
+        formData.append(key, productData[key])
+      }
+    })
+
+    console.log('FormData entries:')
+    for (let [key, value] of formData.entries()) {
+      console.log(key, value)
+    }
+
+    const response = await apiClient.post('/products', formData)
     return response.data
   },
   
   update: async (id, productData) => {
-    const response = await apiClient.put(`/products/${id}`, productData)
+    console.log('Updating product with data:', productData)
+    const formData = new FormData()
+    
+    Object.keys(productData).forEach(key => {
+      if (key === 'images' && productData[key] && Array.isArray(productData[key])) {
+        console.log(`Adding ${productData[key].length} images to FormData for update`)
+        productData[key].forEach((file, index) => {
+          console.log(`Adding update image ${index}:`, file.name || file)
+          formData.append('images', file)
+        })
+      } else if (productData[key] !== undefined && productData[key] !== null && productData[key] !== '') {
+        console.log(`Adding update ${key}:`, productData[key])
+        formData.append(key, productData[key])
+      }
+    })
+
+    console.log('Update FormData entries:')
+    for (let [key, value] of formData.entries()) {
+      console.log(key, value)
+    }
+
+    const response = await apiClient.put(`/products/${id}`, formData)
     return response.data
   },
   

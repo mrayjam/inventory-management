@@ -24,7 +24,8 @@ import {
 } from '@heroicons/react/24/outline'
 import toast from 'react-hot-toast'
 import { useAuth } from '../contexts/AuthContext'
-import { productsApi, uploadsApi } from '../services/apiClient'
+import { productsApi } from '../services/apiClient'
+import ImageUpload from '../components/ImageUpload'
 
 
 const ProductDetailModal = ({ isOpen, onClose, product, onEditProduct, onViewHistory }) => {
@@ -65,7 +66,7 @@ const ProductDetailModal = ({ isOpen, onClose, product, onEditProduct, onViewHis
           
           <div className="aspect-w-16 aspect-h-9">
             <img
-              src={product.imageUrl}
+              src={product.images && product.images.length > 0 ? product.images[0].url : product.imageUrl || 'https://via.placeholder.com/300'}
               alt={product.name}
               className="w-full h-48 sm:h-64 object-cover rounded-t-xl"
             />
@@ -219,7 +220,25 @@ const ProductHistoryModal = ({ isOpen, onClose, product }) => {
 }
 
 const ProductModal = ({ isOpen, onClose, product, mode, onProductSaved }) => {
+  const [selectedImages, setSelectedImages] = useState([])
+  const [removedImageIds, setRemovedImageIds] = useState([])
+
+  useEffect(() => {
+    if (!isOpen) {
+      setSelectedImages([])
+      setRemovedImageIds([])
+    }
+  }, [isOpen])
+
   if (!isOpen) return null
+
+  const handleImagesChange = (images, removedImageId) => {
+    if (removedImageId) {
+      setRemovedImageIds(prev => [...prev, removedImageId])
+    } else if (images) {
+      setSelectedImages(images)
+    }
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -231,7 +250,11 @@ const ProductModal = ({ isOpen, onClose, product, mode, onProductSaved }) => {
       sku: formData.get('sku'),
       supplier: formData.get('supplier') || '',
       description: formData.get('description') || '',
-      imageUrl: formData.get('imageUrl') || 'https://via.placeholder.com/300'
+      images: selectedImages
+    }
+
+    if (mode === 'update' && removedImageIds.length > 0) {
+      productData.removeImageIds = JSON.stringify(removedImageIds)
     }
     
     try {
@@ -241,6 +264,8 @@ const ProductModal = ({ isOpen, onClose, product, mode, onProductSaved }) => {
         await onProductSaved('update', product.id, productData)
       }
       onClose()
+      setSelectedImages([])
+      setRemovedImageIds([])
     } catch (error) {
       console.error('Failed to save product:', error)
     }
@@ -320,17 +345,9 @@ const ProductModal = ({ isOpen, onClose, product, mode, onProductSaved }) => {
                 label="Supplier"
                 defaultValue={product?.supplier || ''}
               />
-              
-              <FloatingLabelInput
-                name="imageUrl"
-                type="url"
-                label="Product Image URL"
-                defaultValue={product?.imageUrl || ''}
-              />
             </div>
             
             <div className="space-y-6">
-              
               <div className="relative">
                 <textarea
                   name="description"
@@ -344,6 +361,15 @@ const ProductModal = ({ isOpen, onClose, product, mode, onProductSaved }) => {
                 </label>
               </div>
             </div>
+          </div>
+
+          <div className="space-y-6">
+            <ImageUpload
+              onImagesChange={handleImagesChange}
+              existingImages={product?.images || []}
+              maxImages={5}
+              maxSizeInMB={5}
+            />
           </div>
           
           <div className="flex flex-col sm:flex-row gap-3 pt-6 border-t border-gray-200">
@@ -564,7 +590,7 @@ export default function Products() {
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
                       <img
-                        src={product.imageUrl}
+                        src={product.images && product.images.length > 0 ? product.images[0].url : product.imageUrl || 'https://via.placeholder.com/300'}
                         alt={product.name}
                         className="h-12 w-12 rounded-lg object-cover cursor-pointer hover:opacity-80 transition-opacity"
                         onClick={() => setDetailModal({ isOpen: true, product })}
@@ -665,7 +691,7 @@ export default function Products() {
                     >
                       <div className="relative h-40 flex-shrink-0">
                         <img
-                          src={product.imageUrl}
+                          src={product.images && product.images.length > 0 ? product.images[0].url : product.imageUrl || 'https://via.placeholder.com/300'}
                           alt={product.name}
                           className="w-full h-full object-cover cursor-pointer hover:opacity-90 transition-opacity"
                           onClick={() => setDetailModal({ isOpen: true, product })}
