@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react'
-import { mockApi } from '../services/mockApi'
+import { authApi, usersApi } from '../services/apiClient'
 
 const AuthContext = createContext(null)
 
@@ -28,6 +28,10 @@ export const AuthProvider = ({ children }) => {
   }, [])
 
   const login = async (email, password) => {
+    if (password.length < 6) {
+      return { success: false, error: 'Password must be at least 6 characters long' }
+    }
+
     try {
       const data = await authApi.login(email, password)
       

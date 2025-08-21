@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import toast from 'react-hot-toast'
 import { useAuth } from '../contexts/AuthContext'
-import { usersApi } from '../services/api'
+import { usersApi } from '../services/apiClient'
 
 const SuperAdminPanel = () => {
   const [activeTab, setActiveTab] = useState('create')

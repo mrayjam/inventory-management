@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import toast from 'react-hot-toast'
 import { useAuth } from '../contexts/AuthContext'
-import { suppliersApi } from '../services/api'
+import { suppliersApi } from '../services/apiClient'
 import {
   Carousel,
   CarouselContent,

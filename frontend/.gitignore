@@ -39,3 +39,6 @@ $RECYCLE.BIN/
 
 # Windows hidden file attributes
 Icon?
+
+
+.env

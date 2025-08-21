@@ -24,7 +24,7 @@ import {
 import toast from 'react-hot-toast'
 import { useAuth } from '../contexts/AuthContext'
 import { useDashboard } from '../contexts/DashboardContext'
-import { purchasesApi, productsApi, suppliersApi } from '../services/api'
+import { purchasesApi, productsApi, suppliersApi } from '../services/apiClient'
 
 // Purchase Detail Modal Component
 const PurchaseDetailModal = ({ isOpen, onClose, purchase, onEditPurchase }) => {

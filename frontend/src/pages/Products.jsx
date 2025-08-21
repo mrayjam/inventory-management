@@ -24,7 +24,7 @@ import {
 } from '@heroicons/react/24/outline'
 import toast from 'react-hot-toast'
 import { useAuth } from '../contexts/AuthContext'
-import { productsApi, uploadsApi } from '../services/api'
+import { productsApi, uploadsApi } from '../services/apiClient'
 
 
 const ProductDetailModal = ({ isOpen, onClose, product, onEditProduct, onViewHistory }) => {

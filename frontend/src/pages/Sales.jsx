@@ -27,7 +27,7 @@ import {
 } from '@heroicons/react/24/outline'
 import toast from 'react-hot-toast'
 import { useAuth } from '../contexts/AuthContext'
-import { salesApi, productsApi } from '../services/api'
+import { salesApi, productsApi } from '../services/apiClient'
 
 const SaleDetailModal = ({ isOpen, onClose, sale, onEditSale }) => {
   if (!isOpen || !sale) return null

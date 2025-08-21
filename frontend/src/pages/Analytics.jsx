@@ -16,7 +16,7 @@ import {
 } from 'recharts'
 import toast from 'react-hot-toast'
 import { useAuth } from '../contexts/AuthContext'
-import { analyticsApi } from '../services/api'
+import { analyticsApi } from '../services/apiClient'
 
 export default function Analytics() {
   const [revenueData, setRevenueData] = useState(null)
