@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import React from 'react'
 import { motion } from 'framer-motion'
 import { 
   CubeIcon, 
@@ -10,15 +10,8 @@ import {
 } from '@heroicons/react/24/outline'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts'
 import StatCard from '../components/StatCard'
-import { useAuth } from '../contexts/AuthContext'
-import { mockApi } from '../services/mockApi'
+import { useDashboard } from '../contexts/DashboardContext'
 
-const mockStats = {
-  totalProducts: 1247,
-  lowStockItems: 23,
-  totalSuppliers: 45,
-  monthlyRevenue: 125000
-}
 
 const mockSalesData = [
   { month: 'Jan', sales: 45000 },
@@ -38,69 +31,8 @@ const mockInventoryData = [
 
 
 export default function Dashboard() {
-  const [stats, setStats] = useState({
-    totalProducts: 0,
-    lowStockItems: 0,
-    totalSuppliers: 0,
-    totalSales: 0,
-    totalRevenue: 0,
-    totalPurchases: 0,
-    purchasePercentageChange: 0
-  })
-  
-  const refreshStats = async () => {
-    try {
-      const [products, suppliers, revenueData] = await Promise.all([
-        mockApi.products.getAll(token),
-        mockApi.suppliers.getAll(token),
-        mockApi.analytics.getRevenue(token)
-      ])
-      
-      const lowStockProducts = products.filter(p => p.stock < 20)
-      const activeSuppliers = suppliers.filter(s => s.status === 'Active')
-      
-      setStats({
-        totalProducts: products.length,
-        lowStockItems: lowStockProducts.length,
-        totalSuppliers: activeSuppliers.length,
-        totalSales: revenueData?.totalSales ?? 0,
-        totalRevenue: revenueData?.totalRevenue ?? 0,
-        totalPurchases: revenueData?.totalPurchases ?? 0,
-        purchasePercentageChange: revenueData?.purchasePercentageChange ?? 0
-      })
-    } catch (error) {
-      console.error('Failed to refresh dashboard stats:', error)
-      setStats(prev => ({
-        ...prev,
-        totalSales: 0,
-        totalRevenue: 0,
-        totalPurchases: 0,
-        purchasePercentageChange: 0
-      }))
-    }
-  }
-  const [loading, setLoading] = useState(true)
-  
-  const { token } = useAuth()
+  const { stats, loading } = useDashboard()
 
-  useEffect(() => {
-    const loadDashboardData = async () => {
-      try {
-        setLoading(true)
-        await refreshStats()
-      } catch (error) {
-        console.error('Failed to load dashboard data:', error)
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    if (token) {
-      loadDashboardData()
-    }
-  }, [token])
-
-  window.refreshDashboard = refreshStats
 
   if (loading) {
     return (

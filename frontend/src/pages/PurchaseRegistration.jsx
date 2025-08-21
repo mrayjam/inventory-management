@@ -13,6 +13,7 @@ import {
 import { FloatingLabelInput } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '../contexts/AuthContext'
+import { useDashboard } from '../contexts/DashboardContext'
 import { mockApi } from '../services/mockApi'
 
 const PurchaseInvoiceModal = ({ isOpen, onClose, purchase, invoice }) => {
@@ -134,6 +135,7 @@ export default function PurchaseRegistration() {
   const [invoiceModal, setInvoiceModal] = useState({ isOpen: false, purchase: null, invoice: null })
   
   const { token } = useAuth()
+  const { incrementPurchases, refreshStats } = useDashboard()
 
   useEffect(() => {
     const loadData = async () => {
@@ -190,6 +192,9 @@ export default function PurchaseRegistration() {
     setSubmitting(true)
     const loadingToast = toast.loading('Processing purchase...')
 
+    // Optimistic update
+    incrementPurchases()
+
     try {
       const purchaseData = {
         productId: formData.productId,
@@ -206,9 +211,8 @@ export default function PurchaseRegistration() {
       if (result.success) {
         toast.success('Purchase registered successfully!', { id: loadingToast })
         
-        if (typeof window.refreshDashboard === 'function') {
-          window.refreshDashboard()
-        }
+        // Refresh to get accurate data (including percentage change)
+        await refreshStats()
         
         setInvoiceModal({
           isOpen: true,
@@ -224,10 +228,14 @@ export default function PurchaseRegistration() {
         })
       } else {
         toast.error(result.error || 'Failed to register purchase', { id: loadingToast })
+        // Revert optimistic update on failure
+        await refreshStats()
       }
     } catch (error) {
       console.error('Purchase registration error:', error)
       toast.error('An error occurred while processing the purchase', { id: loadingToast })
+      // Revert optimistic update on error
+      await refreshStats()
     } finally {
       setSubmitting(false)
     }

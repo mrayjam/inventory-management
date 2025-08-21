@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
 import { AuthProvider } from './contexts/AuthContext'
+import { DashboardProvider } from './contexts/DashboardContext'
 import ProtectedRoute from './components/ProtectedRoute'
 import Layout from './components/Layout'
 import LoginPage from './pages/LoginPage'
@@ -16,7 +17,8 @@ import SuperAdminPanel from './pages/SuperAdminPanel'
 function App() {
   return (
     <AuthProvider>
-      <Router>
+      <DashboardProvider>
+        <Router>
         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
           <div className="absolute inset-0 bg-grid-slate-100 bg-[size:20px_20px] opacity-20"></div>
           <div className="relative">
@@ -94,7 +96,8 @@ function App() {
             },
           }}
         />
-      </Router>
+        </Router>
+      </DashboardProvider>
     </AuthProvider>
   )
 }
