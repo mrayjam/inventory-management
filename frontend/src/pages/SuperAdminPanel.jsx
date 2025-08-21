@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import toast from 'react-hot-toast'
 import { useAuth } from '../contexts/AuthContext'
-import { mockApi } from '../services/mockApi'
+import { usersApi } from '../services/api'
 
 const SuperAdminPanel = () => {
   const [activeTab, setActiveTab] = useState('create')
@@ -25,10 +25,12 @@ const SuperAdminPanel = () => {
   useEffect(() => {
     const loadAdmins = async () => {
       try {
-        const adminList = await mockApi.users.getAdmins(token)
+        const adminList = await usersApi.getAdmins()
         setAdmins(adminList)
       } catch (error) {
         console.error('Failed to load admins:', error)
+        const message = error.response?.data?.message || error.message || 'Failed to load admins'
+        toast.error(message)
       }
     }
     
@@ -132,13 +134,14 @@ const SuperAdminPanel = () => {
           password: '',
         })
         
-        const adminList = await mockApi.users.getAdmins(token)
+        const adminList = await usersApi.getAdmins()
         setAdmins(adminList)
       } else {
         toast.error(result.error, { id: loadingToast })
       }
     } catch (error) {
-      toast.error('Failed to create admin', { id: loadingToast })
+      const message = error.response?.data?.message || error.message || 'Failed to create admin'
+      toast.error(message, { id: loadingToast })
     } finally {
       setIsLoading(false)
     }
@@ -168,7 +171,8 @@ const SuperAdminPanel = () => {
         toast.error(result.error, { id: loadingToast })
       }
     } catch (error) {
-      toast.error('Failed to reset password', { id: loadingToast })
+      const message = error.response?.data?.message || error.message || 'Failed to reset password'
+      toast.error(message, { id: loadingToast })
     } finally {
       setIsLoading(false)
     }

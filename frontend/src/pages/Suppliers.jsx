@@ -1,6 +1,8 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import toast from 'react-hot-toast'
+import { useAuth } from '../contexts/AuthContext'
+import { suppliersApi } from '../services/api'
 import {
   Carousel,
   CarouselContent,
@@ -22,67 +24,32 @@ import {
 import { FloatingLabelInput } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 
-const mockSuppliers = [
-  { 
-    id: 1, 
-    name: 'TechCorp Solutions', 
-    email: 'contact@techcorp.com', 
-    phone: '+1 (555) 123-4567',
-    address: '123 Tech Street, Silicon Valley, CA 94000',
-    category: 'Electronics',
-    status: 'Active'
-  },
-  { 
-    id: 2, 
-    name: 'FashionHub Inc', 
-    email: 'orders@fashionhub.com', 
-    phone: '+1 (555) 234-5678',
-    address: '456 Fashion Ave, New York, NY 10001',
-    category: 'Clothing',
-    status: 'Active'
-  },
-  { 
-    id: 3, 
-    name: 'BookWorld Publishing', 
-    email: 'sales@bookworld.com', 
-    phone: '+1 (555) 345-6789',
-    address: '789 Literature Blvd, Boston, MA 02101',
-    category: 'Books',
-    status: 'Inactive'
-  },
-  { 
-    id: 4, 
-    name: 'GreenThumb Gardens', 
-    email: 'info@greenthumb.com', 
-    phone: '+1 (555) 456-7890',
-    address: '321 Garden Way, Portland, OR 97201',
-    category: 'Home & Garden',
-    status: 'Active'
-  }
-]
-
-const SupplierModal = ({ isOpen, onClose, supplier, mode }) => {
+const SupplierModal = ({ isOpen, onClose, supplier, mode, onSupplierSaved }) => {
   if (!isOpen) return null
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    console.log('API Call:', {
-      endpoint: mode === 'add' ? 'POST /api/suppliers' : `PUT /api/suppliers/${supplier?.id}`,
-      headers: { 'Authorization': 'Bearer <token>', 'Content-Type': 'application/json' },
-      request: {
-        name: e.target.name.value,
-        email: e.target.email.value,
-        phone: e.target.phone.value,
-        address: e.target.address.value,
-        category: e.target.category.value,
-        status: e.target.status.value
-      },
-      response: {
-        success: true,
-        data: { id: supplier?.id || Date.now(), ...Object.fromEntries(new FormData(e.target)) }
+    
+    const formData = new FormData(e.target)
+    const supplierData = {
+      name: formData.get('name'),
+      email: formData.get('email'),
+      phone: formData.get('phone'),
+      address: formData.get('address'),
+      category: formData.get('category'),
+      status: formData.get('status')
+    }
+    
+    try {
+      if (mode === 'add') {
+        await onSupplierSaved('create', null, supplierData)
+      } else {
+        await onSupplierSaved('update', supplier.id, supplierData)
       }
-    })
-    onClose()
+      onClose()
+    } catch (error) {
+      console.error('Failed to save supplier:', error)
+    }
   }
 
   return (
@@ -227,15 +194,59 @@ const SupplierModal = ({ isOpen, onClose, supplier, mode }) => {
 export default function Suppliers() {
   const [searchTerm, setSearchTerm] = useState('')
   const [modalState, setModalState] = useState({ isOpen: false, supplier: null, mode: 'add' })
+  const [suppliers, setSuppliers] = useState([])
+  const [loading, setLoading] = useState(true)
 
-  const filteredSuppliers = mockSuppliers.filter(supplier =>
+  const { token } = useAuth()
+
+  useEffect(() => {
+    const loadSuppliers = async () => {
+      try {
+        setLoading(true)
+        const supplierList = await suppliersApi.getAll()
+        setSuppliers(supplierList)
+      } catch (error) {
+        console.error('Failed to load suppliers:', error)
+        toast.error('Failed to load suppliers')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    if (token) {
+      loadSuppliers()
+    }
+  }, [token])
+
+  const filteredSuppliers = suppliers.filter(supplier =>
     supplier.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     supplier.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
     supplier.category.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
+  const handleSupplierSaved = async (action, supplierId, supplierData) => {
+    const loadingToast = toast.loading(`${action === 'create' ? 'Creating' : 'Updating'} supplier...`)
+    
+    try {
+      if (action === 'create') {
+        await suppliersApi.create(supplierData)
+        toast.success('Supplier created successfully!', { id: loadingToast })
+      } else if (action === 'update') {
+        await suppliersApi.update(supplierId, supplierData)
+        toast.success('Supplier updated successfully!', { id: loadingToast })
+      }
+      
+      const updatedSuppliers = await suppliersApi.getAll()
+      setSuppliers(updatedSuppliers)
+    } catch (error) {
+      const message = error.response?.data?.message || error.message || 'Failed to save supplier'
+      toast.error(message, { id: loadingToast })
+      throw error
+    }
+  }
+
   const handleDelete = async (supplierId) => {
-    const supplier = mockSuppliers.find(s => s.id === supplierId)
+    const supplier = suppliers.find(s => s.id === supplierId)
     const supplierName = supplier?.name || 'this supplier'
     
     const confirmed = await new Promise((resolve) => {
@@ -277,20 +288,22 @@ export default function Suppliers() {
     const loadingToast = toast.loading('Deleting supplier...')
     
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      
-      console.log('API Call:', {
-        endpoint: `DELETE /api/suppliers/${supplierId}`,
-        headers: { 'Authorization': 'Bearer <token>' },
-        request: null,
-        response: { success: true, message: 'Supplier deleted successfully' }
-      })
-      
+      await suppliersApi.delete(supplierId)
+      const updatedSuppliers = await suppliersApi.getAll()
+      setSuppliers(updatedSuppliers)
       toast.success('Supplier deleted successfully!', { id: loadingToast })
     } catch (error) {
-      toast.error('Failed to delete supplier', { id: loadingToast })
+      const message = error.response?.data?.message || error.message || 'Failed to delete supplier'
+      toast.error(message, { id: loadingToast })
     }
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+      </div>
+    )
   }
 
   return (
@@ -413,6 +426,7 @@ export default function Suppliers() {
         onClose={() => setModalState({ isOpen: false, supplier: null, mode: 'add' })}
         supplier={modalState.supplier}
         mode={modalState.mode}
+        onSupplierSaved={handleSupplierSaved}
       />
     </div>
   )
