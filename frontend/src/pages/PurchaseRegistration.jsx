@@ -206,6 +206,10 @@ export default function PurchaseRegistration() {
       if (result.success) {
         toast.success('Purchase registered successfully!', { id: loadingToast })
         
+        if (typeof window.refreshDashboard === 'function') {
+          window.refreshDashboard()
+        }
+        
         setInvoiceModal({
           isOpen: true,
           purchase: result.purchase,

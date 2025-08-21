@@ -804,13 +804,34 @@ export const mockApi = {
         throw new Error('Unauthorized')
       }
       
+      const now = new Date()
+      const currentMonth = now.getMonth()
+      const currentYear = now.getFullYear()
+      const lastMonth = currentMonth === 0 ? 11 : currentMonth - 1
+      const lastMonthYear = currentMonth === 0 ? currentYear - 1 : currentYear
+      
+      const purchasesThisMonth = mockPurchases.filter(purchase => {
+        const purchaseDate = new Date(purchase.purchaseDate)
+        return purchaseDate.getMonth() === currentMonth && purchaseDate.getFullYear() === currentYear
+      }).length
+      
+      const purchasesLastMonth = mockPurchases.filter(purchase => {
+        const purchaseDate = new Date(purchase.purchaseDate)
+        return purchaseDate.getMonth() === lastMonth && purchaseDate.getFullYear() === lastMonthYear
+      }).length
+      
+      const purchasePercentageChange = purchasesLastMonth === 0 
+        ? (purchasesThisMonth > 0 ? 100 : 0)
+        : Math.round(((purchasesThisMonth - purchasesLastMonth) / purchasesLastMonth) * 100)
+      
       return {
         totalRevenue,
         totalSales: mockSales.length,
+        totalPurchases: mockPurchases.length,
+        purchasePercentageChange,
         salesThisMonth: mockSales.filter(sale => {
           const saleDate = new Date(sale.saleDate)
-          const now = new Date()
-          return saleDate.getMonth() === now.getMonth() && saleDate.getFullYear() === now.getFullYear()
+          return saleDate.getMonth() === currentMonth && saleDate.getFullYear() === currentYear
         }).length
       }
     },

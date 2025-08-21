@@ -8,6 +8,7 @@ export default function StatCard({ title, value, icon: Icon, color = 'blue', tre
     yellow: 'bg-yellow-500 text-gray-200 shadow-yellow-500/20',
     red: 'bg-red-500 text-gray-200 shadow-red-500/20',
     purple: 'bg-purple-500 text-gray-200 shadow-purple-500/20',
+    orange: 'bg-orange-500 text-gray-200 shadow-orange-500/20',
   }
 
   const bgClasses = {
@@ -15,16 +16,21 @@ export default function StatCard({ title, value, icon: Icon, color = 'blue', tre
     green: 'bg-green-50 border-green-100', 
     yellow: 'bg-yellow-50 border-yellow-100',
     red: 'bg-red-50 border-red-100',
-    purple: 'bg-purple-50 border-purple-100'
+    purple: 'bg-purple-50 border-purple-100',
+    orange: 'bg-orange-50 border-orange-100'
   }
 
-  const numericValue = rawValue || (typeof value === 'string' ? parseInt(value.replace(/[^0-9]/g, '')) || 0 : value)
-  const animatedValue = useCountUp(numericValue, 2000)
+  const safeValue = value ?? 0
+  const safeTrend = trend ?? 0
+  const safeRawValue = rawValue ?? (typeof safeValue === 'string' ? parseInt(safeValue.replace(/[^0-9]/g, '')) || 0 : safeValue)
   
-  const displayValue = typeof value === 'string' && value.includes('$') 
-    ? `$${(animatedValue / 1000).toFixed(0)}K`
-    : typeof value === 'string' && value.includes('K')
-    ? `${(animatedValue / 1000).toFixed(0)}K`
+  const numericValue = safeRawValue || (typeof safeValue === 'string' ? parseInt(safeValue.replace(/[^0-9]/g, '')) || 0 : safeValue)
+  const animatedValue = useCountUp(Math.max(0, numericValue), 2000)
+  
+  const displayValue = typeof safeValue === 'string' && safeValue.includes('$') 
+    ? `$${animatedValue > 1000 ? (animatedValue / 1000).toFixed(1) : animatedValue}${animatedValue > 1000 ? 'K' : ''}`
+    : typeof safeValue === 'string' && safeValue.includes('K')
+    ? `${(animatedValue / 1000).toFixed(1)}K`
     : animatedValue.toLocaleString()
 
   return (
@@ -38,6 +44,7 @@ export default function StatCard({ title, value, icon: Icon, color = 'blue', tre
           color === 'green' ? 'rgba(16, 185, 129, 0.3)' : 
           color === 'yellow' ? 'rgba(245, 158, 11, 0.3)' : 
           color === 'red' ? 'rgba(239, 68, 68, 0.3)' : 
+          color === 'orange' ? 'rgba(249, 115, 22, 0.3)' :
           'rgba(147, 51, 234, 0.3)'}`
       }}
       transition={{ duration: 0.3, type: "spring", damping: 20 }}
@@ -58,21 +65,22 @@ export default function StatCard({ title, value, icon: Icon, color = 'blue', tre
           >
             {displayValue}
           </motion.p>
-          {trend && (
-            <motion.div
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.8 }}
-              className={`inline-flex items-center text-xs mt-2 sm:mt-3 px-2 py-1 rounded-full ${
-                trend > 0 ? 'text-green-700 bg-green-100' : 'text-red-700 bg-red-100'
-              }`}
-            >
-              <svg className={`w-3 h-3 mr-1 ${trend > 0 ? 'rotate-0' : 'rotate-180'}`} fill="currentColor" viewBox="0 0 20 20">
+          <motion.div
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.8 }}
+            className={`inline-flex items-center text-xs mt-2 sm:mt-3 px-2 py-1 rounded-full ${
+              safeTrend > 0 ? 'text-green-700 bg-green-100' : 
+              safeTrend < 0 ? 'text-red-700 bg-red-100' : 'text-gray-700 bg-gray-100'
+            }`}
+          >
+            {safeTrend !== 0 && (
+              <svg className={`w-3 h-3 mr-1 ${safeTrend > 0 ? 'rotate-0' : 'rotate-180'}`} fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M5.293 7.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L10 4.414 6.707 7.707a1 1 0 01-1.414 0z" clipRule="evenodd" />
               </svg>
-              {Math.abs(trend)}% from last month
-            </motion.div>
-          )}
+            )}
+            {Math.abs(safeTrend)}% from last month
+          </motion.div>
         </div>
         <motion.div 
           className={`flex-shrink-0 p-3 md:p-4 rounded-2xl bg-opacity-10 shadow-lg ${colorClasses[color]} self-center`}

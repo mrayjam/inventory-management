@@ -5,7 +5,8 @@ import {
   ExclamationTriangleIcon, 
   BuildingStorefrontIcon,
   CurrencyDollarIcon,
-  ReceiptPercentIcon 
+  ReceiptPercentIcon,
+  ShoppingCartIcon
 } from '@heroicons/react/24/outline'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts'
 import StatCard from '../components/StatCard'
@@ -42,8 +43,42 @@ export default function Dashboard() {
     lowStockItems: 0,
     totalSuppliers: 0,
     totalSales: 0,
-    totalRevenue: 0
+    totalRevenue: 0,
+    totalPurchases: 0,
+    purchasePercentageChange: 0
   })
+  
+  const refreshStats = async () => {
+    try {
+      const [products, suppliers, revenueData] = await Promise.all([
+        mockApi.products.getAll(token),
+        mockApi.suppliers.getAll(token),
+        mockApi.analytics.getRevenue(token)
+      ])
+      
+      const lowStockProducts = products.filter(p => p.stock < 20)
+      const activeSuppliers = suppliers.filter(s => s.status === 'Active')
+      
+      setStats({
+        totalProducts: products.length,
+        lowStockItems: lowStockProducts.length,
+        totalSuppliers: activeSuppliers.length,
+        totalSales: revenueData?.totalSales ?? 0,
+        totalRevenue: revenueData?.totalRevenue ?? 0,
+        totalPurchases: revenueData?.totalPurchases ?? 0,
+        purchasePercentageChange: revenueData?.purchasePercentageChange ?? 0
+      })
+    } catch (error) {
+      console.error('Failed to refresh dashboard stats:', error)
+      setStats(prev => ({
+        ...prev,
+        totalSales: 0,
+        totalRevenue: 0,
+        totalPurchases: 0,
+        purchasePercentageChange: 0
+      }))
+    }
+  }
   const [loading, setLoading] = useState(true)
   
   const { token } = useAuth()
@@ -52,22 +87,7 @@ export default function Dashboard() {
     const loadDashboardData = async () => {
       try {
         setLoading(true)
-        const [products, suppliers, revenueData] = await Promise.all([
-          mockApi.products.getAll(token),
-          mockApi.suppliers.getAll(token),
-          mockApi.analytics.getRevenue(token)
-        ])
-        
-        const lowStockProducts = products.filter(p => p.stock < 20)
-        const activeSuppliers = suppliers.filter(s => s.status === 'Active')
-        
-        setStats({
-          totalProducts: products.length,
-          lowStockItems: lowStockProducts.length,
-          totalSuppliers: activeSuppliers.length,
-          totalSales: revenueData.totalSales,
-          totalRevenue: revenueData.totalRevenue
-        })
+        await refreshStats()
       } catch (error) {
         console.error('Failed to load dashboard data:', error)
       } finally {
@@ -79,6 +99,8 @@ export default function Dashboard() {
       loadDashboardData()
     }
   }, [token])
+
+  window.refreshDashboard = refreshStats
 
   if (loading) {
     return (
@@ -96,7 +118,7 @@ export default function Dashboard() {
         </div>
 
         <motion.div 
-          className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-5 gap-4 sm:gap-6 mb-6 lg:mb-8 px-3"
+          className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-6 gap-4 sm:gap-6 mb-6 lg:mb-8 px-3"
           variants={{
             hidden: { opacity: 0 },
             show: {
@@ -151,11 +173,21 @@ export default function Dashboard() {
           </motion.div>
           <motion.div variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } }}>
             <StatCard
+              title="Total Purchases"
+              value={stats.totalPurchases || 0}
+              rawValue={stats.totalPurchases || 0}
+              icon={ShoppingCartIcon}
+              color="orange"
+              trend={stats.purchasePercentageChange || 0}
+            />
+          </motion.div>
+          <motion.div variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } }}>
+            <StatCard
               title="Total Revenue"
               value={stats.totalRevenue > 0 ? `$${(stats.totalRevenue / 1000).toFixed(1)}K` : '$0'}
-              rawValue={stats.totalRevenue}
+              rawValue={stats.totalRevenue || 0}
               icon={CurrencyDollarIcon}
-              color="green"
+              color="purple"
               trend={18}
             />
           </motion.div>
