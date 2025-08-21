@@ -24,7 +24,7 @@ import {
 } from '@heroicons/react/24/outline'
 import toast from 'react-hot-toast'
 import { useAuth } from '../contexts/AuthContext'
-import { mockApi } from '../services/mockApi'
+import { productsApi, uploadsApi } from '../services/api'
 
 
 const ProductDetailModal = ({ isOpen, onClose, product, onEditProduct, onViewHistory }) => {
@@ -229,6 +229,7 @@ const ProductModal = ({ isOpen, onClose, product, mode, onProductSaved }) => {
       name: formData.get('name'),
       category: formData.get('category'),
       sku: formData.get('sku'),
+      supplier: formData.get('supplier') || '',
       description: formData.get('description') || '',
       imageUrl: formData.get('imageUrl') || 'https://via.placeholder.com/300'
     }
@@ -314,6 +315,13 @@ const ProductModal = ({ isOpen, onClose, product, mode, onProductSaved }) => {
               </div>
               
               <FloatingLabelInput
+                name="supplier"
+                type="text"
+                label="Supplier"
+                defaultValue={product?.supplier || ''}
+              />
+              
+              <FloatingLabelInput
                 name="imageUrl"
                 type="url"
                 label="Product Image URL"
@@ -378,10 +386,11 @@ export default function Products() {
     const loadProducts = async () => {
       try {
         setLoading(true)
-        const productList = await mockApi.products.getAll(token)
+        const productList = await productsApi.getAll()
         setProducts(productList)
       } catch (error) {
         console.error('Failed to load products:', error)
+        toast.error('Failed to load products')
       } finally {
         setLoading(false)
       }
@@ -413,17 +422,18 @@ export default function Products() {
     
     try {
       if (action === 'create') {
-        await mockApi.products.create(token, productData)
+        await productsApi.create(productData)
         toast.success('Product created successfully!', { id: loadingToast })
       } else if (action === 'update') {
-        await mockApi.products.update(token, productId, productData)
+        await productsApi.update(productId, productData)
         toast.success('Product updated successfully!', { id: loadingToast })
       }
       
-      const updatedProducts = await mockApi.products.getAll(token)
+      const updatedProducts = await productsApi.getAll()
       setProducts(updatedProducts)
     } catch (error) {
-      toast.error(error.message || 'Failed to save product', { id: loadingToast })
+      const message = error.response?.data?.message || error.message || 'Failed to save product'
+      toast.error(message, { id: loadingToast })
       throw error
     }
   }
@@ -471,12 +481,13 @@ export default function Products() {
     const loadingToast = toast.loading('Deleting product...')
     
     try {
-      await mockApi.products.delete(token, productId)
-      const updatedProducts = await mockApi.products.getAll(token)
+      await productsApi.delete(productId)
+      const updatedProducts = await productsApi.getAll()
       setProducts(updatedProducts)
       toast.success('Product deleted successfully!', { id: loadingToast })
     } catch (error) {
-      toast.error(error.message || 'Failed to delete product', { id: loadingToast })
+      const message = error.response?.data?.message || error.message || 'Failed to delete product'
+      toast.error(message, { id: loadingToast })
     }
   }
 

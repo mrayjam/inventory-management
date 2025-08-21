@@ -24,7 +24,7 @@ import {
 import toast from 'react-hot-toast'
 import { useAuth } from '../contexts/AuthContext'
 import { useDashboard } from '../contexts/DashboardContext'
-import { mockApi } from '../services/mockApi'
+import { purchasesApi, productsApi, suppliersApi } from '../services/api'
 
 // Purchase Detail Modal Component
 const PurchaseDetailModal = ({ isOpen, onClose, purchase, onEditPurchase }) => {
@@ -493,9 +493,9 @@ export default function Purchase() {
     try {
       setLoading(true)
       const [purchaseList, productList, supplierList] = await Promise.all([
-        mockApi.purchases.getAll(token),
-        mockApi.products.getAll(token),
-        mockApi.suppliers.getAll(token)
+        purchasesApi.getAll(),
+        productsApi.getAll(),
+        suppliersApi.getAll()
       ])
       
       setPurchases(purchaseList.sort((a, b) => new Date(b.purchaseDate) - new Date(a.purchaseDate)))
@@ -503,7 +503,8 @@ export default function Purchase() {
       setSuppliers(supplierList)
     } catch (error) {
       console.error('Failed to load data:', error)
-      toast.error('Failed to load purchase data')
+      const message = error.response?.data?.message || error.message || 'Failed to load purchase data'
+      toast.error(message)
     } finally {
       setLoading(false)
     }
@@ -511,7 +512,7 @@ export default function Purchase() {
 
   const refreshPurchases = async () => {
     try {
-      const purchaseList = await mockApi.purchases.getAll(token)
+      const purchaseList = await purchasesApi.getAll()
       setPurchases(purchaseList.sort((a, b) => new Date(b.purchaseDate) - new Date(a.purchaseDate)))
     } catch (error) {
       console.error('Failed to refresh purchases:', error)
@@ -547,24 +548,21 @@ export default function Purchase() {
     )
     
     try {
-      let result
       if (purchaseModal.purchase) {
-        result = await mockApi.purchases.update(token, purchaseModal.purchase.id, purchaseData)
+        await purchasesApi.update(purchaseModal.purchase.id, purchaseData)
+        toast.success('Purchase updated successfully', { id: loadingToast })
       } else {
-        result = await mockApi.purchases.create(token, purchaseData)
+        await purchasesApi.create(purchaseData)
+        toast.success('Purchase created successfully', { id: loadingToast })
       }
       
-      if (result.success) {
-        toast.success(result.message, { id: loadingToast })
-        await refreshPurchases()
-        await refreshStats()
-        handleClosePurchaseModal()
-      } else {
-        toast.error(result.error || 'Operation failed', { id: loadingToast })
-      }
+      await refreshPurchases()
+      await refreshStats()
+      handleClosePurchaseModal()
     } catch (error) {
       console.error('Purchase operation error:', error)
-      toast.error(error.message || 'An error occurred', { id: loadingToast })
+      const message = error.response?.data?.message || error.message || 'An error occurred'
+      toast.error(message, { id: loadingToast })
     } finally {
       setPurchaseModal(prev => ({ ...prev, isLoading: false }))
     }
@@ -580,17 +578,14 @@ export default function Purchase() {
     const loadingToast = toast.loading('Deleting purchase...')
     
     try {
-      const result = await mockApi.purchases.delete(token, purchase.id)
-      if (result.success) {
-        toast.success(result.message, { id: loadingToast })
-        await refreshPurchases()
-        await refreshStats()
-      } else {
-        toast.error(result.error || 'Failed to delete purchase', { id: loadingToast })
-      }
+      await purchasesApi.delete(purchase.id)
+      toast.success('Purchase deleted successfully', { id: loadingToast })
+      await refreshPurchases()
+      await refreshStats()
     } catch (error) {
       console.error('Delete purchase error:', error)
-      toast.error(error.message || 'An error occurred', { id: loadingToast })
+      const message = error.response?.data?.message || error.message || 'An error occurred'
+      toast.error(message, { id: loadingToast })
     }
   }
 

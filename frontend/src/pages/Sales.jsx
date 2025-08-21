@@ -27,7 +27,7 @@ import {
 } from '@heroicons/react/24/outline'
 import toast from 'react-hot-toast'
 import { useAuth } from '../contexts/AuthContext'
-import { mockApi } from '../services/mockApi'
+import { salesApi, productsApi } from '../services/api'
 
 const SaleDetailModal = ({ isOpen, onClose, sale, onEditSale }) => {
   if (!isOpen || !sale) return null
@@ -150,11 +150,12 @@ const SaleModal = ({ isOpen, onClose, sale, mode, onSaleSaved }) => {
       const loadProducts = async () => {
         try {
           setLoading(true)
-          const productList = await mockApi.products.getAll(token)
+          const productList = await productsApi.getAll()
           setProducts(productList.filter(p => p.stock > 0))
         } catch (error) {
           console.error('Failed to load products:', error)
-          toast.error('Failed to load products')
+          const message = error.response?.data?.message || error.message || 'Failed to load products'
+          toast.error(message)
         } finally {
           setLoading(false)
         }
@@ -438,11 +439,12 @@ export default function Sales() {
     const loadSales = async () => {
       try {
         setLoading(true)
-        const salesList = await mockApi.sales.getAll(token)
+        const salesList = await salesApi.getAll()
         setSales(salesList.sort((a, b) => new Date(b.saleDate) - new Date(a.saleDate)))
       } catch (error) {
         console.error('Failed to load sales:', error)
-        toast.error('Failed to load sales')
+        const message = error.response?.data?.message || error.message || 'Failed to load sales'
+        toast.error(message)
       } finally {
         setLoading(false)
       }
@@ -471,12 +473,12 @@ export default function Sales() {
   const handleSaleSaved = async (action, saleId, saleData) => {
     try {
       if (action === 'create') {
-        await mockApi.sales.create(token, saleData)
+        await salesApi.create(saleData)
       } else if (action === 'update') {
-        await mockApi.sales.update(token, saleId, saleData)
+        await salesApi.update(saleId, saleData)
       }
       
-      const updatedSales = await mockApi.sales.getAll(token)
+      const updatedSales = await salesApi.getAll()
       setSales(updatedSales.sort((a, b) => new Date(b.saleDate) - new Date(a.saleDate)))
     } catch (error) {
       throw error
@@ -526,12 +528,13 @@ export default function Sales() {
     const loadingToast = toast.loading('Deleting sale...')
     
     try {
-      await mockApi.sales.delete(token, saleId)
-      const updatedSales = await mockApi.sales.getAll(token)
+      await salesApi.delete(saleId)
+      const updatedSales = await salesApi.getAll()
       setSales(updatedSales.sort((a, b) => new Date(b.saleDate) - new Date(a.saleDate)))
       toast.success('Sale deleted successfully!', { id: loadingToast })
     } catch (error) {
-      toast.error(error.message || 'Failed to delete sale', { id: loadingToast })
+      const message = error.response?.data?.message || error.message || 'Failed to delete sale'
+      toast.error(message, { id: loadingToast })
     }
   }
 
