@@ -15,6 +15,7 @@ import { Button } from '@/components/ui/button'
 import { useAuth } from '../contexts/AuthContext'
 import { useDashboard } from '../contexts/DashboardContext'
 import { mockApi } from '../services/mockApi'
+import PurchasesList from '../components/PurchasesList'
 
 const PurchaseInvoiceModal = ({ isOpen, onClose, purchase, invoice }) => {
   if (!isOpen || !purchase || !invoice) return null
@@ -473,6 +474,11 @@ export default function PurchaseRegistration() {
           />
         )}
       </AnimatePresence>
+
+      {/* Purchases List Section */}
+      <div className="mt-12">
+        <PurchasesList />
+      </div>
     </div>
   )
 }

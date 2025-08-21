@@ -614,6 +614,110 @@ export const mockApi = {
       }
       
       return purchase
+    },
+
+    update: async (token, id, purchaseData) => {
+      await delay(800)
+      
+      const user = verifyToken(token)
+      if (!user) {
+        throw new Error('Unauthorized')
+      }
+      
+      const purchaseIndex = mockPurchases.findIndex(p => p.id === parseInt(id))
+      if (purchaseIndex === -1) {
+        throw new Error('Purchase not found')
+      }
+      
+      const oldPurchase = mockPurchases[purchaseIndex]
+      const oldProduct = mockProducts.find(p => p.id === oldPurchase.productId)
+      
+      // Revert old stock change
+      if (oldProduct) {
+        oldProduct.stock -= oldPurchase.quantity
+      }
+      
+      // Validate new data
+      if (!purchaseData.productId || !purchaseData.quantity || !purchaseData.supplierId || !purchaseData.unitPrice) {
+        throw new Error('Product, quantity, supplier and unit price are required')
+      }
+      
+      const product = mockProducts.find(p => p.id === parseInt(purchaseData.productId))
+      if (!product) {
+        throw new Error('Product not found')
+      }
+      
+      const supplier = mockSuppliers.find(s => s.id === parseInt(purchaseData.supplierId))
+      if (!supplier) {
+        throw new Error('Supplier not found')
+      }
+      
+      if (supplier.status !== 'Active') {
+        throw new Error('Cannot purchase from inactive supplier')
+      }
+      
+      const quantity = parseInt(purchaseData.quantity)
+      const unitPrice = parseFloat(purchaseData.unitPrice)
+      
+      if (unitPrice <= 0) {
+        throw new Error('Unit price must be greater than 0')
+      }
+      
+      const totalAmount = (quantity * unitPrice).toFixed(2)
+      
+      const updatedPurchase = {
+        ...oldPurchase,
+        productId: product.id,
+        productName: purchaseData.productName || product.name,
+        productSku: purchaseData.productSku || product.sku,
+        supplierId: supplier.id,
+        supplierName: purchaseData.supplierName || supplier.name,
+        quantity,
+        unitPrice,
+        totalAmount: parseFloat(totalAmount),
+        updatedAt: new Date().toISOString(),
+        updatedBy: user.name
+      }
+      
+      mockPurchases[purchaseIndex] = updatedPurchase
+      
+      // Apply new stock change
+      product.stock += quantity
+      
+      return {
+        success: true,
+        purchase: updatedPurchase,
+        message: 'Purchase updated successfully'
+      }
+    },
+
+    delete: async (token, id) => {
+      await delay(500)
+      
+      const user = verifyToken(token)
+      if (!user) {
+        throw new Error('Unauthorized')
+      }
+      
+      const purchaseIndex = mockPurchases.findIndex(p => p.id === parseInt(id))
+      if (purchaseIndex === -1) {
+        throw new Error('Purchase not found')
+      }
+      
+      const purchase = mockPurchases[purchaseIndex]
+      const product = mockProducts.find(p => p.id === purchase.productId)
+      
+      // Revert stock increase from this purchase
+      if (product) {
+        product.stock -= purchase.quantity
+      }
+      
+      mockPurchases.splice(purchaseIndex, 1)
+      
+      return {
+        success: true,
+        message: 'Purchase deleted successfully'
+      }
     }
   },
 
