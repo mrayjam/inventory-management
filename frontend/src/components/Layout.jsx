@@ -26,7 +26,7 @@ export default function Layout() {
     { name: 'Products', href: '/products', icon: CubeIcon },
     { name: 'Suppliers', href: '/suppliers', icon: BuildingStorefrontIcon },
     { name: 'Sales', href: '/sales', icon: CurrencyDollarIcon },
-    { name: 'Purchase', href: '/purchase-registration', icon: ShoppingCartIcon },
+    { name: 'Purchases', href: '/purchases', icon: ShoppingCartIcon },
     { name: 'Analytics', href: '/analytics', icon: ChartBarIcon },
   ]
 

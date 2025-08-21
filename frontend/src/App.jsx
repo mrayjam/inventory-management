@@ -9,7 +9,7 @@ import Dashboard from './pages/Dashboard'
 import Products from './pages/Products'
 import Suppliers from './pages/Suppliers'
 import Sales from './pages/Sales'
-import PurchaseRegistration from './pages/PurchaseRegistration'
+import Purchase from './pages/Purchase'
 import Analytics from './pages/Analytics'
 import ChangePasswordPage from './pages/ChangePasswordPage'
 import SuperAdminPanel from './pages/SuperAdminPanel'
@@ -36,7 +36,7 @@ function App() {
                 <Route path="products" element={<Products />} />
                 <Route path="suppliers" element={<Suppliers />} />
                 <Route path="sales" element={<Sales />} />
-                <Route path="purchase-registration" element={<PurchaseRegistration />} />
+                <Route path="purchases" element={<Purchase />} />
                 <Route path="analytics" element={<Analytics />} />
                 <Route path="change-password" element={<ChangePasswordPage />} />
                 <Route 
