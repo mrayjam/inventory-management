@@ -29,7 +29,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      const data = await mockApi.auth.login(email, password)
+      const data = await authApi.login(email, password)
       
       setToken(data.token)
       setUser(data.user)
@@ -38,7 +38,8 @@ export const AuthProvider = ({ children }) => {
       
       return { success: true }
     } catch (error) {
-      return { success: false, error: error.message }
+      const message = error.response?.data?.message || error.message || 'Login failed'
+      return { success: false, error: message }
     }
   }
 
@@ -51,28 +52,31 @@ export const AuthProvider = ({ children }) => {
 
   const changePassword = async (currentPassword, newPassword) => {
     try {
-      const data = await mockApi.auth.changePassword(token, currentPassword, newPassword)
+      const data = await authApi.changePassword(currentPassword, newPassword)
       return { success: true, message: data.message }
     } catch (error) {
-      return { success: false, error: error.message }
+      const message = error.response?.data?.message || error.message || 'Password change failed'
+      return { success: false, error: message }
     }
   }
 
   const createAdmin = async (name, email, password) => {
     try {
-      const data = await mockApi.users.create(token, { name, email, password, role: 'admin' })
+      const data = await usersApi.create({ name, email, password, role: 'admin' })
       return { success: true, user: data.user }
     } catch (error) {
-      return { success: false, error: error.message }
+      const message = error.response?.data?.message || error.message || 'User creation failed'
+      return { success: false, error: message }
     }
   }
 
   const resetAdminPassword = async (userId, newPassword) => {
     try {
-      const data = await mockApi.users.resetPassword(token, userId, newPassword)
+      const data = await usersApi.resetPassword(userId, newPassword)
       return { success: true, message: data.message }
     } catch (error) {
-      return { success: false, error: error.message }
+      const message = error.response?.data?.message || error.message || 'Password reset failed'
+      return { success: false, error: message }
     }
   }
 

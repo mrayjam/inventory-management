@@ -71,6 +71,7 @@ const LoginPage = () => {
     }
 
     setIsLoading(true)
+    setServerError('')
     const loadingToast = toast.loading('Signing you in...')
 
     try {
@@ -79,10 +80,13 @@ const LoginPage = () => {
       if (result.success) {
         toast.success('Welcome back! Redirecting...', { id: loadingToast })
       } else {
+        setServerError(result.error)
         toast.error(result.error, { id: loadingToast })
       }
     } catch (error) {
-      toast.error('An unexpected error occurred', { id: loadingToast })
+      const errorMessage = 'An unexpected error occurred'
+      setServerError(errorMessage)
+      toast.error(errorMessage, { id: loadingToast })
     } finally {
       setIsLoading(false)
     }
@@ -233,6 +237,19 @@ const LoginPage = () => {
                   )}
                 </AnimatePresence>
               </motion.div>
+
+              <AnimatePresence>
+                {serverError && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="bg-red-50 border border-red-200 rounded-xl p-3"
+                  >
+                    <p className="text-sm text-red-600 text-center">{serverError}</p>
+                  </motion.div>
+                )}
+              </AnimatePresence>
 
               <motion.div
                 initial={{ y: 20, opacity: 0 }}
