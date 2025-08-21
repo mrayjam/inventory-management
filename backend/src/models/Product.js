@@ -46,7 +46,6 @@ const productSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Transform output to match API spec
 productSchema.methods.toJSON = function() {
   const product = this.toObject();
   product.id = product._id.toString();

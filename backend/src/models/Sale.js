@@ -48,13 +48,11 @@ const saleSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Calculate total amount before saving
 saleSchema.pre('save', function(next) {
   this.totalAmount = this.quantity * this.salePrice;
   next();
 });
 
-// Transform output to match API spec
 saleSchema.methods.toJSON = function() {
   const sale = this.toObject();
   sale.id = sale._id.toString();

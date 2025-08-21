@@ -52,13 +52,11 @@ const purchaseSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Calculate total amount before saving
 purchaseSchema.pre('save', function(next) {
   this.totalAmount = this.quantity * this.unitPrice;
   next();
 });
 
-// Transform output to match API spec
 purchaseSchema.methods.toJSON = function() {
   const purchase = this.toObject();
   purchase.id = purchase._id.toString();

@@ -9,7 +9,6 @@ export const handleValidationErrors = (req, res, next) => {
   next();
 };
 
-// Authentication validations
 export const validateLogin = [
   body('email').isEmail().normalizeEmail().withMessage('Please enter a valid email'),
   body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
@@ -22,7 +21,6 @@ export const validateChangePassword = [
   handleValidationErrors
 ];
 
-// User validations
 export const validateCreateUser = [
   body('name').trim().isLength({ min: 1 }).withMessage('Name is required'),
   body('email').isEmail().normalizeEmail().withMessage('Please enter a valid email'),
@@ -37,7 +35,6 @@ export const validateResetPassword = [
   handleValidationErrors
 ];
 
-// Product validations
 export const validateCreateProduct = [
   body('name').trim().isLength({ min: 1 }).withMessage('Product name is required'),
   body('category').trim().isLength({ min: 1 }).withMessage('Category is required'),
@@ -65,7 +62,6 @@ export const validateDeleteProduct = [
   handleValidationErrors
 ];
 
-// Supplier validations
 export const validateCreateSupplier = [
   body('name').trim().isLength({ min: 1 }).withMessage('Supplier name is required'),
   body('email').isEmail().normalizeEmail().withMessage('Please enter a valid email'),
@@ -92,7 +88,6 @@ export const validateDeleteSupplier = [
   handleValidationErrors
 ];
 
-// Purchase validations
 export const validateCreatePurchase = [
   body('productId').isMongoId().withMessage('Invalid product ID'),
   body('quantity').isInt({ min: 1 }).withMessage('Quantity must be at least 1'),
@@ -121,7 +116,6 @@ export const validateDeletePurchase = [
   handleValidationErrors
 ];
 
-// Sale validations
 export const validateCreateSale = [
   body('productId').isMongoId().withMessage('Invalid product ID'),
   body('quantity').isInt({ min: 1 }).withMessage('Quantity must be at least 1'),

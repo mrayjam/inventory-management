@@ -4,13 +4,11 @@ export const createUser = async (req, res) => {
   try {
     const { name, email, password, role = 'admin' } = req.body;
 
-    // Check if user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ message: 'Email already exists' });
     }
 
-    // Create new user
     const user = new User({
       name,
       email,
@@ -51,7 +49,6 @@ export const resetUserPassword = async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    // Update password
     user.password = newPassword;
     await user.save();
 

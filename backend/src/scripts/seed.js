@@ -19,7 +19,6 @@ const seedData = async () => {
     await Supplier.deleteMany({});
     console.log('Cleared existing data');
 
-    // Users
     const users = [
       {
         name: 'Admin User',
@@ -50,7 +49,6 @@ const seedData = async () => {
     await User.insertMany(users);
     console.log('✅ Users seeded (passwords hashed)');
 
-    // Suppliers
     const suppliers = [
       {
         name: 'TechCorp Solutions',
@@ -89,7 +87,6 @@ const seedData = async () => {
     await Supplier.insertMany(suppliers);
     console.log('✅ Suppliers seeded');
 
-    // Products
     const products = [
       {
         name: 'Wireless Headphones',

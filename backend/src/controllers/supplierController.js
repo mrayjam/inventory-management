@@ -28,7 +28,6 @@ export const createSupplier = async (req, res) => {
   try {
     const { name, email, phone, address, category, status = 'Active' } = req.body;
 
-    // Check if email already exists
     const existingSupplier = await Supplier.findOne({ email });
     if (existingSupplier) {
       return res.status(400).json({ message: 'Email already exists' });
@@ -62,13 +61,11 @@ export const updateSupplier = async (req, res) => {
     const { id } = req.params;
     const updates = req.body;
 
-    // Check if supplier exists
     const supplier = await Supplier.findById(id);
     if (!supplier) {
       return res.status(404).json({ message: 'Supplier not found' });
     }
 
-    // If email is being updated, check uniqueness
     if (updates.email && updates.email !== supplier.email) {
       const existingSupplier = await Supplier.findOne({ email: updates.email });
       if (existingSupplier) {
@@ -76,7 +73,6 @@ export const updateSupplier = async (req, res) => {
       }
     }
 
-    // Update supplier
     const updatedSupplier = await Supplier.findByIdAndUpdate(
       id,
       { $set: updates },

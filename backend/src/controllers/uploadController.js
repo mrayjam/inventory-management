@@ -2,13 +2,11 @@ import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
 
-// Create uploads directory if it doesn't exist
 const uploadDir = process.env.UPLOAD_PATH || 'uploads/';
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
 
-// Configure multer for file uploads
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, uploadDir);
@@ -20,7 +18,6 @@ const storage = multer.diskStorage({
 });
 
 const fileFilter = (req, file, cb) => {
-  // Accept only image files
   if (file.mimetype.startsWith('image/')) {
     cb(null, true);
   } else {
@@ -42,8 +39,6 @@ export const uploadFile = async (req, res) => {
       return res.status(400).json({ message: 'No file provided' });
     }
 
-    // In a real application, you would upload to cloud storage (AWS S3, Cloudinary, etc.)
-    // For this implementation, we'll return a local file URL
     const fileUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
 
     res.json({

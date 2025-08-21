@@ -30,13 +30,11 @@ export const createPurchase = async (req, res) => {
   try {
     const { productId, quantity, supplierId, unitPrice, productName, productSku, supplierName } = req.body;
 
-    // Verify product exists
     const product = await Product.findById(productId);
     if (!product) {
       return res.status(404).json({ message: 'Product not found' });
     }
 
-    // Verify supplier exists and is active
     const supplier = await Supplier.findById(supplierId);
     if (!supplier) {
       return res.status(404).json({ message: 'Supplier not found' });
@@ -46,7 +44,6 @@ export const createPurchase = async (req, res) => {
       return res.status(400).json({ message: 'Cannot purchase from inactive supplier' });
     }
 
-    // Create purchase
     const purchase = new Purchase({
       productId,
       productName: productName || product.name,
@@ -60,11 +57,9 @@ export const createPurchase = async (req, res) => {
 
     await purchase.save();
 
-    // Update product stock
     product.stock += quantity;
     await product.save();
 
-    // Generate invoice
     const invoice = {
       id: `INV-${Date.now()}`,
       purchaseId: purchase.id,
@@ -91,19 +86,16 @@ export const updatePurchase = async (req, res) => {
     const { id } = req.params;
     const { productId, quantity, supplierId, unitPrice, productName, productSku, supplierName } = req.body;
 
-    // Find existing purchase
     const existingPurchase = await Purchase.findById(id);
     if (!existingPurchase) {
       return res.status(404).json({ message: 'Purchase not found' });
     }
 
-    // Verify new product exists
     const product = await Product.findById(productId);
     if (!product) {
       return res.status(404).json({ message: 'Product not found' });
     }
 
-    // Verify new supplier exists and is active
     const supplier = await Supplier.findById(supplierId);
     if (!supplier) {
       return res.status(404).json({ message: 'Supplier not found' });
@@ -113,14 +105,12 @@ export const updatePurchase = async (req, res) => {
       return res.status(400).json({ message: 'Cannot purchase from inactive supplier' });
     }
 
-    // Revert stock change from old purchase
     const oldProduct = await Product.findById(existingPurchase.productId);
     if (oldProduct) {
       oldProduct.stock -= existingPurchase.quantity;
       await oldProduct.save();
     }
 
-    // Update purchase
     existingPurchase.productId = productId;
     existingPurchase.productName = productName || product.name;
     existingPurchase.productSku = productSku || product.sku;
@@ -132,7 +122,6 @@ export const updatePurchase = async (req, res) => {
 
     await existingPurchase.save();
 
-    // Apply new stock change
     product.stock += quantity;
     await product.save();
 
@@ -155,7 +144,6 @@ export const deletePurchase = async (req, res) => {
       return res.status(404).json({ message: 'Purchase not found' });
     }
 
-    // Revert stock change from this purchase
     const product = await Product.findById(purchase.productId);
     if (product) {
       product.stock -= purchase.quantity;

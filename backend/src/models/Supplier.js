@@ -37,7 +37,6 @@ const supplierSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Transform output to match API spec
 supplierSchema.methods.toJSON = function() {
   const supplier = this.toObject();
   supplier.id = supplier._id.toString();

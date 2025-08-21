@@ -29,20 +29,17 @@ export const createSale = async (req, res) => {
   try {
     const { productId, quantity, salePrice, customer = '', saleDate } = req.body;
 
-    // Verify product exists
     const product = await Product.findById(productId);
     if (!product) {
       return res.status(404).json({ message: 'Product not found' });
     }
 
-    // Check stock availability
     if (product.stock < quantity) {
       return res.status(400).json({ 
         message: `Insufficient stock. Available: ${product.stock}, Requested: ${quantity}` 
       });
     }
 
-    // Create sale
     const sale = new Sale({
       productId,
       productName: product.name,
@@ -56,7 +53,6 @@ export const createSale = async (req, res) => {
 
     await sale.save();
 
-    // Update product stock
     product.stock -= quantity;
     await product.save();
 
@@ -75,20 +71,17 @@ export const updateSale = async (req, res) => {
     const { id } = req.params;
     const updates = req.body;
 
-    // Find existing sale
     const existingSale = await Sale.findById(id);
     if (!existingSale) {
       return res.status(404).json({ message: 'Sale not found' });
     }
 
-    // Revert stock change from old sale
     const oldProduct = await Product.findById(existingSale.productId);
     if (oldProduct) {
       oldProduct.stock += existingSale.quantity;
       await oldProduct.save();
     }
 
-    // If product is changing, verify new product
     let newProduct = oldProduct;
     if (updates.productId && updates.productId !== existingSale.productId.toString()) {
       newProduct = await Product.findById(updates.productId);
@@ -97,7 +90,6 @@ export const updateSale = async (req, res) => {
       }
     }
 
-    // Check stock availability for new quantity
     const newQuantity = updates.quantity || existingSale.quantity;
     if (newProduct.stock < newQuantity) {
       return res.status(400).json({ 
@@ -105,14 +97,12 @@ export const updateSale = async (req, res) => {
       });
     }
 
-    // Update sale
     Object.keys(updates).forEach(key => {
       if (key !== 'id') {
         existingSale[key] = updates[key];
       }
     });
 
-    // Update product references if product changed
     if (updates.productId && updates.productId !== oldProduct._id.toString()) {
       existingSale.productName = newProduct.name;
       existingSale.productSku = newProduct.sku;
@@ -121,7 +111,6 @@ export const updateSale = async (req, res) => {
     existingSale.updatedBy = req.user.name;
     await existingSale.save();
 
-    // Apply new stock change
     newProduct.stock -= newQuantity;
     await newProduct.save();
 
@@ -143,7 +132,6 @@ export const deleteSale = async (req, res) => {
       return res.status(404).json({ message: 'Sale not found' });
     }
 
-    // Revert stock change from this sale
     const product = await Product.findById(sale.productId);
     if (product) {
       product.stock += sale.quantity;
