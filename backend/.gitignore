@@ -82,3 +82,7 @@ $RECYCLE.BIN/
 
 # Windows hidden file attributes
 Icon?
+
+
+# Temp API docs
+API_DOCUMENTATION.md

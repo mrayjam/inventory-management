@@ -1,55 +1,56 @@
 import dotenv from 'dotenv';
 import connectDatabase from '../config/database.js';
+import bcrypt from 'bcryptjs';
 import User from '../models/User.js';
 import Product from '../models/Product.js';
 import Supplier from '../models/Supplier.js';
 
-// Load environment variables
+
 dotenv.config();
 
 const seedData = async () => {
   try {
-    // Connect to database
+    
     await connectDatabase();
 
-    // Clear existing data
+    
     await User.deleteMany({});
     await Product.deleteMany({});
     await Supplier.deleteMany({});
     console.log('Cleared existing data');
 
-    // Create users
+    // Users
     const users = [
       {
         name: 'Admin User',
         email: 'admin@example.com',
-        password: 'password123',
+        password: bcrypt.hashSync('password123', 10),
         role: 'admin'
       },
       {
         name: 'Super Admin',
         email: 'superadmin@example.com', 
-        password: 'password123',
+        password: bcrypt.hashSync('password123', 10),
         role: 'super_admin'
       },
       {
         name: 'John Doe',
         email: 'john@example.com',
-        password: 'password123',
+        password: bcrypt.hashSync('password123', 10),
         role: 'admin'
       },
       {
         name: 'Jane Smith',
         email: 'jane@example.com',
-        password: 'password123',
+        password: bcrypt.hashSync('password123', 10),
         role: 'admin'
       }
     ];
 
     await User.insertMany(users);
-    console.log('✅ Users seeded');
+    console.log('✅ Users seeded (passwords hashed)');
 
-    // Create suppliers
+    // Suppliers
     const suppliers = [
       {
         name: 'TechCorp Solutions',
@@ -88,7 +89,7 @@ const seedData = async () => {
     await Supplier.insertMany(suppliers);
     console.log('✅ Suppliers seeded');
 
-    // Create products
+    // Products
     const products = [
       {
         name: 'Wireless Headphones',
