@@ -1,5 +1,6 @@
 import Purchase from '../models/Purchase.js';
 import Product from '../models/Product.js';
+import ProductHistory from '../models/ProductHistory.js';
 import Supplier from '../models/Supplier.js';
 
 export const getAllPurchases = async (req, res) => {
@@ -57,8 +58,33 @@ export const createPurchase = async (req, res) => {
 
     await purchase.save();
 
-    product.stock += quantity;
-    await product.save();
+    const oldPrice = product.price;
+    if (oldPrice !== unitPrice) {
+      product.price = unitPrice;
+      await product.save();
+
+      if (oldPrice !== null && oldPrice !== undefined) {
+        await new ProductHistory({
+          product: product._id,
+          action: 'price_changed',
+          user: req.user.id,
+          userName: req.user.name,
+          oldValue: oldPrice,
+          newValue: unitPrice,
+          details: `Price updated from $${oldPrice} to $${unitPrice} via purchase`
+        }).save();
+      }
+    }
+
+    await new ProductHistory({
+      product: product._id,
+      action: 'stock_changed',
+      user: req.user.id,
+      userName: req.user.name,
+      oldValue: null,
+      newValue: quantity,
+      details: `Stock increased by ${quantity} units via purchase`
+    }).save();
 
     const invoice = {
       id: `INV-${Date.now()}`,
@@ -105,12 +131,6 @@ export const updatePurchase = async (req, res) => {
       return res.status(400).json({ message: 'Cannot purchase from inactive supplier' });
     }
 
-    const oldProduct = await Product.findById(existingPurchase.productId);
-    if (oldProduct) {
-      oldProduct.stock -= existingPurchase.quantity;
-      await oldProduct.save();
-    }
-
     existingPurchase.productId = productId;
     existingPurchase.productName = productName || product.name;
     existingPurchase.productSku = productSku || product.sku;
@@ -122,8 +142,33 @@ export const updatePurchase = async (req, res) => {
 
     await existingPurchase.save();
 
-    product.stock += quantity;
-    await product.save();
+    const oldPrice = product.price;
+    if (oldPrice !== unitPrice) {
+      product.price = unitPrice;
+      await product.save();
+
+      if (oldPrice !== null && oldPrice !== undefined) {
+        await new ProductHistory({
+          product: product._id,
+          action: 'price_changed',
+          user: req.user.id,
+          userName: req.user.name,
+          oldValue: oldPrice,
+          newValue: unitPrice,
+          details: `Price updated from $${oldPrice} to $${unitPrice} via purchase update`
+        }).save();
+      }
+    }
+
+    await new ProductHistory({
+      product: product._id,
+      action: 'stock_changed',
+      user: req.user.id,
+      userName: req.user.name,
+      oldValue: null,
+      newValue: quantity,
+      details: `Purchase updated - quantity changed to ${quantity} units`
+    }).save();
 
     res.json({
       success: true,
@@ -144,11 +189,15 @@ export const deletePurchase = async (req, res) => {
       return res.status(404).json({ message: 'Purchase not found' });
     }
 
-    const product = await Product.findById(purchase.productId);
-    if (product) {
-      product.stock -= purchase.quantity;
-      await product.save();
-    }
+    await new ProductHistory({
+      product: purchase.productId,
+      action: 'stock_changed',
+      user: req.user.id,
+      userName: req.user.name,
+      oldValue: null,
+      newValue: -purchase.quantity,
+      details: `Stock decreased by ${purchase.quantity} units due to purchase deletion`
+    }).save();
 
     await Purchase.findByIdAndDelete(id);
 
