@@ -161,6 +161,11 @@ export const productsApi = {
   delete: async (id) => {
     const response = await apiClient.delete(`/products/${id}`)
     return response.data
+  },
+
+  getHistory: async (id) => {
+    const response = await apiClient.get(`/products/${id}/history`)
+    return response.data
   }
 }
 
