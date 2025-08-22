@@ -17,8 +17,6 @@ import {
   XMarkIcon,
   EyeIcon,
   ClockIcon,
-  Squares2X2Icon,
-  RectangleGroupIcon,
   ChevronLeftIcon,
   ChevronRightIcon
 } from '@heroicons/react/24/outline'
@@ -92,14 +90,10 @@ const ProductDetailModal = ({ isOpen, onClose, product, onEditProduct, onViewHis
               </div>
             </div>
             
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-4 sm:mb-6">
+            <div className="mb-4 sm:mb-6">
               <div>
                 <p className="text-sm font-medium text-gray-500">Category</p>
                 <p className="text-lg text-gray-900">{product.category}</p>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-500">Supplier</p>
-                <p className="text-lg text-gray-900">{product.supplier}</p>
               </div>
             </div>
             
@@ -138,14 +132,29 @@ const ProductDetailModal = ({ isOpen, onClose, product, onEditProduct, onViewHis
 }
 
 const ProductHistoryModal = ({ isOpen, onClose, product }) => {
-  if (!isOpen || !product) return null
+  const [history, setHistory] = useState([])
+  const [loading, setLoading] = useState(false)
 
-  const mockHistory = [
-    { id: 1, action: 'Created', user: 'John Doe', date: '2024-01-15', details: 'Product added to inventory' },
-    { id: 2, action: 'Stock Updated', user: 'Jane Smith', date: '2024-01-20', details: 'Stock increased from 45 to 75 units' },
-    { id: 3, action: 'Price Modified', user: 'John Doe', date: '2024-01-25', details: 'Price changed from $899.99 to $849.99' },
-    { id: 4, action: 'Description Updated', user: 'Admin', date: '2024-02-01', details: 'Product description enhanced' },
-  ]
+  useEffect(() => {
+    const fetchHistory = async () => {
+      if (isOpen && product) {
+        try {
+          setLoading(true)
+          const historyData = await productsApi.getHistory(product.id)
+          setHistory(historyData)
+        } catch (error) {
+          console.error('Failed to fetch product history:', error)
+          toast.error('Failed to load product history')
+        } finally {
+          setLoading(false)
+        }
+      }
+    }
+
+    fetchHistory()
+  }, [isOpen, product])
+
+  if (!isOpen || !product) return null
 
   return (
     <motion.div
@@ -181,30 +190,44 @@ const ProductHistoryModal = ({ isOpen, onClose, product }) => {
           </button>
         </div>
 
-        <div className="space-y-4">
-          {mockHistory.map((entry, index) => (
-            <motion.div
-              key={entry.id}
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: index * 0.1 }}
-              className="bg-white/70 backdrop-blur-sm rounded-lg p-4 border border-white/30"
-            >
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="font-semibold text-slate-900">{entry.action}</span>
-                    <span className="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded-full">
-                      {entry.user}
-                    </span>
-                  </div>
-                  <p className="text-sm text-slate-600 mb-1">{entry.details}</p>
-                  <p className="text-xs text-slate-400">{entry.date}</p>
-                </div>
+        {loading ? (
+          <div className="flex items-center justify-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {history.length === 0 ? (
+              <div className="text-center py-8 text-slate-500">
+                No history available for this product
               </div>
-            </motion.div>
-          ))}
-        </div>
+            ) : (
+              history.map((entry, index) => (
+                <motion.div
+                  key={entry.id}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  className="bg-white/70 backdrop-blur-sm rounded-lg p-4 border border-white/30"
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="font-semibold text-slate-900 capitalize">
+                          {entry.action.replace('_', ' ')}
+                        </span>
+                        <span className="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded-full">
+                          {entry.user}
+                        </span>
+                      </div>
+                      <p className="text-sm text-slate-600 mb-1">{entry.details}</p>
+                      <p className="text-xs text-slate-400">{entry.date}</p>
+                    </div>
+                  </div>
+                </motion.div>
+              ))
+            )}
+          </div>
+        )}
 
         <div className="mt-4 sm:mt-6 flex justify-end">
           <button
@@ -232,6 +255,7 @@ const ProductModal = ({ isOpen, onClose, product, mode, onProductSaved }) => {
       setRemovedImageIds([])
     }
   }, [isOpen])
+
 
   if (!isOpen) return null
 
@@ -263,7 +287,6 @@ const ProductModal = ({ isOpen, onClose, product, mode, onProductSaved }) => {
       name: formData.get('name'),
       category: formData.get('category'),
       sku: formData.get('sku'),
-      supplier: formData.get('supplier') || '',
       description: formData.get('description') || '',
       images: validFiles
     }
@@ -353,13 +376,6 @@ const ProductModal = ({ isOpen, onClose, product, mode, onProductSaved }) => {
                   required
                 />
               </div>
-              
-              <FloatingLabelInput
-                name="supplier"
-                type="text"
-                label="Supplier"
-                defaultValue={product?.supplier || ''}
-              />
             </div>
             
             <div className="space-y-6">
@@ -444,8 +460,7 @@ export default function Products() {
 
   const filteredProducts = products.filter(product =>
     product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    product.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    product.supplier.toLowerCase().includes(searchTerm.toLowerCase())
+    product.category.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
   // Table view pagination (3 rows per page)
@@ -541,13 +556,6 @@ export default function Products() {
     toast.success(`Viewing history for ${product.name}`)
   }
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
-      </div>
-    )
-  }
 
   return (
     <div className="w-full max-w-full overflow-x-hidden min-w-0">
@@ -590,73 +598,103 @@ export default function Products() {
                 <th className="text-left px-6 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider">Category</th>
                 <th className="text-left px-6 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider">Price</th>
                 <th className="text-left px-6 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider">Stock</th>
-                <th className="text-left px-6 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider">Supplier</th>
                 <th className="text-left px-6 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-200">
-              {currentTableProducts.map((product) => (
-                <motion.tr
-                  key={product.id}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="hover:bg-slate-50"
-                >
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-3">
-                      <img
-                        src={product.images && product.images.length > 0 ? product.images[0].url : product.imageUrl || 'https://via.placeholder.com/300'}
-                        alt={product.name}
-                        className="h-12 w-12 rounded-lg object-cover cursor-pointer hover:opacity-80 transition-opacity"
-                        onClick={() => setDetailModal({ isOpen: true, product })}
-                      />
-                      <div>
-                        <div className="font-medium text-slate-900">{product.name}</div>
-                        <div className="text-sm text-slate-500">SKU: {product.sku}</div>
+              {loading ? (
+                [...Array(3)].map((_, index) => (
+                  <tr key={`skeleton-${index}`} className="animate-pulse">
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-3">
+                        <div className="h-12 w-12 bg-slate-200 rounded-lg"></div>
+                        <div>
+                          <div className="h-4 bg-slate-200 rounded w-24 mb-2"></div>
+                          <div className="h-3 bg-slate-200 rounded w-16"></div>
+                        </div>
                       </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 text-sm text-slate-900">{product.category}</td>
-                  <td className="px-6 py-4 text-sm text-slate-900">${product.price}</td>
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-1">
-                      <span className="font-medium text-slate-900">{product.stock}</span>
-                      <span className="text-xs text-slate-500">units</span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 text-sm text-slate-900">{product.supplier}</td>
-                  <td className="px-6 py-4">
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => setDetailModal({ isOpen: true, product })}
-                        className="text-gray-600 hover:text-gray-800 p-1"
-                        title="View Details"
-                      >
-                        <EyeIcon className="h-4 w-4" />
-                      </button>
-                      <button
-                        onClick={() => setModalState({ isOpen: true, product, mode: 'edit' })}
-                        className="text-blue-600 hover:text-blue-800 p-1"
-                        title="Edit Product"
-                      >
-                        <PencilIcon className="h-4 w-4" />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(product.id)}
-                        className="text-red-600 hover:text-red-800 p-1"
-                        title="Delete Product"
-                      >
-                        <TrashIcon className="h-4 w-4" />
-                      </button>
-                    </div>
-                  </td>
-                </motion.tr>
-              ))}
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="h-4 bg-slate-200 rounded w-20"></div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="h-4 bg-slate-200 rounded w-12"></div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="h-4 bg-slate-200 rounded w-16"></div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex gap-2">
+                        <div className="h-6 w-6 bg-slate-200 rounded"></div>
+                        <div className="h-6 w-6 bg-slate-200 rounded"></div>
+                        <div className="h-6 w-6 bg-slate-200 rounded"></div>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                currentTableProducts.map((product) => (
+                  <motion.tr
+                    key={product.id}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="hover:bg-slate-50"
+                  >
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-3">
+                        <img
+                          src={product.images && product.images.length > 0 ? product.images[0].url : product.imageUrl || 'https://via.placeholder.com/300'}
+                          alt={product.name}
+                          className="h-12 w-12 rounded-lg object-cover cursor-pointer hover:opacity-80 transition-opacity"
+                          onClick={() => setDetailModal({ isOpen: true, product })}
+                        />
+                        <div>
+                          <div className="font-medium text-slate-900">{product.name}</div>
+                          <div className="text-sm text-slate-500">SKU: {product.sku}</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 text-sm text-slate-900">{product.category}</td>
+                    <td className="px-6 py-4 text-sm text-slate-900">${product.price}</td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-1">
+                        <span className="font-medium text-slate-900">{product.stock}</span>
+                        <span className="text-xs text-slate-500">units</span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => setDetailModal({ isOpen: true, product })}
+                          className="text-gray-600 hover:text-gray-800 p-1"
+                          title="View Details"
+                        >
+                          <EyeIcon className="h-4 w-4" />
+                        </button>
+                        <button
+                          onClick={() => setModalState({ isOpen: true, product, mode: 'edit' })}
+                          className="text-blue-600 hover:text-blue-800 p-1"
+                          title="Edit Product"
+                        >
+                          <PencilIcon className="h-4 w-4" />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(product.id)}
+                          className="text-red-600 hover:text-red-800 p-1"
+                          title="Delete Product"
+                        >
+                          <TrashIcon className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </motion.tr>
+                ))
+              )}
             </tbody>
           </table>
           
           {/* Pagination Controls - Only shows above 900px */}
-          {totalTablePages > 1 && (
+          {!loading && totalTablePages > 1 && (
             <div className="px-6 py-4 border-t border-slate-200 flex items-center justify-between">
               <div className="text-sm text-slate-500">
                 Showing {tableStartIndex + 1} to {Math.min(tableEndIndex, filteredProducts.length)} of {filteredProducts.length} products
@@ -686,15 +724,46 @@ export default function Products() {
         
         {/* Carousel View - Shows at 900px and below */}
         <div className="max-[900px]:block min-[901px]:hidden px-3 sm:px-4 lg:px-6 py-6">
-          <Carousel
-            opts={{
-              align: "start",
-              loop: true,
-            }}
-            className="w-full max-w-none"
-          >
-            <CarouselContent className="-ml-4">
-              {filteredProducts.map((product, index) => (
+          {loading ? (
+            <div className="grid grid-cols-1 min-[694px]:grid-cols-2 gap-4">
+              {[...Array(4)].map((_, index) => (
+                <div key={`carousel-skeleton-${index}`} className="animate-pulse">
+                  <div className="bg-white/80 backdrop-blur-sm border border-white/40 rounded-2xl overflow-hidden h-[420px] flex flex-col">
+                    <div className="h-40 bg-slate-200"></div>
+                    <div className="p-4 flex-1 flex flex-col">
+                      <div className="flex justify-between items-start mb-3">
+                        <div className="flex-1">
+                          <div className="h-6 bg-slate-200 rounded w-3/4 mb-2"></div>
+                          <div className="h-4 bg-slate-200 rounded w-1/2"></div>
+                        </div>
+                        <div className="h-6 bg-slate-200 rounded w-16 ml-3"></div>
+                      </div>
+                      <div className="space-y-3 mb-4">
+                        <div className="flex items-center">
+                          <div className="w-8 h-8 bg-slate-200 rounded-lg mr-3"></div>
+                          <div className="h-4 bg-slate-200 rounded w-20"></div>
+                        </div>
+                      </div>
+                      <div className="flex gap-2 mt-auto">
+                        <div className="flex-1 h-12 bg-slate-200 rounded-lg"></div>
+                        <div className="flex-1 h-12 bg-slate-200 rounded-lg"></div>
+                        <div className="flex-1 h-12 bg-slate-200 rounded-lg"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <Carousel
+              opts={{
+                align: "start",
+                loop: true,
+              }}
+              className="w-full max-w-none"
+            >
+              <CarouselContent className="-ml-4">
+                {filteredProducts.map((product, index) => (
                 <CarouselItem key={product.id} className="pl-4 basis-full min-[694px]:basis-1/2">
                   <div className="h-full">
                     <motion.div
@@ -745,14 +814,6 @@ export default function Products() {
                               </div>
                               <span className="truncate font-medium">{product.category}</span>
                             </div>
-                            <div className="flex items-center text-sm text-slate-600">
-                              <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center mr-3">
-                                <svg className="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                                  <path fillRule="evenodd" d="M4 4a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2H4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1z" clipRule="evenodd" />
-                                </svg>
-                              </div>
-                              <span className="truncate font-medium">{product.supplier}</span>
-                            </div>
                           </div>
                         </div>
                         
@@ -790,10 +851,11 @@ export default function Products() {
                   </div>
                 </CarouselItem>
               ))}
-            </CarouselContent>
-            <CarouselPrevious className="w-12 h-12 bg-white/95 backdrop-blur-sm border border-white/40 shadow-xl hover:bg-white hover:scale-110 transition-all duration-300 -left-6" />
-            <CarouselNext className="w-12 h-12 bg-white/95 backdrop-blur-sm border border-white/40 shadow-xl hover:bg-white hover:scale-110 transition-all duration-300 -right-6" />
-          </Carousel>
+              </CarouselContent>
+              <CarouselPrevious className="w-12 h-12 bg-white/95 backdrop-blur-sm border border-white/40 shadow-xl hover:bg-white hover:scale-110 transition-all duration-300 -left-6" />
+              <CarouselNext className="w-12 h-12 bg-white/95 backdrop-blur-sm border border-white/40 shadow-xl hover:bg-white hover:scale-110 transition-all duration-300 -right-6" />
+            </Carousel>
+          )}
         </div>
       </div>
 
