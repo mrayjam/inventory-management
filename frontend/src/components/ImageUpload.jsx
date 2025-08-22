@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { useDropzone } from 'react-dropzone'
 import { AnimatePresence, motion } from 'framer-motion'
 import { 
@@ -15,7 +15,12 @@ const ImageUpload = ({
   maxSizeInMB = 5 
 }) => {
   const [selectedImages, setSelectedImages] = useState([])
+  const [visibleExistingImages, setVisibleExistingImages] = useState(existingImages)
   const [errors, setErrors] = useState([])
+
+  useEffect(() => {
+    setVisibleExistingImages(existingImages)
+  }, [existingImages])
 
   const onDrop = useCallback((acceptedFiles, rejectedFiles) => {
     setErrors([])
@@ -41,7 +46,7 @@ const ImageUpload = ({
         return
       }
       
-      const totalImages = selectedImages.length + existingImages.length + validFiles.length
+      const totalImages = selectedImages.length + visibleExistingImages.length + validFiles.length
       
       if (totalImages > maxImages) {
         setErrors([`Maximum ${maxImages} images allowed. Please remove some images first.`])
@@ -61,7 +66,7 @@ const ImageUpload = ({
       console.log('ImageUpload - Sending', validFileObjects.length, 'valid File objects to parent')
       onImagesChange(validFileObjects)
     }
-  }, [selectedImages, existingImages, maxImages, maxSizeInMB, onImagesChange])
+  }, [selectedImages, visibleExistingImages, maxImages, maxSizeInMB, onImagesChange])
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
@@ -82,10 +87,12 @@ const ImageUpload = ({
   }
 
   const removeExistingImage = (imagePublicId) => {
+    const updatedVisibleImages = visibleExistingImages.filter(img => img.publicId !== imagePublicId)
+    setVisibleExistingImages(updatedVisibleImages)
     onImagesChange(null, imagePublicId)
   }
 
-  const totalImages = selectedImages.length + existingImages.length
+  const totalImages = selectedImages.length + visibleExistingImages.length
 
   return (
     <div className="space-y-4">
@@ -159,17 +166,20 @@ const ImageUpload = ({
         )}
       </AnimatePresence>
 
-      {(existingImages.length > 0 || selectedImages.length > 0) && (
+      {(visibleExistingImages.length > 0 || selectedImages.length > 0) && (
         <div className="space-y-3">
           <h4 className="text-sm font-medium text-gray-700">Image Preview</h4>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
-            {existingImages.map((image, index) => (
-              <motion.div
-                key={`existing-${image.publicId || index}`}
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="relative group"
-              >
+            <AnimatePresence>
+              {visibleExistingImages.map((image, index) => (
+                <motion.div
+                  key={`existing-${image.publicId || index}`}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.8 }}
+                  transition={{ duration: 0.2 }}
+                  className="relative group"
+                >
                 <div className="aspect-square rounded-lg overflow-hidden bg-gray-100">
                   <img
                     src={image.url}
@@ -195,6 +205,8 @@ const ImageUpload = ({
                 key={image.id}
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                transition={{ duration: 0.2 }}
                 className="relative group"
               >
                 <div className="aspect-square rounded-lg overflow-hidden bg-gray-100">
@@ -216,6 +228,7 @@ const ImageUpload = ({
                 </div>
               </motion.div>
             ))}
+            </AnimatePresence>
           </div>
         </div>
       )}

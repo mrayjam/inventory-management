@@ -207,19 +207,46 @@ export const updateProduct = async (req, res) => {
       updates.sku = updates.sku.toUpperCase();
     }
 
+    let historyEvents = [];
+    let currentImages = [...(product.images || [])];
 
-    if ('images' in updates && (!req.files || req.files.length === 0)) {
-      console.log('Removing invalid images data from request body');
-      delete updates.images;
+    if (updates.deletedImages) {
+      console.log('Processing deleted images:', updates.deletedImages);
+      let deletedImageIds = [];
+      
+      try {
+        deletedImageIds = typeof updates.deletedImages === 'string' 
+          ? JSON.parse(updates.deletedImages) 
+          : updates.deletedImages;
+      } catch (error) {
+        console.error('Failed to parse deletedImages:', error);
+        return res.status(400).json({ message: 'Invalid deletedImages format' });
+      }
+
+      if (Array.isArray(deletedImageIds) && deletedImageIds.length > 0) {
+        for (const publicId of deletedImageIds) {
+          try {
+            await getCloudinary().uploader.destroy(publicId);
+            console.log('Deleted image from Cloudinary:', publicId);
+          } catch (error) {
+            console.error('Failed to delete image from Cloudinary:', error);
+          }
+        }
+        
+        currentImages = currentImages.filter(img => !deletedImageIds.includes(img.publicId));
+        historyEvents.push({
+          action: 'image_removed',
+          details: `Removed ${deletedImageIds.length} image(s)`
+        });
+      }
+      delete updates.deletedImages;
     }
 
-    let historyEvents = [];
-
     if (req.files && req.files.length > 0) {
-      console.log('Processing uploaded files for update:', req.files.length);
+      console.log('Processing new uploaded files:', req.files.length);
       const newImages = [];
       req.files.forEach((file, index) => {
-        console.log(`Update File ${index}:`, {
+        console.log(`New File ${index}:`, {
           originalname: file.originalname,
           path: file.path,
           filename: file.filename
@@ -230,58 +257,15 @@ export const updateProduct = async (req, res) => {
         });
       });
 
-      if (updates.replaceImages === 'true') {
-        console.log('Replacing all existing images');
-        if (product.images && product.images.length > 0) {
-          for (const image of product.images) {
-            try {
-              await getCloudinary().uploader.destroy(image.publicId);
-              console.log('Deleted image from Cloudinary:', image.publicId);
-            } catch (error) {
-              console.error('Failed to delete image from Cloudinary:', error);
-            }
-          }
-        }
-        updates.images = newImages;
-        updates.imageUrl = newImages.length > 0 ? newImages[0].url : 'https://via.placeholder.com/300';
-        historyEvents.push({
-          action: 'image_added',
-          details: `Replaced all images with ${newImages.length} new image(s)`
-        });
-      } else {
-        console.log('Adding new images to existing ones');
-        updates.images = [...(product.images || []), ...newImages];
-        if (newImages.length > 0) {
-          updates.imageUrl = newImages[0].url;
-        }
-        historyEvents.push({
-          action: 'image_added',
-          details: `Added ${newImages.length} new image(s)`
-        });
-      }
-    }
-
-    if (updates.removeImageIds) {
-      console.log('Removing images:', updates.removeImageIds);
-      const removeIds = JSON.parse(updates.removeImageIds);
-      const remainingImages = product.images.filter(img => !removeIds.includes(img.publicId));
-      
-      for (const imageId of removeIds) {
-        try {
-          await getCloudinary().uploader.destroy(imageId);
-          console.log('Deleted image from Cloudinary:', imageId);
-        } catch (error) {
-          console.error('Failed to delete image from Cloudinary:', error);
-        }
-      }
-      
-      updates.images = remainingImages;
-      updates.imageUrl = remainingImages.length > 0 ? remainingImages[0].url : 'https://via.placeholder.com/300';
+      currentImages = [...currentImages, ...newImages];
       historyEvents.push({
-        action: 'image_removed',
-        details: `Removed ${removeIds.length} image(s)`
+        action: 'image_added',
+        details: `Added ${newImages.length} new image(s)`
       });
     }
+
+    updates.images = currentImages;
+    updates.imageUrl = currentImages.length > 0 ? currentImages[0].url : 'https://via.placeholder.com/300';
 
     console.log('Final updates object:', updates);
 
@@ -328,6 +312,17 @@ export const updateProduct = async (req, res) => {
         );
       }
 
+      if (updates.category && updates.category !== oldProductData.category) {
+        await createProductHistory(
+          updatedProduct._id,
+          'updated',
+          userId,
+          userName,
+          oldProductData.category,
+          updates.category,
+          'Product category updated'
+        );
+      }
     }
 
     const responseData = updatedProduct.toJSON();

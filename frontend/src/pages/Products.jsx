@@ -244,24 +244,23 @@ const ProductHistoryModal = ({ isOpen, onClose, product }) => {
 
 const ProductModal = ({ isOpen, onClose, product, mode, onProductSaved }) => {
   const [selectedImages, setSelectedImages] = useState([])
-  const [removedImageIds, setRemovedImageIds] = useState([])
+  const [deletedImageIds, setDeletedImageIds] = useState([])
 
   useEffect(() => {
     if (!isOpen) {
       setSelectedImages([])
-      setRemovedImageIds([])
+      setDeletedImageIds([])
     } else {
       setSelectedImages([])
-      setRemovedImageIds([])
+      setDeletedImageIds([])
     }
-  }, [isOpen])
-
+  }, [isOpen, product])
 
   if (!isOpen) return null
 
   const handleImagesChange = (images, removedImageId) => {
     if (removedImageId) {
-      setRemovedImageIds(prev => [...prev, removedImageId])
+      setDeletedImageIds(prev => [...prev, removedImageId])
     } else if (images) {
       setSelectedImages(images)
     }
@@ -270,7 +269,16 @@ const ProductModal = ({ isOpen, onClose, product, mode, onProductSaved }) => {
   const handleSubmit = async (e) => {
     e.preventDefault()
     
-    const formData = new FormData(e.target)
+    const formData = new FormData()
+    
+    formData.append('name', e.target.name.value)
+    formData.append('category', e.target.category.value)
+    formData.append('sku', e.target.sku.value)
+    formData.append('description', e.target.description.value || '')
+    
+    if (deletedImageIds.length > 0) {
+      formData.append('deletedImages', JSON.stringify(deletedImageIds))
+    }
     
     const validFiles = (selectedImages || [])
       .filter(file => {
@@ -282,28 +290,21 @@ const ProductModal = ({ isOpen, onClose, product, mode, onProductSaved }) => {
       })
     
     console.log('Frontend - Processing', validFiles.length, 'valid image files')
+    console.log('Frontend - Deleted image IDs:', deletedImageIds)
     
-    const productData = {
-      name: formData.get('name'),
-      category: formData.get('category'),
-      sku: formData.get('sku'),
-      description: formData.get('description') || '',
-      images: validFiles
-    }
-
-    if (mode === 'update' && removedImageIds.length > 0) {
-      productData.removeImageIds = JSON.stringify(removedImageIds)
-    }
+    validFiles.forEach((file) => {
+      formData.append('images', file)
+    })
     
     try {
       if (mode === 'add') {
-        await onProductSaved('create', null, productData)
+        await onProductSaved('create', null, formData)
       } else {
-        await onProductSaved('update', product.id, productData)
+        await onProductSaved('update', product.id, formData)
       }
       onClose()
       setSelectedImages([])
-      setRemovedImageIds([])
+      setDeletedImageIds([])
     } catch (error) {
       console.error('Failed to save product:', error)
     }
