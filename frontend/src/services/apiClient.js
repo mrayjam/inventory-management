@@ -78,11 +78,24 @@ export const productsApi = {
     
     Object.keys(productData).forEach(key => {
       if (key === 'images' && productData[key] && Array.isArray(productData[key])) {
-        console.log(`Adding ${productData[key].length} images to FormData`)
-        productData[key].forEach((file, index) => {
-          console.log(`Adding image ${index}:`, file.name || file)
+        const validFiles = productData[key].filter(file => file instanceof File && file.size > 0)
+        console.log(`Adding ${validFiles.length} valid images to FormData (filtered from ${productData[key].length} items)`)
+        
+        validFiles.forEach((file, index) => {
+          console.log(`Adding valid image ${index}:`, { 
+            name: file.name, 
+            size: file.size, 
+            type: file.type,
+            isFile: file instanceof File 
+          })
           formData.append('images', file)
         })
+        
+        if (productData[key].length > validFiles.length) {
+          console.warn('Some invalid file objects were filtered out:', 
+            productData[key].filter(file => !(file instanceof File && file.size > 0))
+          )
+        }
       } else if (productData[key] !== undefined && productData[key] !== null && productData[key] !== '') {
         console.log(`Adding ${key}:`, productData[key])
         formData.append(key, productData[key])
@@ -94,7 +107,11 @@ export const productsApi = {
       console.log(key, value)
     }
 
-    const response = await apiClient.post('/products', formData)
+    const response = await apiClient.post('/products', formData, {
+      headers: {
+        'Content-Type': undefined
+      }
+    })
     return response.data
   },
   
@@ -104,11 +121,24 @@ export const productsApi = {
     
     Object.keys(productData).forEach(key => {
       if (key === 'images' && productData[key] && Array.isArray(productData[key])) {
-        console.log(`Adding ${productData[key].length} images to FormData for update`)
-        productData[key].forEach((file, index) => {
-          console.log(`Adding update image ${index}:`, file.name || file)
+        const validFiles = productData[key].filter(file => file instanceof File && file.size > 0)
+        console.log(`Adding ${validFiles.length} valid images to FormData for update (filtered from ${productData[key].length} items)`)
+        
+        validFiles.forEach((file, index) => {
+          console.log(`Adding valid update image ${index}:`, { 
+            name: file.name, 
+            size: file.size, 
+            type: file.type,
+            isFile: file instanceof File 
+          })
           formData.append('images', file)
         })
+        
+        if (productData[key].length > validFiles.length) {
+          console.warn('Some invalid file objects were filtered out during update:', 
+            productData[key].filter(file => !(file instanceof File && file.size > 0))
+          )
+        }
       } else if (productData[key] !== undefined && productData[key] !== null && productData[key] !== '') {
         console.log(`Adding update ${key}:`, productData[key])
         formData.append(key, productData[key])
@@ -120,7 +150,11 @@ export const productsApi = {
       console.log(key, value)
     }
 
-    const response = await apiClient.put(`/products/${id}`, formData)
+    const response = await apiClient.put(`/products/${id}`, formData, {
+      headers: {
+        'Content-Type': undefined
+      }
+    })
     return response.data
   },
   

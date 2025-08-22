@@ -227,6 +227,9 @@ const ProductModal = ({ isOpen, onClose, product, mode, onProductSaved }) => {
     if (!isOpen) {
       setSelectedImages([])
       setRemovedImageIds([])
+    } else {
+      setSelectedImages([])
+      setRemovedImageIds([])
     }
   }, [isOpen])
 
@@ -244,13 +247,25 @@ const ProductModal = ({ isOpen, onClose, product, mode, onProductSaved }) => {
     e.preventDefault()
     
     const formData = new FormData(e.target)
+    
+    const validFiles = (selectedImages || [])
+      .filter(file => {
+        const isValidFile = file instanceof File && file.size > 0 && file.type.startsWith('image/')
+        if (!isValidFile && file) {
+          console.warn('Invalid file object detected and filtered out:', file)
+        }
+        return isValidFile
+      })
+    
+    console.log('Frontend - Processing', validFiles.length, 'valid image files')
+    
     const productData = {
       name: formData.get('name'),
       category: formData.get('category'),
       sku: formData.get('sku'),
       supplier: formData.get('supplier') || '',
       description: formData.get('description') || '',
-      images: selectedImages
+      images: validFiles
     }
 
     if (mode === 'update' && removedImageIds.length > 0) {

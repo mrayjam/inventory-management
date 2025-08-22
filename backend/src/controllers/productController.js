@@ -58,6 +58,8 @@ export const createProduct = async (req, res) => {
           publicId: file.filename
         });
       });
+    } else {
+      console.log('No files uploaded, using placeholder image');
     }
 
     const product = new Product({
@@ -121,6 +123,12 @@ export const updateProduct = async (req, res) => {
         return res.status(400).json({ message: 'SKU already exists' });
       }
       updates.sku = updates.sku.toUpperCase();
+    }
+
+    // Remove any invalid images data from the frontend
+    if ('images' in updates && (!req.files || req.files.length === 0)) {
+      console.log('Removing invalid images data from request body');
+      delete updates.images;
     }
 
     if (req.files && req.files.length > 0) {

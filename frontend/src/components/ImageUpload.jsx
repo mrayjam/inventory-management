@@ -34,14 +34,21 @@ const ImageUpload = ({
     }
 
     if (acceptedFiles.length > 0) {
-      const totalImages = selectedImages.length + existingImages.length + acceptedFiles.length
+      const validFiles = acceptedFiles.filter(file => file instanceof File && file.size > 0)
+      
+      if (validFiles.length === 0) {
+        setErrors(['No valid image files were selected.'])
+        return
+      }
+      
+      const totalImages = selectedImages.length + existingImages.length + validFiles.length
       
       if (totalImages > maxImages) {
         setErrors([`Maximum ${maxImages} images allowed. Please remove some images first.`])
         return
       }
 
-      const newImages = acceptedFiles.map(file => ({
+      const newImages = validFiles.map(file => ({
         file,
         preview: URL.createObjectURL(file),
         id: `new-${Date.now()}-${Math.random()}`
@@ -49,7 +56,10 @@ const ImageUpload = ({
 
       const updatedImages = [...selectedImages, ...newImages]
       setSelectedImages(updatedImages)
-      onImagesChange(updatedImages.map(img => img.file))
+      
+      const validFileObjects = updatedImages.map(img => img.file).filter(file => file instanceof File)
+      console.log('ImageUpload - Sending', validFileObjects.length, 'valid File objects to parent')
+      onImagesChange(validFileObjects)
     }
   }, [selectedImages, existingImages, maxImages, maxSizeInMB, onImagesChange])
 
@@ -65,7 +75,10 @@ const ImageUpload = ({
   const removeImage = (imageId) => {
     const updatedImages = selectedImages.filter(img => img.id !== imageId)
     setSelectedImages(updatedImages)
-    onImagesChange(updatedImages.map(img => img.file))
+    
+    const validFileObjects = updatedImages.map(img => img.file).filter(file => file instanceof File)
+    console.log('ImageUpload - After removal, sending', validFileObjects.length, 'valid File objects to parent')
+    onImagesChange(validFileObjects)
   }
 
   const removeExistingImage = (imagePublicId) => {
