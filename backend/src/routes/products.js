@@ -4,7 +4,8 @@ import {
   getProductById, 
   createProduct, 
   updateProduct, 
-  deleteProduct 
+  deleteProduct,
+  getProductHistory
 } from '../controllers/productController.js';
 import { authenticate } from '../middleware/auth.js';
 import { 
@@ -25,6 +26,8 @@ router.post('/', authenticate, (req, res, next) => {
 }, validateCreateProduct, createProduct);
 
 router.get('/:id', authenticate, validateGetById, getProductById);
+
+router.get('/:id/history', authenticate, validateGetById, getProductHistory);
 
 router.put('/:id', authenticate, (req, res, next) => {
   const upload = createUpload();
