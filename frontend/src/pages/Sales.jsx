@@ -151,7 +151,17 @@ const SaleModal = ({ isOpen, onClose, sale, mode, onSaleSaved }) => {
         try {
           setLoading(true)
           const productList = await productsApi.getAll()
-          setProducts(productList.filter(p => p.stock > 0))
+          console.log('Loaded products:', productList)
+          const availableProducts = productList.filter(p => (p.stock || 0) > 0)
+          console.log('Products with stock > 0:', availableProducts)
+          
+          if (availableProducts.length === 0 && productList.length > 0) {
+            console.log('No products with stock, showing all products')
+            setProducts(productList)
+          } else {
+            console.log('Setting products state with', availableProducts.length, 'items')
+            setProducts(availableProducts)
+          }
         } catch (error) {
           console.error('Failed to load products:', error)
           const message = error.response?.data?.message || error.message || 'Failed to load products'
@@ -183,7 +193,7 @@ const SaleModal = ({ isOpen, onClose, sale, mode, onSaleSaved }) => {
     }
   }, [isOpen, sale, token])
 
-  const selectedProduct = products.find(p => p.id === parseInt(formData.productId))
+  const selectedProduct = products.find(p => String(p._id || p.id) === String(formData.productId))
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
@@ -290,9 +300,13 @@ const SaleModal = ({ isOpen, onClose, sale, mode, onSaleSaved }) => {
                     required
                   >
                     <option value="">Select Product</option>
+                    {(() => {
+                      console.log('Rendering products in dropdown:', products)
+                      return null
+                    })()}
                     {products.map(product => (
-                      <option key={product.id} value={product.id}>
-                        {product.name} - {product.sku} (Stock: {product.stock})
+                      <option key={product._id || product.id} value={product._id || product.id}>
+                        {product.name} - {product.sku} (Stock: {product.stock || 0})
                       </option>
                     ))}
                   </select>
