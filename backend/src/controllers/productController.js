@@ -6,7 +6,7 @@ import { getCloudinary } from '../config/cloudinary.js';
 
 const calculateProductStock = async (productId) => {
   const purchases = await Purchase.aggregate([
-    { $match: { productId: productId } },
+    { $match: { product: productId } },
     { $group: { _id: null, totalPurchased: { $sum: '$quantity' } } }
   ]);
   
@@ -22,7 +22,7 @@ const calculateProductStock = async (productId) => {
 };
 
 const getLatestPurchasePrice = async (productId) => {
-  const latestPurchase = await Purchase.findOne({ productId }).sort({ createdAt: -1 });
+  const latestPurchase = await Purchase.findOne({ product: productId }).sort({ createdAt: -1 });
   return latestPurchase ? latestPurchase.unitPrice : null;
 };
 
@@ -52,7 +52,10 @@ export const getAllProducts = async (req, res) => {
     const productsWithCalculatedData = await Promise.all(
       products.map(async (product) => {
         const productObj = product.toJSON();
-        productObj.stock = await calculateProductStock(product._id);
+        // Use the actual stock value from the database (updated by purchase/sale controllers)
+        // productObj.stock is already set from the database
+        
+        // Only update price if it's null/undefined
         if (!productObj.price) {
           productObj.price = await getLatestPurchasePrice(product._id) || 0;
         }
