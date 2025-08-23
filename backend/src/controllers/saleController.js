@@ -1,5 +1,6 @@
 import Sale from '../models/Sale.js';
 import Product from '../models/Product.js';
+import ProductHistory from '../models/ProductHistory.js';
 
 export const getAllSales = async (req, res) => {
   try {
@@ -53,8 +54,19 @@ export const createSale = async (req, res) => {
 
     await sale.save();
 
+    const oldStock = product.stock;
     product.stock -= quantity;
     await product.save();
+
+    await new ProductHistory({
+      product: product._id,
+      action: 'stock_changed',
+      user: req.user.id,
+      userName: req.user.name,
+      oldValue: oldStock,
+      newValue: product.stock,
+      details: `Stock decreased by ${quantity} units via sale (${oldStock} → ${product.stock})`
+    }).save();
 
     res.json({
       success: true,
@@ -78,8 +90,19 @@ export const updateSale = async (req, res) => {
 
     const oldProduct = await Product.findById(existingSale.productId);
     if (oldProduct) {
+      const oldStock = oldProduct.stock;
       oldProduct.stock += existingSale.quantity;
       await oldProduct.save();
+
+      await new ProductHistory({
+        product: oldProduct._id,
+        action: 'stock_changed',
+        user: req.user.id,
+        userName: req.user.name,
+        oldValue: oldStock,
+        newValue: oldProduct.stock,
+        details: `Stock restored by ${existingSale.quantity} units due to sale update (${oldStock} → ${oldProduct.stock})`
+      }).save();
     }
 
     let newProduct = oldProduct;
@@ -111,8 +134,19 @@ export const updateSale = async (req, res) => {
     existingSale.updatedBy = req.user.name;
     await existingSale.save();
 
+    const newOldStock = newProduct.stock;
     newProduct.stock -= newQuantity;
     await newProduct.save();
+
+    await new ProductHistory({
+      product: newProduct._id,
+      action: 'stock_changed',
+      user: req.user.id,
+      userName: req.user.name,
+      oldValue: newOldStock,
+      newValue: newProduct.stock,
+      details: `Stock decreased by ${newQuantity} units via sale update (${newOldStock} → ${newProduct.stock})`
+    }).save();
 
     res.json({
       success: true,
@@ -134,8 +168,19 @@ export const deleteSale = async (req, res) => {
 
     const product = await Product.findById(sale.productId);
     if (product) {
+      const oldStock = product.stock;
       product.stock += sale.quantity;
       await product.save();
+
+      await new ProductHistory({
+        product: product._id,
+        action: 'stock_changed',
+        user: req.user.id,
+        userName: req.user.name,
+        oldValue: oldStock,
+        newValue: product.stock,
+        details: `Stock restored by ${sale.quantity} units due to sale deletion (${oldStock} → ${product.stock})`
+      }).save();
     }
 
     await Sale.findByIdAndDelete(id);
