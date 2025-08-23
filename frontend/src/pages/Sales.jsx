@@ -101,7 +101,7 @@ const SaleDetailModal = ({ isOpen, onClose, sale, onEditSale }) => {
               
               <div className="bg-green-50 rounded-lg p-4">
                 <p className="text-sm font-medium text-green-700 mb-1">Total Amount</p>
-                <p className="text-2xl font-bold text-green-600">${sale.totalAmount}</p>
+                <p className="text-2xl font-bold text-green-600">${sale.totalAmount.toFixed(2)}</p>
               </div>
             </div>
             
@@ -601,7 +601,6 @@ export default function Sales() {
           <table className="w-full">
             <thead className="bg-slate-50">
               <tr>
-                <th className="text-left px-6 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider">Sale ID</th>
                 <th className="text-left px-6 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider">Product</th>
                 <th className="text-left px-6 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider">Customer</th>
                 <th className="text-left px-6 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider">Quantity</th>
@@ -618,7 +617,6 @@ export default function Sales() {
                   animate={{ opacity: 1 }}
                   className="hover:bg-slate-50"
                 >
-                  <td className="px-6 py-4 text-sm font-medium text-slate-900">#{sale.id}</td>
                   <td className="px-6 py-4">
                     <div>
                       <div className="font-medium text-slate-900">{sale.productName}</div>
@@ -627,7 +625,7 @@ export default function Sales() {
                   </td>
                   <td className="px-6 py-4 text-sm text-slate-900">{sale.customer || 'Walk-in'}</td>
                   <td className="px-6 py-4 text-sm text-slate-900">{sale.quantity}</td>
-                  <td className="px-6 py-4 text-sm font-medium text-green-600">${sale.totalAmount}</td>
+                  <td className="px-6 py-4 text-sm font-medium text-green-600">${sale.totalAmount.toFixed(2)}</td>
                   <td className="px-6 py-4 text-sm text-slate-900">{new Date(sale.saleDate).toLocaleDateString()}</td>
                   <td className="px-6 py-4">
                     <div className="flex gap-2">
@@ -712,7 +710,7 @@ export default function Sales() {
                         <div>
                           <div className="flex justify-between items-start mb-3">
                             <div>
-                              <h3 className="font-bold text-slate-900 text-lg">Sale #{sale.id}</h3>
+                              <h3 className="font-bold text-slate-900 text-lg">{sale.productName}</h3>
                               <p className="text-sm text-slate-500">{new Date(sale.saleDate).toLocaleDateString()}</p>
                             </div>
                             <div className="text-right">
@@ -722,8 +720,8 @@ export default function Sales() {
                           
                           <div className="space-y-2 mb-4">
                             <div className="flex items-center text-sm text-slate-600">
-                              <CubeIcon className="w-4 h-4 mr-2" />
-                              <span className="truncate">{sale.productName}</span>
+                              <DocumentTextIcon className="w-4 h-4 mr-2" />
+                              <span className="text-xs text-slate-500 truncate">SKU: {sale.productSku}</span>
                             </div>
                             <div className="flex items-center text-sm text-slate-600">
                               <UserIcon className="w-4 h-4 mr-2" />
