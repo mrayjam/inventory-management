@@ -29,16 +29,28 @@ export const getPurchaseById = async (req, res) => {
 
 export const createPurchase = async (req, res) => {
   try {
-    const { productId, quantity, supplierId, unitPrice, productName, productSku, supplierName } = req.body;
+    const { productId, supplierId, quantity, unitPrice } = req.body;
+
+    if (!productId || !supplierId || !quantity || !unitPrice) {
+      return res.status(400).json({ message: 'Missing required fields: productId, supplierId, quantity, unitPrice' });
+    }
+
+    if (quantity < 1) {
+      return res.status(400).json({ message: 'Quantity must be at least 1' });
+    }
+
+    if (unitPrice < 0) {
+      return res.status(400).json({ message: 'Unit price cannot be negative' });
+    }
 
     const product = await Product.findById(productId);
     if (!product) {
-      return res.status(404).json({ message: 'Product not found' });
+      return res.status(404).json({ message: 'Selected product does not exist' });
     }
 
     const supplier = await Supplier.findById(supplierId);
     if (!supplier) {
-      return res.status(404).json({ message: 'Supplier not found' });
+      return res.status(404).json({ message: 'Selected supplier does not exist' });
     }
 
     if (supplier.status !== 'Active') {
@@ -46,11 +58,11 @@ export const createPurchase = async (req, res) => {
     }
 
     const purchase = new Purchase({
-      productId,
-      productName: productName || product.name,
-      productSku: productSku || product.sku,
-      supplierId,
-      supplierName: supplierName || supplier.name,
+      product: productId,
+      productName: product.name,
+      productSku: product.sku,
+      supplier: supplierId,
+      supplierName: supplier.name,
       quantity,
       unitPrice,
       createdBy: req.user.name
@@ -96,13 +108,26 @@ export const createPurchase = async (req, res) => {
       generatedAt: new Date().toISOString()
     };
 
-    res.json({
+    res.status(201).json({
       success: true,
       purchase,
       invoice,
       message: 'Purchase registered successfully'
     });
   } catch (error) {
+    console.error('Error creating purchase:', error);
+    
+    if (error.name === 'ValidationError') {
+      return res.status(400).json({ 
+        message: 'Validation error', 
+        errors: Object.values(error.errors).map(e => e.message) 
+      });
+    }
+    
+    if (error.name === 'CastError' && error.kind === 'ObjectId') {
+      return res.status(400).json({ message: 'Invalid product or supplier ID format' });
+    }
+    
     res.status(500).json({ message: 'Internal server error' });
   }
 };
@@ -110,7 +135,7 @@ export const createPurchase = async (req, res) => {
 export const updatePurchase = async (req, res) => {
   try {
     const { id } = req.params;
-    const { productId, quantity, supplierId, unitPrice, productName, productSku, supplierName } = req.body;
+    const { productId, supplierId, quantity, unitPrice } = req.body;
 
     const existingPurchase = await Purchase.findById(id);
     if (!existingPurchase) {
@@ -119,23 +144,23 @@ export const updatePurchase = async (req, res) => {
 
     const product = await Product.findById(productId);
     if (!product) {
-      return res.status(404).json({ message: 'Product not found' });
+      return res.status(404).json({ message: 'Selected product does not exist' });
     }
 
     const supplier = await Supplier.findById(supplierId);
     if (!supplier) {
-      return res.status(404).json({ message: 'Supplier not found' });
+      return res.status(404).json({ message: 'Selected supplier does not exist' });
     }
 
     if (supplier.status !== 'Active') {
       return res.status(400).json({ message: 'Cannot purchase from inactive supplier' });
     }
 
-    existingPurchase.productId = productId;
-    existingPurchase.productName = productName || product.name;
-    existingPurchase.productSku = productSku || product.sku;
-    existingPurchase.supplierId = supplierId;
-    existingPurchase.supplierName = supplierName || supplier.name;
+    existingPurchase.product = productId;
+    existingPurchase.productName = product.name;
+    existingPurchase.productSku = product.sku;
+    existingPurchase.supplier = supplierId;
+    existingPurchase.supplierName = supplier.name;
     existingPurchase.quantity = quantity;
     existingPurchase.unitPrice = unitPrice;
     existingPurchase.updatedBy = req.user.name;
@@ -190,7 +215,7 @@ export const deletePurchase = async (req, res) => {
     }
 
     await new ProductHistory({
-      product: purchase.productId,
+      product: purchase.product,
       action: 'stock_changed',
       user: req.user.id,
       userName: req.user.name,

@@ -1,27 +1,27 @@
 import mongoose from 'mongoose';
 
 const purchaseSchema = new mongoose.Schema({
-  productId: {
+  product: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Product',
     required: [true, 'Product is required']
   },
   productName: {
     type: String,
-    required: true
+    required: false
   },
   productSku: {
     type: String,
-    required: true
+    required: false
   },
-  supplierId: {
+  supplier: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Supplier',
     required: [true, 'Supplier is required']
   },
   supplierName: {
     type: String,
-    required: true
+    required: false
   },
   quantity: {
     type: Number,
@@ -35,7 +35,7 @@ const purchaseSchema = new mongoose.Schema({
   },
   totalAmount: {
     type: Number,
-    required: true
+    required: false
   },
   purchaseDate: {
     type: Date,
@@ -60,8 +60,8 @@ purchaseSchema.pre('save', function(next) {
 purchaseSchema.methods.toJSON = function() {
   const purchase = this.toObject();
   purchase.id = purchase._id.toString();
-  purchase.productId = purchase.productId.toString();
-  purchase.supplierId = purchase.supplierId.toString();
+  purchase.productId = purchase.product.toString();
+  purchase.supplierId = purchase.supplier.toString();
   purchase.purchaseDate = purchase.purchaseDate.toISOString().split('T')[0];
   purchase.createdAt = purchase.createdAt.toISOString();
   if (purchase.updatedAt) {
