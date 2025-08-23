@@ -163,9 +163,9 @@ const PurchaseModal = ({
   useEffect(() => {
     if (purchase) {
       setFormData({
-        productId: purchase.productId.toString(),
+        productId: purchase.productId,
         quantity: purchase.quantity.toString(),
-        supplierId: purchase.supplierId.toString(),
+        supplierId: purchase.supplierId,
         unitPrice: purchase.unitPrice.toString()
       })
     } else {
@@ -192,7 +192,7 @@ const PurchaseModal = ({
       return false
     }
     
-    const selectedProduct = products.find(p => p.id === parseInt(formData.productId))
+    const selectedProduct = products.find(p => p.id === formData.productId)
     if (!selectedProduct) {
       toast.error('Selected product does not exist')
       return false
@@ -214,7 +214,7 @@ const PurchaseModal = ({
       return false
     }
     
-    const selectedSupplier = suppliers.find(s => s.id === parseInt(formData.supplierId))
+    const selectedSupplier = suppliers.find(s => s.id === formData.supplierId)
     if (!selectedSupplier) {
       toast.error('Selected supplier does not exist')
       return false
@@ -244,24 +244,18 @@ const PurchaseModal = ({
     
     if (!validateForm()) return
 
-    const selectedProduct = products.find(p => p.id === parseInt(formData.productId))
-    const selectedSupplier = suppliers.find(s => s.id === parseInt(formData.supplierId))
-
     const purchaseData = {
-      productId: parseInt(formData.productId),
+      productId: formData.productId,
+      supplierId: formData.supplierId,
       quantity: parseInt(formData.quantity),
-      supplierId: parseInt(formData.supplierId),
-      unitPrice: parseFloat(formData.unitPrice),
-      productName: selectedProduct?.name,
-      productSku: selectedProduct?.sku,
-      supplierName: selectedSupplier?.name
+      unitPrice: parseFloat(formData.unitPrice)
     }
 
     await onSave(purchaseData)
   }
 
-  const selectedProduct = products.find(p => p.id === parseInt(formData.productId))
-  const selectedSupplier = suppliers.find(s => s.id === parseInt(formData.supplierId))
+  const selectedProduct = products.find(p => p.id === formData.productId)
+  const selectedSupplier = suppliers.find(s => s.id === formData.supplierId)
   const activeSuppliers = suppliers.filter(s => s.status === 'Active')
 
   if (!isOpen) return null
@@ -306,13 +300,14 @@ const PurchaseModal = ({
             </div>
             
             <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-4 max-[548px]:grid-cols-1">
                 <div className="relative">
                   <select
+                    id="productId"
                     name="productId"
                     value={formData.productId}
                     onChange={handleInputChange}
-                    className="w-full h-14 border border-slate-300 bg-white/80 backdrop-blur-sm rounded-xl px-4 pt-6 pb-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 shadow-sm hover:bg-white hover:shadow-md appearance-none"
+                    className="w-full h-14 border border-slate-300 bg-white/80 backdrop-blur-sm rounded-xl px-4 pt-6 pb-2 pr-12 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 shadow-sm hover:bg-white hover:shadow-md appearance-none"
                     required
                   >
                     <option value="">Select Product</option>
@@ -326,11 +321,12 @@ const PurchaseModal = ({
                     Product *
                   </label>
                   <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
-                    <CubeIcon className="w-4 h-4 text-slate-400" />
+                    <CubeIcon className="w-4 h-4 text-slate-400 min-w-[16px] flex-shrink-0" />
                   </div>
                 </div>
 
                 <FloatingLabelInput
+                  id="quantity"
                   name="quantity"
                   type="number"
                   label="Quantity *"
@@ -342,10 +338,11 @@ const PurchaseModal = ({
 
                 <div className="relative">
                   <select
+                    id="supplierId"
                     name="supplierId"
                     value={formData.supplierId}
                     onChange={handleInputChange}
-                    className="w-full h-14 border border-slate-300 bg-white/80 backdrop-blur-sm rounded-xl px-4 pt-6 pb-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 shadow-sm hover:bg-white hover:shadow-md appearance-none"
+                    className="w-full h-14 border border-slate-300 bg-white/80 backdrop-blur-sm rounded-xl px-4 pt-6 pb-2 pr-12 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 shadow-sm hover:bg-white hover:shadow-md appearance-none"
                     required
                   >
                     <option value="">Select Supplier</option>
@@ -359,11 +356,12 @@ const PurchaseModal = ({
                     Supplier *
                   </label>
                   <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
-                    <BuildingStorefrontIcon className="w-4 h-4 text-slate-400" />
+                    <BuildingStorefrontIcon className="w-4 h-4 text-slate-400 min-w-[16px] flex-shrink-0" />
                   </div>
                 </div>
 
                 <FloatingLabelInput
+                  id="unitPrice"
                   name="unitPrice"
                   type="number"
                   step="0.01"
@@ -386,7 +384,7 @@ const PurchaseModal = ({
                     Purchase Summary
                   </h3>
                   
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 min-[549px]:grid-cols-2 gap-4">
                     {selectedProduct && (
                       <div>
                         <p className="text-xs text-slate-600 mb-1">Selected Product</p>
@@ -424,7 +422,7 @@ const PurchaseModal = ({
                 </motion.div>
               )}
               
-              <div className="flex flex-col sm:flex-row gap-3 pt-6 border-t border-gray-200">
+              <div className="flex flex-col min-[549px]:flex-row gap-3 pt-6 border-t border-gray-200">
                 <Button
                   type="submit"
                   size="lg"
@@ -460,6 +458,28 @@ const PurchaseModal = ({
   )
 }
 
+// Custom hook for window size
+const useWindowSize = () => {
+  const [windowSize, setWindowSize] = useState({
+    width: typeof window !== 'undefined' ? window.innerWidth : 0
+  })
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+
+    const handleResize = () => {
+      setWindowSize({ width: window.innerWidth })
+    }
+
+    window.addEventListener('resize', handleResize)
+    handleResize() // Set initial size
+
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
+
+  return windowSize
+}
+
 // Main Purchase Component
 export default function Purchase() {
   const [purchases, setPurchases] = useState([])
@@ -467,6 +487,7 @@ export default function Purchase() {
   const [suppliers, setSuppliers] = useState([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
+  const { width } = useWindowSize()
   
   // Modal states
   const [purchaseModal, setPurchaseModal] = useState({ 
@@ -569,31 +590,61 @@ export default function Purchase() {
   }
 
   const handleDeletePurchase = async (purchase) => {
-    const confirmDelete = window.confirm(
-      `Are you sure you want to delete this purchase? This action will reduce the stock for "${purchase.productName}" by ${purchase.quantity} units and cannot be undone.`
-    )
-    
-    if (!confirmDelete) return
-    
-    const loadingToast = toast.loading('Deleting purchase...')
-    
-    try {
-      await purchasesApi.delete(purchase.id)
-      toast.success('Purchase deleted successfully', { id: loadingToast })
-      await refreshPurchases()
-      await refreshStats()
-    } catch (error) {
-      console.error('Delete purchase error:', error)
-      const message = error.response?.data?.message || error.message || 'An error occurred'
-      toast.error(message, { id: loadingToast })
-    }
+    toast((t) => (
+      <div className="flex flex-col gap-3">
+        <div>
+          <p className="font-medium text-gray-900">Delete Purchase</p>
+          <p className="text-sm text-gray-600 mt-1">
+            Are you sure you want to delete this purchase? This action will reduce the stock for "{purchase.productName}" by {purchase.quantity} units and cannot be undone.
+          </p>
+        </div>
+        <div className="flex gap-2 justify-end">
+          <button
+            onClick={() => toast.dismiss(t.id)}
+            className="px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={async () => {
+              toast.dismiss(t.id)
+              const loadingToast = toast.loading('Deleting purchase...')
+              
+              try {
+                await purchasesApi.delete(purchase.id)
+                toast.success('Purchase deleted successfully', { id: loadingToast })
+                await refreshPurchases()
+                await refreshStats()
+              } catch (error) {
+                console.error('Delete purchase error:', error)
+                const message = error.response?.data?.message || error.message || 'An error occurred'
+                toast.error(message, { id: loadingToast })
+              }
+            }}
+            className="px-3 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors"
+          >
+            Delete
+          </button>
+        </div>
+      </div>
+    ), {
+      duration: 10000,
+      style: {
+        background: 'white',
+        color: 'black',
+        border: '1px solid #e5e7eb',
+        borderRadius: '12px',
+        padding: '16px',
+        maxWidth: '400px',
+      }
+    })
   }
 
   // Filter purchases based on search term
   const filteredPurchases = purchases.filter(purchase =>
-    purchase.productName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    purchase.supplierName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    purchase.productSku.toLowerCase().includes(searchTerm.toLowerCase())
+    (purchase.productName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (purchase.supplierName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (purchase.productSku || '').toLowerCase().includes(searchTerm.toLowerCase())
   )
 
   if (loading) {
@@ -658,8 +709,9 @@ export default function Purchase() {
         </div>
       ) : (
         <>
-          {/* Desktop Table View */}
-          <div className="hidden lg:block bg-white/80 backdrop-blur-sm rounded-xl shadow-sm border border-white/30 overflow-hidden">
+          {width >= 1217 ? (
+            /* Desktop Table View */
+            <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-sm border border-white/30 overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead className="bg-slate-50/50 border-b border-slate-200">
@@ -735,10 +787,10 @@ export default function Purchase() {
                 </tbody>
               </table>
             </div>
-          </div>
-
-          {/* Mobile Carousel View */}
-          <div className="lg:hidden">
+            </div>
+          ) : (
+            /* Mobile Carousel View */
+            <div>
             <Carousel className="w-full">
               <CarouselContent className="-ml-2 md:-ml-4">
                 {filteredPurchases.map((purchase, index) => (
@@ -755,7 +807,6 @@ export default function Purchase() {
                             <ShoppingCartIcon className="w-4 h-4 text-yellow-600" />
                           </div>
                           <div>
-                            <p className="font-semibold text-slate-900 text-sm">Purchase #{purchase.id}</p>
                             <p className="text-xs text-slate-500">{new Date(purchase.purchaseDate).toLocaleDateString()}</p>
                           </div>
                         </div>
@@ -826,7 +877,8 @@ export default function Purchase() {
               <CarouselPrevious className="hidden sm:flex" />
               <CarouselNext className="hidden sm:flex" />
             </Carousel>
-          </div>
+            </div>
+          )}
         </>
       )}
 
