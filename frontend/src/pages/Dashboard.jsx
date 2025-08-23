@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { 
   CubeIcon, 
@@ -11,27 +11,42 @@ import {
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts'
 import StatCard from '../components/StatCard'
 import { useDashboard } from '../contexts/DashboardContext'
-
-
-const mockSalesData = [
-  { month: 'Jan', sales: 45000 },
-  { month: 'Feb', sales: 52000 },
-  { month: 'Mar', sales: 48000 },
-  { month: 'Apr', sales: 61000 },
-  { month: 'May', sales: 55000 },
-  { month: 'Jun', sales: 67000 }
-]
-
-const mockInventoryData = [
-  { category: 'Electronics', count: 450 },
-  { category: 'Clothing', count: 320 },
-  { category: 'Books', count: 280 },
-  { category: 'Home & Garden', count: 197 }
-]
+import { analyticsApi } from '../services/apiClient'
+import { useAuth } from '../contexts/AuthContext'
+import toast from 'react-hot-toast'
 
 
 export default function Dashboard() {
   const { stats, loading } = useDashboard()
+  const [salesData, setSalesData] = useState([])
+  const [inventoryData, setInventoryData] = useState([])
+  const [chartsLoading, setChartsLoading] = useState(true)
+  const { token } = useAuth()
+
+  useEffect(() => {
+    const loadChartData = async () => {
+      if (!token) return
+      
+      try {
+        setChartsLoading(true)
+        const [salesTrend, inventoryByCategory] = await Promise.all([
+          analyticsApi.getSalesTrend(),
+          analyticsApi.getInventoryByCategory()
+        ])
+        
+        setSalesData(salesTrend)
+        setInventoryData(inventoryByCategory)
+      } catch (error) {
+        console.error('Failed to load chart data:', error)
+        const message = error.response?.data?.message || error.message || 'Failed to load chart data'
+        toast.error(message)
+      } finally {
+        setChartsLoading(false)
+      }
+    }
+
+    loadChartData()
+  }, [token])
 
 
   if (loading) {
@@ -134,8 +149,13 @@ export default function Dashboard() {
           >
             <h3 className="text-sm sm:text-base max-[1440px]:text-sm lg:text-lg font-semibold text-slate-900 mb-3 sm:mb-4">Sales Trend</h3>
             <div className="h-[200px] sm:h-[220px] max-[1440px]:h-[200px] lg:h-[280px] xl:h-[300px]">
+              {chartsLoading ? (
+                <div className="flex items-center justify-center h-full">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                </div>
+              ) : (
               <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={mockSalesData} margin={{ top: 10, right: 10, left: 0, bottom: 20 }}>
+              <LineChart data={salesData} margin={{ top: 10, right: 10, left: 0, bottom: 20 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
                 <XAxis 
                   dataKey="month" 
@@ -168,6 +188,7 @@ export default function Dashboard() {
                 />
               </LineChart>
               </ResponsiveContainer>
+              )}
             </div>
           </motion.div>
 
@@ -179,9 +200,14 @@ export default function Dashboard() {
           >
             <h3 className="text-sm sm:text-base max-[1440px]:text-sm lg:text-lg font-semibold text-slate-900 mb-3 sm:mb-4">Inventory by Category</h3>
             <div className="h-[200px] sm:h-[220px] max-[1440px]:h-[200px] lg:h-[280px] xl:h-[320px]">
+              {chartsLoading ? (
+                <div className="flex items-center justify-center h-full">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                </div>
+              ) : (
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart 
-                  data={mockInventoryData} 
+                  data={inventoryData} 
                   margin={{ top: 10, right: 10, left: 0, bottom: 45 }}
                 >
                 <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
@@ -213,6 +239,7 @@ export default function Dashboard() {
                 <Bar dataKey="count" fill="#10b981" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
+              )}
             </div>
           </motion.div>
         </div>

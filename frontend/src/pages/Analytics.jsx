@@ -21,15 +21,10 @@ import { analyticsApi } from '../services/apiClient'
 export default function Analytics() {
   const [revenueData, setRevenueData] = useState(null)
   const [topProducts, setTopProducts] = useState([])
+  const [categoryData, setCategoryData] = useState([])
+  const [inventoryValue, setInventoryValue] = useState(0)
   const [loading, setLoading] = useState(true)
   const { token } = useAuth()
-
-  const categoryData = [
-    { name: 'Electronics', value: 450, color: '#3b82f6' },
-    { name: 'Clothing', value: 320, color: '#10b981' },
-    { name: 'Books', value: 280, color: '#f59e0b' },
-    { name: 'Home & Garden', value: 197, color: '#ef4444' }
-  ]
 
   useEffect(() => {
     const loadAnalyticsData = async () => {
@@ -37,13 +32,17 @@ export default function Analytics() {
       
       try {
         setLoading(true)
-        const [revenueResponse, topProductsResponse] = await Promise.all([
+        const [revenueResponse, topProductsResponse, categoryDistribution, inventoryValueResponse] = await Promise.all([
           analyticsApi.getRevenue(),
-          analyticsApi.getTopSellingProducts()
+          analyticsApi.getTopSellingProducts(),
+          analyticsApi.getCategoryDistribution(),
+          analyticsApi.getInventoryValue()
         ])
         
         setRevenueData(revenueResponse)
         setTopProducts(topProductsResponse)
+        setCategoryData(categoryDistribution)
+        setInventoryValue(inventoryValueResponse.totalInventoryValue)
       } catch (error) {
         console.error('Failed to load analytics data:', error)
         const message = error.response?.data?.message || error.message || 'Failed to load analytics data'
@@ -201,7 +200,7 @@ export default function Analytics() {
                     </td>
                     <td className="py-3 text-right text-slate-900 px-4">{product.totalQuantity}</td>
                     <td className="py-3 text-right font-medium text-slate-900">
-                      ${product.totalRevenue.toLocaleString()}
+                      ${(product.totalRevenue || 0).toLocaleString()}
                     </td>
                   </motion.tr>
                 ))}
@@ -242,7 +241,7 @@ export default function Analytics() {
                     </div>
                     <div className="text-center">
                       <div className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                        ${product.totalRevenue.toLocaleString()}
+                        ${(product.totalRevenue || 0).toLocaleString()}
                       </div>
                       <div className="text-xs text-slate-500 mt-1">Revenue</div>
                     </div>
@@ -352,7 +351,7 @@ export default function Analytics() {
                   animate={{ scale: 1 }}
                   transition={{ delay: 1.6, type: "spring", damping: 15 }}
                 >
-                  $261.8k
+                  ${inventoryValue > 0 ? (inventoryValue / 1000).toFixed(1) : '0.0'}k
                 </motion.div>
                 <div className="text-sm text-slate-600 font-medium">Total Inventory Value</div>
               </div>
