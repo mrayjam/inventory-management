@@ -22,15 +22,15 @@ export default function StatCard({ title, value, icon: Icon, color = 'blue', tre
 
   const safeValue = value ?? 0
   const safeTrend = trend ?? 0
-  const safeRawValue = rawValue ?? (typeof safeValue === 'string' ? parseInt(safeValue.replace(/[^0-9]/g, '')) || 0 : safeValue)
+  const safeRawValue = rawValue ?? (typeof safeValue === 'string' ? parseFloat(safeValue.replace(/[^0-9.-]/g, '')) || 0 : safeValue)
   
-  const numericValue = safeRawValue || (typeof safeValue === 'string' ? parseInt(safeValue.replace(/[^0-9]/g, '')) || 0 : safeValue)
-  const animatedValue = useCountUp(Math.max(0, numericValue), 2000)
+  const numericValue = safeRawValue || (typeof safeValue === 'string' ? parseFloat(safeValue.replace(/[^0-9.-]/g, '')) || 0 : safeValue)
+  const animatedValue = useCountUp(numericValue, 2000)
   
   const displayValue = typeof safeValue === 'string' && safeValue.includes('$') 
-    ? `$${animatedValue > 1000 ? (animatedValue / 1000).toFixed(1) : animatedValue}${animatedValue > 1000 ? 'K' : ''}`
+    ? `${animatedValue < 0 ? '-' : ''}$${Math.abs(animatedValue) > 1000 ? (Math.abs(animatedValue) / 1000).toFixed(1) : Math.abs(animatedValue)}${Math.abs(animatedValue) > 1000 ? 'K' : ''}`
     : typeof safeValue === 'string' && safeValue.includes('K')
-    ? `${(animatedValue / 1000).toFixed(1)}K`
+    ? `${animatedValue < 0 ? '-' : ''}${(Math.abs(animatedValue) / 1000).toFixed(1)}K`
     : animatedValue.toLocaleString()
 
   return (
