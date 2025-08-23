@@ -7,7 +7,11 @@ export const getAllSales = async (req, res) => {
     const sales = await Sale.find().sort({ createdAt: -1 });
     res.json(sales);
   } catch (error) {
-    res.status(500).json({ message: 'Internal server error' });
+    console.error('Get all sales error:', error);
+    res.status(500).json({ 
+      message: 'Internal server error',
+      error: process.env.NODE_ENV === 'development' ? error.message : 'Something went wrong'
+    });
   }
 };
 
@@ -22,7 +26,19 @@ export const getSaleById = async (req, res) => {
 
     res.json(sale);
   } catch (error) {
-    res.status(500).json({ message: 'Internal server error' });
+    console.error('Get sale by ID error:', error);
+    
+    if (error.name === 'CastError' && error.kind === 'ObjectId') {
+      return res.status(400).json({ 
+        message: 'Invalid sale ID format',
+        error: error.message 
+      });
+    }
+    
+    res.status(500).json({ 
+      message: 'Internal server error',
+      error: process.env.NODE_ENV === 'development' ? error.message : 'Something went wrong'
+    });
   }
 };
 
@@ -30,34 +46,52 @@ export const createSale = async (req, res) => {
   try {
     const { productId, quantity, salePrice, customer = '', saleDate } = req.body;
 
+    // Validate required fields
+    if (!productId) {
+      return res.status(400).json({ message: 'Product ID is required' });
+    }
+
+    if (!quantity || quantity < 1) {
+      return res.status(400).json({ message: 'Quantity must be at least 1' });
+    }
+
+    if (salePrice === undefined || salePrice === null || salePrice < 0) {
+      return res.status(400).json({ message: 'Sale price is required and cannot be negative' });
+    }
+
+    // Find product and validate existence
     const product = await Product.findById(productId);
     if (!product) {
       return res.status(404).json({ message: 'Product not found' });
     }
 
+    // Validate sufficient stock
     if (product.stock < quantity) {
       return res.status(400).json({ 
         message: `Insufficient stock. Available: ${product.stock}, Requested: ${quantity}` 
       });
     }
 
+    // Create sale document
     const sale = new Sale({
       productId,
       productName: product.name,
       productSku: product.sku,
-      quantity,
-      salePrice,
-      customer,
+      quantity: parseInt(quantity),
+      salePrice: parseFloat(salePrice),
+      customer: customer || '',
       saleDate: saleDate ? new Date(saleDate) : new Date(),
       createdBy: req.user.name
     });
 
     await sale.save();
 
+    // Update product stock
     const oldStock = product.stock;
     product.stock -= quantity;
     await product.save();
 
+    // Create product history record
     await new ProductHistory({
       product: product._id,
       action: 'stock_changed',
@@ -68,13 +102,37 @@ export const createSale = async (req, res) => {
       details: `Stock decreased by ${quantity} units via sale (${oldStock} → ${product.stock})`
     }).save();
 
-    res.json({
+    // Return both sale and updated product
+    res.status(201).json({
       success: true,
-      sale,
+      sale: sale.toJSON(),
+      product: product.toJSON(),
       message: 'Sale recorded successfully'
     });
   } catch (error) {
-    res.status(500).json({ message: 'Internal server error' });
+    console.error('Create sale error:', error);
+    
+    // Handle validation errors
+    if (error.name === 'ValidationError') {
+      return res.status(400).json({ 
+        message: 'Validation error', 
+        details: Object.values(error.errors).map(e => e.message),
+        error: error.message
+      });
+    }
+    
+    // Handle cast errors (invalid ObjectId)
+    if (error.name === 'CastError' && error.kind === 'ObjectId') {
+      return res.status(400).json({ 
+        message: 'Invalid product ID format',
+        error: error.message 
+      });
+    }
+    
+    res.status(500).json({ 
+      message: 'Internal server error',
+      error: process.env.NODE_ENV === 'development' ? error.message : 'Something went wrong'
+    });
   }
 };
 
