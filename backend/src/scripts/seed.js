@@ -4,6 +4,8 @@ import bcrypt from 'bcryptjs';
 import User from '../models/User.js';
 import Product from '../models/Product.js';
 import Supplier from '../models/Supplier.js';
+import Purchase from '../models/Purchase.js';
+import Sale from '../models/Sale.js';
 
 
 dotenv.config();
@@ -17,6 +19,8 @@ const seedData = async () => {
     await User.deleteMany({});
     await Product.deleteMany({});
     await Supplier.deleteMany({});
+    await Purchase.deleteMany({});
+    await Sale.deleteMany({});
     console.log('Cleared existing data');
 
     const users = [
@@ -84,7 +88,7 @@ const seedData = async () => {
       }
     ];
 
-    await Supplier.insertMany(suppliers);
+    const createdSuppliers = await Supplier.insertMany(suppliers);
     console.log('✅ Suppliers seeded');
 
     const products = [
@@ -130,8 +134,145 @@ const seedData = async () => {
       }
     ];
 
-    await Product.insertMany(products);
+    const createdProducts = await Product.insertMany(products);
     console.log('✅ Products seeded');
+
+    const purchases = [
+      {
+        product: createdProducts[0]._id,
+        productName: 'Wireless Headphones',
+        productSku: 'WH-001',
+        supplier: createdSuppliers[0]._id,
+        supplierName: 'TechCorp Solutions',
+        quantity: 50,
+        unitPrice: 75.99,
+        purchaseDate: new Date('2024-01-15'),
+        createdBy: 'admin@example.com'
+      },
+      {
+        product: createdProducts[1]._id,
+        productName: 'Cotton T-Shirt',
+        productSku: 'CT-002',
+        supplier: createdSuppliers[1]._id,
+        supplierName: 'FashionHub Inc',
+        quantity: 100,
+        unitPrice: 15.99,
+        purchaseDate: new Date('2024-01-20'),
+        createdBy: 'admin@example.com'
+      },
+      {
+        product: createdProducts[2]._id,
+        productName: 'Programming Guide',
+        productSku: 'PG-003',
+        supplier: createdSuppliers[2]._id,
+        supplierName: 'BookWorld Publishing',
+        quantity: 30,
+        unitPrice: 35.99,
+        purchaseDate: new Date('2024-02-01'),
+        createdBy: 'john@example.com'
+      },
+      {
+        product: createdProducts[3]._id,
+        productName: 'Garden Tools Set',
+        productSku: 'GT-004',
+        supplier: createdSuppliers[3]._id,
+        supplierName: 'GreenThumb Gardens',
+        quantity: 25,
+        unitPrice: 120.99,
+        purchaseDate: new Date('2024-02-10'),
+        createdBy: 'jane@example.com'
+      },
+      {
+        product: createdProducts[0]._id,
+        productName: 'Wireless Headphones',
+        productSku: 'WH-001',
+        supplier: createdSuppliers[0]._id,
+        supplierName: 'TechCorp Solutions',
+        quantity: 20,
+        unitPrice: 73.99,
+        purchaseDate: new Date('2024-03-01'),
+        createdBy: 'admin@example.com'
+      }
+    ];
+
+    await Purchase.insertMany(purchases);
+    console.log('✅ Purchases seeded');
+
+    const sales = [
+      {
+        productId: createdProducts[0]._id,
+        productName: 'Wireless Headphones',
+        productSku: 'WH-001',
+        quantity: 2,
+        salePrice: 99.99,
+        customer: 'John Smith',
+        saleDate: new Date('2024-02-15'),
+        createdBy: 'admin@example.com'
+      },
+      {
+        productId: createdProducts[1]._id,
+        productName: 'Cotton T-Shirt',
+        productSku: 'CT-002',
+        quantity: 5,
+        salePrice: 24.99,
+        customer: 'Sarah Johnson',
+        saleDate: new Date('2024-02-16'),
+        createdBy: 'admin@example.com'
+      },
+      {
+        productId: createdProducts[0]._id,
+        productName: 'Wireless Headphones',
+        productSku: 'WH-001',
+        quantity: 1,
+        salePrice: 99.99,
+        customer: 'Mike Davis',
+        saleDate: new Date('2024-02-18'),
+        createdBy: 'john@example.com'
+      },
+      {
+        productId: createdProducts[3]._id,
+        productName: 'Garden Tools Set',
+        productSku: 'GT-004',
+        quantity: 1,
+        salePrice: 159.99,
+        customer: 'Lisa Wilson',
+        saleDate: new Date('2024-02-20'),
+        createdBy: 'jane@example.com'
+      },
+      {
+        productId: createdProducts[1]._id,
+        productName: 'Cotton T-Shirt',
+        productSku: 'CT-002',
+        quantity: 3,
+        salePrice: 24.99,
+        customer: 'Emma Brown',
+        saleDate: new Date('2024-02-22'),
+        createdBy: 'admin@example.com'
+      },
+      {
+        productId: createdProducts[2]._id,
+        productName: 'Programming Guide',
+        productSku: 'PG-003',
+        quantity: 2,
+        salePrice: 49.99,
+        customer: 'David Lee',
+        saleDate: new Date('2024-02-25'),
+        createdBy: 'john@example.com'
+      },
+      {
+        productId: createdProducts[0]._id,
+        productName: 'Wireless Headphones',
+        productSku: 'WH-001',
+        quantity: 1,
+        salePrice: 99.99,
+        customer: '',
+        saleDate: new Date('2024-03-05'),
+        createdBy: 'admin@example.com'
+      }
+    ];
+
+    await Sale.insertMany(sales);
+    console.log('✅ Sales seeded');
 
     console.log('🎉 Database seeded successfully!');
     console.log('\n📋 Default login credentials:');
