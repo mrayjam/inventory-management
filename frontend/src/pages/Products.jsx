@@ -557,6 +557,7 @@ export default function Products() {
     toast.success(`Viewing history for ${product.name}`)
   }
 
+ 
 
   return (
     <div className="w-full max-w-full overflow-x-hidden min-w-0">
