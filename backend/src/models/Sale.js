@@ -26,7 +26,7 @@ const saleSchema = new mongoose.Schema({
   },
   totalAmount: {
     type: Number,
-    required: true
+    required: false
   },
   customer: {
     type: String,
