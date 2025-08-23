@@ -5,7 +5,8 @@ import {
   getSalesTrend, 
   getInventoryByCategory, 
   getCategoryDistribution,
-  getInventoryValue 
+  getInventoryValue,
+  getAdvancedMetrics 
 } from '../controllers/analyticsController.js';
 import { authenticate } from '../middleware/auth.js';
 
@@ -22,5 +23,7 @@ router.get('/inventory-by-category', authenticate, getInventoryByCategory);
 router.get('/category-distribution', authenticate, getCategoryDistribution);
 
 router.get('/inventory-value', authenticate, getInventoryValue);
+
+router.get('/advanced-metrics', authenticate, getAdvancedMetrics);
 
 export default router;
