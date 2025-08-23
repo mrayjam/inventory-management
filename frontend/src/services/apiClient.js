@@ -293,6 +293,11 @@ export const analyticsApi = {
   getInventoryValue: async () => {
     const response = await apiClient.get('/analytics/inventory-value')
     return response.data
+  },
+  
+  getAdvancedMetrics: async () => {
+    const response = await apiClient.get('/analytics/advanced-metrics')
+    return response.data
   }
 }
 

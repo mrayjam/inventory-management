@@ -23,6 +23,7 @@ export default function Analytics() {
   const [topProducts, setTopProducts] = useState([])
   const [categoryData, setCategoryData] = useState([])
   const [inventoryValue, setInventoryValue] = useState(0)
+  const [advancedMetrics, setAdvancedMetrics] = useState(null)
   const [loading, setLoading] = useState(true)
   const { token } = useAuth()
 
@@ -32,17 +33,19 @@ export default function Analytics() {
       
       try {
         setLoading(true)
-        const [revenueResponse, topProductsResponse, categoryDistribution, inventoryValueResponse] = await Promise.all([
+        const [revenueResponse, topProductsResponse, categoryDistribution, inventoryValueResponse, advancedMetricsResponse] = await Promise.all([
           analyticsApi.getRevenue(),
           analyticsApi.getTopSellingProducts(),
           analyticsApi.getCategoryDistribution(),
-          analyticsApi.getInventoryValue()
+          analyticsApi.getInventoryValue(),
+          analyticsApi.getAdvancedMetrics()
         ])
         
         setRevenueData(revenueResponse)
         setTopProducts(topProductsResponse)
         setCategoryData(categoryDistribution)
         setInventoryValue(inventoryValueResponse.totalInventoryValue)
+        setAdvancedMetrics(advancedMetricsResponse)
       } catch (error) {
         console.error('Failed to load analytics data:', error)
         const message = error.response?.data?.message || error.message || 'Failed to load analytics data'
@@ -273,14 +276,14 @@ export default function Analytics() {
                   animate={{ scale: 1 }}
                   transition={{ delay: 0.7, type: "spring" }}
                 >
-                  8.5x
+                  {advancedMetrics?.inventoryTurnover ? `${advancedMetrics.inventoryTurnover}x` : 'N/A'}
                 </motion.span>
               </div>
               <div className="w-full bg-slate-200 rounded-full h-3 overflow-hidden">
                 <motion.div 
                   className="bg-gradient-to-r from-blue-500 to-blue-600 h-3 rounded-full shadow-sm"
                   initial={{ width: 0 }}
-                  animate={{ width: '85%' }}
+                  animate={{ width: advancedMetrics?.inventoryTurnover ? `${Math.min(advancedMetrics.inventoryTurnover * 10, 100)}%` : '0%' }}
                   transition={{ delay: 0.8, duration: 1.2, ease: "easeOut" }}
                 />
               </div>
@@ -299,14 +302,14 @@ export default function Analytics() {
                   animate={{ scale: 1 }}
                   transition={{ delay: 0.9, type: "spring" }}
                 >
-                  96.8%
+                  N/A
                 </motion.span>
               </div>
               <div className="w-full bg-slate-200 rounded-full h-3 overflow-hidden">
                 <motion.div 
-                  className="bg-gradient-to-r from-green-500 to-green-600 h-3 rounded-full shadow-sm"
+                  className="bg-gradient-to-r from-gray-400 to-gray-500 h-3 rounded-full shadow-sm"
                   initial={{ width: 0 }}
-                  animate={{ width: '96.8%' }}
+                  animate={{ width: '0%' }}
                   transition={{ delay: 1.0, duration: 1.2, ease: "easeOut" }}
                 />
               </div>
@@ -325,14 +328,14 @@ export default function Analytics() {
                   animate={{ scale: 1 }}
                   transition={{ delay: 1.1, type: "spring" }}
                 >
-                  94.2%
+                  N/A
                 </motion.span>
               </div>
               <div className="w-full bg-slate-200 rounded-full h-3 overflow-hidden">
                 <motion.div 
-                  className="bg-gradient-to-r from-yellow-500 to-yellow-600 h-3 rounded-full shadow-sm"
+                  className="bg-gradient-to-r from-gray-400 to-gray-500 h-3 rounded-full shadow-sm"
                   initial={{ width: 0 }}
-                  animate={{ width: '94.2%' }}
+                  animate={{ width: '0%' }}
                   transition={{ delay: 1.2, duration: 1.2, ease: "easeOut" }}
                 />
               </div>
