@@ -101,7 +101,7 @@ const SaleDetailModal = ({ isOpen, onClose, sale, onEditSale }) => {
               
               <div className="bg-green-50 rounded-lg p-4">
                 <p className="text-sm font-medium text-green-700 mb-1">Total Amount</p>
-                <p className="text-2xl font-bold text-green-600">${sale.totalAmount.toFixed(2)}</p>
+                <p className="text-2xl font-bold text-green-600">${(sale.totalAmount || (sale.salePrice * sale.quantity)).toFixed(2)}</p>
               </div>
             </div>
             
@@ -625,7 +625,7 @@ export default function Sales() {
                   </td>
                   <td className="px-6 py-4 text-sm text-slate-900">{sale.customer || 'Walk-in'}</td>
                   <td className="px-6 py-4 text-sm text-slate-900">{sale.quantity}</td>
-                  <td className="px-6 py-4 text-sm font-medium text-green-600">${sale.totalAmount.toFixed(2)}</td>
+                  <td className="px-6 py-4 text-sm font-medium text-green-600">${(sale.totalAmount || (sale.salePrice * sale.quantity)).toFixed(2)}</td>
                   <td className="px-6 py-4 text-sm text-slate-900">{new Date(sale.saleDate).toLocaleDateString()}</td>
                   <td className="px-6 py-4">
                     <div className="flex gap-2">
@@ -714,7 +714,7 @@ export default function Sales() {
                               <p className="text-sm text-slate-500">{new Date(sale.saleDate).toLocaleDateString()}</p>
                             </div>
                             <div className="text-right">
-                              <p className="text-xl font-bold text-green-600">${sale.totalAmount}</p>
+                              <p className="text-xl font-bold text-green-600">${(sale.totalAmount || (sale.salePrice * sale.quantity)).toFixed(2)}</p>
                             </div>
                           </div>
                           

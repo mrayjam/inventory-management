@@ -273,6 +273,26 @@ export const analyticsApi = {
   getTopSellingProducts: async () => {
     const response = await apiClient.get('/analytics/top-selling')
     return response.data
+  },
+  
+  getSalesTrend: async () => {
+    const response = await apiClient.get('/analytics/sales-trend')
+    return response.data
+  },
+  
+  getInventoryByCategory: async () => {
+    const response = await apiClient.get('/analytics/inventory-by-category')
+    return response.data
+  },
+  
+  getCategoryDistribution: async () => {
+    const response = await apiClient.get('/analytics/category-distribution')
+    return response.data
+  },
+  
+  getInventoryValue: async () => {
+    const response = await apiClient.get('/analytics/inventory-value')
+    return response.data
   }
 }
 
