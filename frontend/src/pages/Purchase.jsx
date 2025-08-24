@@ -19,7 +19,9 @@ import {
   CubeIcon,
   BuildingStorefrontIcon,
   CurrencyDollarIcon,
-  MagnifyingGlassIcon
+  MagnifyingGlassIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon
 } from '@heroicons/react/24/outline'
 import toast from 'react-hot-toast'
 import { useAuth } from '../contexts/AuthContext'
@@ -155,7 +157,8 @@ const PurchaseModal = ({
     productId: '',
     quantity: '',
     supplierId: '',
-    unitPrice: ''
+    unitPrice: '',
+    purchaseDate: ''
   })
   
   const isEditMode = !!purchase
@@ -166,14 +169,17 @@ const PurchaseModal = ({
         productId: purchase.productId,
         quantity: purchase.quantity.toString(),
         supplierId: purchase.supplierId,
-        unitPrice: purchase.unitPrice.toString()
+        unitPrice: purchase.unitPrice.toString(),
+        purchaseDate: purchase.purchaseDate || ''
       })
     } else {
+      const today = new Date().toISOString().split('T')[0]
       setFormData({
         productId: '',
         quantity: '',
         supplierId: '',
-        unitPrice: ''
+        unitPrice: '',
+        purchaseDate: today
       })
     }
   }, [purchase])
@@ -248,7 +254,8 @@ const PurchaseModal = ({
       productId: formData.productId,
       supplierId: formData.supplierId,
       quantity: parseInt(formData.quantity),
-      unitPrice: parseFloat(formData.unitPrice)
+      unitPrice: parseFloat(formData.unitPrice),
+      purchaseDate: formData.purchaseDate
     }
 
     await onSave(purchaseData)
@@ -373,6 +380,20 @@ const PurchaseModal = ({
                 />
               </div>
 
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="w-full md:col-span-1">
+                  <FloatingLabelInput
+                    id="purchaseDate"
+                    name="purchaseDate"
+                    type="date"
+                    label="Purchase Date *"
+                    value={formData.purchaseDate}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </div>
+              </div>
+
               {(selectedProduct || selectedSupplier || (formData.quantity && formData.unitPrice)) && (
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
@@ -487,6 +508,8 @@ export default function Purchase() {
   const [suppliers, setSuppliers] = useState([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
+  const [currentTablePage, setCurrentTablePage] = useState(1)
+  const tableItemsPerPage = 3
   const { width } = useWindowSize()
   
   // Modal states
@@ -507,6 +530,11 @@ export default function Purchase() {
   useEffect(() => {
     loadAllData()
   }, [token])
+
+  // Reset pagination when search term changes
+  useEffect(() => {
+    setCurrentTablePage(1)
+  }, [searchTerm])
 
   const loadAllData = async () => {
     if (!token) return
@@ -647,6 +675,12 @@ export default function Purchase() {
     (purchase.productSku || '').toLowerCase().includes(searchTerm.toLowerCase())
   )
 
+  // Table view pagination (3 rows per page)
+  const totalTablePages = Math.ceil(filteredPurchases.length / tableItemsPerPage)
+  const tableStartIndex = (currentTablePage - 1) * tableItemsPerPage
+  const tableEndIndex = tableStartIndex + tableItemsPerPage
+  const currentTablePurchases = filteredPurchases.slice(tableStartIndex, tableEndIndex)
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -726,7 +760,7 @@ export default function Purchase() {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredPurchases.map((purchase, index) => (
+                  {currentTablePurchases.map((purchase, index) => (
                     <motion.tr
                       key={purchase.id}
                       initial={{ opacity: 0, y: 20 }}
@@ -744,7 +778,7 @@ export default function Purchase() {
                         <p className="text-slate-900">{purchase.supplierName}</p>
                       </td>
                       <td className="py-3 px-4">
-                        <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-sm font-medium">
+                        <span className="text-slate-500 px-2 py-1 text-sm font-medium">
                           {purchase.quantity} units
                         </span>
                       </td>
@@ -787,6 +821,34 @@ export default function Purchase() {
                 </tbody>
               </table>
             </div>
+            
+            {/* Pagination Controls */}
+            {totalTablePages > 1 && (
+              <div className="flex items-center justify-between mt-4 px-4">
+                <div className="text-sm text-slate-600">
+                  Showing {tableStartIndex + 1} to {Math.min(tableEndIndex, filteredPurchases.length)} of {filteredPurchases.length} purchases
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setCurrentTablePage(prev => Math.max(prev - 1, 1))}
+                    disabled={currentTablePage === 1}
+                    className="p-2 rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    <ChevronLeftIcon className="h-4 w-4" />
+                  </button>
+                  <span className="text-sm text-slate-600">
+                    Page {currentTablePage} of {totalTablePages}
+                  </span>
+                  <button
+                    onClick={() => setCurrentTablePage(prev => Math.min(prev + 1, totalTablePages))}
+                    disabled={currentTablePage === totalTablePages}
+                    className="p-2 rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    <ChevronRightIcon className="h-4 w-4" />
+                  </button>
+                </div>
+              </div>
+            )}
             </div>
           ) : (
             /* Mobile Carousel View */

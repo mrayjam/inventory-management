@@ -196,6 +196,8 @@ export default function Suppliers() {
   const [modalState, setModalState] = useState({ isOpen: false, supplier: null, mode: 'add' })
   const [suppliers, setSuppliers] = useState([])
   const [loading, setLoading] = useState(true)
+  const [currentTablePage, setCurrentTablePage] = useState(1)
+  const tableItemsPerPage = 3
 
   const { token } = useAuth()
 
@@ -218,11 +220,22 @@ export default function Suppliers() {
     }
   }, [token])
 
+  // Reset pagination when search term changes
+  useEffect(() => {
+    setCurrentTablePage(1)
+  }, [searchTerm])
+
   const filteredSuppliers = suppliers.filter(supplier =>
     supplier.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     supplier.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
     supplier.category.toLowerCase().includes(searchTerm.toLowerCase())
   )
+
+  // Pagination logic
+  const totalTablePages = Math.ceil(filteredSuppliers.length / tableItemsPerPage)
+  const tableStartIndex = (currentTablePage - 1) * tableItemsPerPage
+  const tableEndIndex = tableStartIndex + tableItemsPerPage
+  const currentTableSuppliers = filteredSuppliers.slice(tableStartIndex, tableEndIndex)
 
   const handleSupplierSaved = async (action, supplierId, supplierData) => {
     const loadingToast = toast.loading(`${action === 'create' ? 'Creating' : 'Updating'} supplier...`)
@@ -351,7 +364,7 @@ export default function Suppliers() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {filteredSuppliers.map((supplier, index) => (
+              {currentTableSuppliers.map((supplier, index) => (
                 <motion.tr
                   key={supplier.id}
                   initial={{ opacity: 0, x: -20 }}
@@ -405,6 +418,34 @@ export default function Suppliers() {
               ))}
             </tbody>
           </table>
+          
+          {/* Pagination Controls */}
+          {totalTablePages > 1 && (
+            <div className="flex items-center justify-between mt-4 px-4">
+              <div className="text-sm text-slate-600">
+                Showing {tableStartIndex + 1} to {Math.min(tableEndIndex, filteredSuppliers.length)} of {filteredSuppliers.length} suppliers
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setCurrentTablePage(prev => Math.max(prev - 1, 1))}
+                  disabled={currentTablePage === 1}
+                  className="p-2 rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  <ChevronLeftIcon className="h-4 w-4" />
+                </button>
+                <span className="text-sm text-slate-600">
+                  Page {currentTablePage} of {totalTablePages}
+                </span>
+                <button
+                  onClick={() => setCurrentTablePage(prev => Math.min(prev + 1, totalTablePages))}
+                  disabled={currentTablePage === totalTablePages}
+                  className="p-2 rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  <ChevronRightIcon className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Mobile Carousel View */}

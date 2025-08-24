@@ -29,10 +29,10 @@ export const getPurchaseById = async (req, res) => {
 
 export const createPurchase = async (req, res) => {
   try {
-    const { productId, supplierId, quantity, unitPrice } = req.body;
+    const { productId, supplierId, quantity, unitPrice, purchaseDate } = req.body;
 
-    if (!productId || !supplierId || !quantity || !unitPrice) {
-      return res.status(400).json({ message: 'Missing required fields: productId, supplierId, quantity, unitPrice' });
+    if (!productId || !supplierId || !quantity || !unitPrice || !purchaseDate) {
+      return res.status(400).json({ message: 'Missing required fields: productId, supplierId, quantity, unitPrice, purchaseDate' });
     }
 
     if (quantity < 1) {
@@ -65,6 +65,7 @@ export const createPurchase = async (req, res) => {
       supplierName: supplier.name,
       quantity,
       unitPrice,
+      purchaseDate: new Date(purchaseDate),
       createdBy: req.user.name
     });
 
@@ -139,7 +140,7 @@ export const createPurchase = async (req, res) => {
 export const updatePurchase = async (req, res) => {
   try {
     const { id } = req.params;
-    const { productId, supplierId, quantity, unitPrice } = req.body;
+    const { productId, supplierId, quantity, unitPrice, purchaseDate } = req.body;
 
     const existingPurchase = await Purchase.findById(id);
     if (!existingPurchase) {
@@ -181,6 +182,7 @@ export const updatePurchase = async (req, res) => {
     existingPurchase.supplierName = supplier.name;
     existingPurchase.quantity = quantity;
     existingPurchase.unitPrice = unitPrice;
+    existingPurchase.purchaseDate = purchaseDate ? new Date(purchaseDate) : existingPurchase.purchaseDate;
     existingPurchase.updatedBy = req.user.name;
 
     await existingPurchase.save();
