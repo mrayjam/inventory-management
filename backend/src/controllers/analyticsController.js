@@ -9,8 +9,6 @@ export const getRevenue = async (req, res) => {
     const now = new Date();
     const currentMonth = now.getMonth();
     const currentYear = now.getFullYear();
-    const lastMonth = currentMonth === 0 ? 11 : currentMonth - 1;
-    const lastMonthYear = currentMonth === 0 ? currentYear - 1 : currentYear;
 
     const allSales = await Sale.find();
     const allPurchases = await Purchase.find();
@@ -33,63 +31,12 @@ export const getRevenue = async (req, res) => {
     const totalSales = allSales.length;
     const totalPurchases = allPurchases.length;
 
-    const purchasesThisMonth = allPurchases.filter(purchase => {
-      const purchaseDate = new Date(purchase.purchaseDate);
-      return purchaseDate.getMonth() === currentMonth && purchaseDate.getFullYear() === currentYear;
-    }).length;
-
-    const purchasesLastMonth = allPurchases.filter(purchase => {
-      const purchaseDate = new Date(purchase.purchaseDate);
-      return purchaseDate.getMonth() === lastMonth && purchaseDate.getFullYear() === lastMonthYear;
-    }).length;
-
-    const purchasesAmountThisMonth = allPurchases.filter(purchase => {
-      const purchaseDate = new Date(purchase.purchaseDate);
-      return purchaseDate.getMonth() === currentMonth && purchaseDate.getFullYear() === currentYear;
-    }).reduce((sum, purchase) => sum + (purchase.totalAmount || (purchase.unitPrice * purchase.quantity)), 0);
-
-    const purchasesAmountLastMonth = allPurchases.filter(purchase => {
-      const purchaseDate = new Date(purchase.purchaseDate);
-      return purchaseDate.getMonth() === lastMonth && purchaseDate.getFullYear() === lastMonthYear;
-    }).reduce((sum, purchase) => sum + (purchase.totalAmount || (purchase.unitPrice * purchase.quantity)), 0);
-
-    const purchasePercentageChange = purchasesLastMonth === 0 
-      ? (purchasesThisMonth > 0 ? 100 : 0)
-      : Math.round(((purchasesThisMonth - purchasesLastMonth) / purchasesLastMonth) * 100);
-
     const salesThisMonth = allSales.filter(sale => {
       const saleDate = new Date(sale.saleDate);
       return saleDate.getMonth() === currentMonth && saleDate.getFullYear() === currentYear;
     }).length;
 
-    const salesLastMonth = allSales.filter(sale => {
-      const saleDate = new Date(sale.saleDate);
-      return saleDate.getMonth() === lastMonth && saleDate.getFullYear() === lastMonthYear;
-    }).length;
-
-    // Calculate revenue for this month and last month
-    const salesThisMonthAmount = allSales.filter(sale => {
-      const saleDate = new Date(sale.saleDate);
-      return saleDate.getMonth() === currentMonth && saleDate.getFullYear() === currentYear;
-    }).reduce((sum, sale) => sum + (sale.totalAmount || (sale.salePrice * sale.quantity)), 0);
-
-    const salesLastMonthAmount = allSales.filter(sale => {
-      const saleDate = new Date(sale.saleDate);
-      return saleDate.getMonth() === lastMonth && saleDate.getFullYear() === lastMonthYear;
-    }).reduce((sum, sale) => sum + (sale.totalAmount || (sale.salePrice * sale.quantity)), 0);
-
-    const salesPercentageChange = salesLastMonthAmount === 0 
-      ? (salesThisMonthAmount > 0 ? 100 : 0)
-      : Math.round(((salesThisMonthAmount - salesLastMonthAmount) / Math.abs(salesLastMonthAmount)) * 100);
-
-    const revenueThisMonth = salesThisMonthAmount - purchasesAmountThisMonth;
-    const revenueLastMonth = salesLastMonthAmount - purchasesAmountLastMonth;
-
-    const revenuePercentageChange = revenueLastMonth === 0 
-      ? (revenueThisMonth !== 0 ? 100 : 0)
-      : Math.round(((revenueThisMonth - revenueLastMonth) / Math.abs(revenueLastMonth)) * 100);
-
-    console.log(`Analytics: Revenue calculated - Total: $${totalRevenue.toFixed(2)}, Change: ${revenuePercentageChange}% (${revenueThisMonth.toFixed(2)} vs ${revenueLastMonth.toFixed(2)})`);
+    console.log(`Analytics: Revenue calculated - Total: $${totalRevenue.toFixed(2)}`);
 
     res.json({
       totalRevenue,
@@ -97,9 +44,6 @@ export const getRevenue = async (req, res) => {
       totalSalesAmount,
       totalPurchases,
       totalPurchasesAmount,
-      purchasePercentageChange,
-      revenuePercentageChange,
-      salesPercentageChange,
       salesThisMonth
     });
   } catch (error) {
@@ -245,6 +189,21 @@ export const getAdvancedMetrics = async (req, res) => {
     const purchases = await Purchase.find();
     const sales = await Sale.find();
     
+    // Calculate total sales amount
+    const totalSalesAmount = sales.reduce((sum, sale) => {
+      const saleAmount = sale.totalAmount || (sale.salePrice * sale.quantity);
+      return sum + saleAmount;
+    }, 0);
+
+    // Calculate total purchase amount
+    const totalPurchasesAmount = purchases.reduce((sum, purchase) => {
+      const purchaseAmount = purchase.totalAmount || (purchase.unitPrice * purchase.quantity);
+      return sum + purchaseAmount;
+    }, 0);
+
+    // Calculate profit: Total Sales Amount - Total Purchases Amount
+    const profit = totalSalesAmount - totalPurchasesAmount;
+    
     // Calculate Cost of Goods Sold (COGS) - total purchase amount for sold items
     const totalPurchaseCost = purchases.reduce((sum, purchase) => 
       sum + (purchase.totalAmount || (purchase.unitPrice * purchase.quantity)), 0);
@@ -267,7 +226,12 @@ export const getAdvancedMetrics = async (req, res) => {
     // Since we don't have historical inventory data, we'll use current inventory value
     const inventoryTurnover = totalInventoryValue > 0 ? totalPurchaseCost / totalInventoryValue : 0;
 
+    console.log(`Analytics: Advanced metrics calculated - Profit: $${profit.toFixed(2)} (Sales: $${totalSalesAmount.toFixed(2)}, Purchases: $${totalPurchasesAmount.toFixed(2)})`);
+
     res.json({
+      profit,
+      totalSalesAmount,
+      totalPurchasesAmount,
       inventoryTurnover: Math.round(inventoryTurnover * 10) / 10, // Round to 1 decimal
       totalInventoryValue,
       totalPurchaseCost,

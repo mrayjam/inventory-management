@@ -19,12 +19,9 @@ export const DashboardProvider = ({ children }) => {
     totalSuppliers: 0,
     totalSales: 0,
     totalSalesAmount: 0,
-    salesPercentageChange: 0,
     totalRevenue: 0,
     totalPurchases: 0,
-    totalPurchasesAmount: 0,
-    purchasePercentageChange: 0,
-    revenuePercentageChange: 0
+    totalPurchasesAmount: 0
   })
   const [loading, setLoading] = useState(true)
   
@@ -49,12 +46,9 @@ export const DashboardProvider = ({ children }) => {
         totalSuppliers: activeSuppliers.length,
         totalSales: revenueData?.totalSales ?? 0,
         totalSalesAmount: revenueData?.totalSalesAmount ?? 0,
-        salesPercentageChange: revenueData?.salesPercentageChange ?? 0,
         totalRevenue: revenueData?.totalRevenue ?? 0,
         totalPurchases: revenueData?.totalPurchases ?? 0,
-        totalPurchasesAmount: revenueData?.totalPurchasesAmount ?? 0,
-        purchasePercentageChange: revenueData?.purchasePercentageChange ?? 0,
-        revenuePercentageChange: revenueData?.revenuePercentageChange ?? 0
+        totalPurchasesAmount: revenueData?.totalPurchasesAmount ?? 0
       })
     } catch (error) {
       console.error('Failed to refresh dashboard stats:', error)
@@ -65,12 +59,9 @@ export const DashboardProvider = ({ children }) => {
         ...prev,
         totalSales: 0,
         totalSalesAmount: 0,
-        salesPercentageChange: 0,
         totalRevenue: 0,
         totalPurchases: 0,
-        totalPurchasesAmount: 0,
-        purchasePercentageChange: 0,
-        revenuePercentageChange: 0
+        totalPurchasesAmount: 0
       }))
     }
   }, [token])

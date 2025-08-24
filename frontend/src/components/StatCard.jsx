@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion'
 import { useCountUp } from '../hooks/useCountUp'
 
-export default function StatCard({ title, value, icon: Icon, color = 'blue', trend, rawValue }) {
+export default function StatCard({ title, value, icon: Icon, color = 'blue', rawValue }) {
   const colorClasses = {
     blue: 'bg-blue-500 text-gray-200 shadow-blue-500/20',
     green: 'bg-green-500 text-gray-200 shadow-green-500/20',
@@ -21,7 +21,6 @@ export default function StatCard({ title, value, icon: Icon, color = 'blue', tre
   }
 
   const safeValue = value ?? 0
-  const safeTrend = trend ?? 0
   const safeRawValue = rawValue ?? (typeof safeValue === 'string' ? parseFloat(safeValue.replace(/[^0-9.-]/g, '')) || 0 : safeValue)
   
   const numericValue = safeRawValue || (typeof safeValue === 'string' ? parseFloat(safeValue.replace(/[^0-9.-]/g, '')) || 0 : safeValue)
@@ -65,22 +64,6 @@ export default function StatCard({ title, value, icon: Icon, color = 'blue', tre
           >
             {displayValue}
           </motion.p>
-          <motion.div
-            initial={{ opacity: 0, x: -10 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.8 }}
-            className={`inline-flex items-center text-xs mt-2 sm:mt-3 px-2 py-1 rounded-full ${
-              safeTrend > 0 ? 'text-green-700 bg-green-100' : 
-              safeTrend < 0 ? 'text-red-700 bg-red-100' : 'text-gray-700 bg-gray-100'
-            }`}
-          >
-            {safeTrend !== 0 && (
-              <svg className={`w-3 h-3 mr-1 ${safeTrend > 0 ? 'rotate-0' : 'rotate-180'}`} fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M5.293 7.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L10 4.414 6.707 7.707a1 1 0 01-1.414 0z" clipRule="evenodd" />
-              </svg>
-            )}
-            {Math.abs(safeTrend)}% from last month
-          </motion.div>
         </div>
         <motion.div 
           className={`flex-shrink-0 p-3 md:p-4 rounded-2xl bg-opacity-10 shadow-lg ${colorClasses[color]} self-center`}

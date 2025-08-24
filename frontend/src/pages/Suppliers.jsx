@@ -308,7 +308,7 @@ export default function Suppliers() {
 
   return (
     <div className="w-full max-w-full overflow-x-hidden min-w-0">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-8">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 mr-3 sm:mb-8">
         <div>
           <h1 className="text-xl sm:text-2xl max-[1440px]:text-xl lg:text-3xl font-bold text-slate-900">Suppliers</h1>
           <p className="text-xs sm:text-sm max-[1440px]:text-xs lg:text-base text-slate-600 mt-1">Manage your supplier relationships</p>
@@ -338,17 +338,87 @@ export default function Suppliers() {
           </div>
         </div>
 
-        <div className="px-3 sm:px-4 lg:px-6 py-6">
+        {/* Desktop Table View */}
+        <div className="hidden md:block px-6 py-6 overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b border-slate-200">
+                <th className="text-left py-3 text-sm font-medium text-slate-600">Name</th>
+                <th className="text-left py-3 text-sm font-medium text-slate-600">Contact</th>
+                <th className="text-left py-3 text-sm font-medium text-slate-600">Email</th>
+                <th className="text-center py-3 text-sm font-medium text-slate-600">Status</th>
+                <th className="text-center py-3 text-sm font-medium text-slate-600">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {filteredSuppliers.map((supplier, index) => (
+                <motion.tr
+                  key={supplier.id}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.05 }}
+                  className="hover:bg-slate-50"
+                >
+                  <td className="py-4">
+                    <div>
+                      <div className="font-medium text-slate-900">{supplier.name}</div>
+                      <div className="text-sm text-slate-500">{supplier.category}</div>
+                    </div>
+                  </td>
+                  <td className="py-4">
+                    <div className="text-sm text-slate-900">{supplier.phone}</div>
+                    <div className="text-sm text-slate-500">{supplier.address}</div>
+                  </td>
+                  <td className="py-4">
+                    <div className="text-sm text-slate-900">{supplier.email}</div>
+                  </td>
+                  <td className="py-4 text-center">
+                    <span className={`inline-flex px-3 py-1 text-xs font-semibold rounded-full ${
+                      supplier.status === 'Active' 
+                        ? 'bg-green-100 text-green-800' 
+                        : 'bg-red-100 text-red-800'
+                    }`}>
+                      {supplier.status}
+                    </span>
+                  </td>
+                  <td className="py-4 text-center">
+                    <div className="flex justify-center gap-2">
+                      <motion.button
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                        onClick={() => setModalState({ isOpen: true, supplier, mode: 'edit' })}
+                        className="text-blue-600 hover:text-blue-800 p-2 rounded-lg hover:bg-blue-50 transition-colors"
+                      >
+                        <PencilIcon className="h-4 w-4" />
+                      </motion.button>
+                      <motion.button
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                        onClick={() => handleDelete(supplier.id)}
+                        className="text-red-600 hover:text-red-800 p-2 rounded-lg hover:bg-red-50 transition-colors"
+                      >
+                        <TrashIcon className="h-4 w-4" />
+                      </motion.button>
+                    </div>
+                  </td>
+                </motion.tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Mobile Carousel View */}
+        <div className="block md:hidden px-3 sm:px-4 py-6">
           <Carousel
             opts={{
               align: "start",
-              loop: true,
+              loop: false,
             }}
             className="w-full max-w-none"
           >
             <CarouselContent className="-ml-4">
               {filteredSuppliers.map((supplier, index) => (
-                <CarouselItem key={supplier.id} className="pl-4 basis-[95%] sm:basis-[95%] md:basis-1/2 min-[1246px]:basis-1/3 max-[1245px]:basis-1/2 max-[775px]:basis-full">
+                <CarouselItem key={supplier.id} className="pl-4 basis-full">
                   <div className="h-full">
                     <motion.div
                       initial={{ opacity: 0, y: 20 }}
@@ -415,8 +485,8 @@ export default function Suppliers() {
                 </CarouselItem>
               ))}
             </CarouselContent>
-            <CarouselPrevious className="w-10 h-10 sm:w-12 sm:h-12 bg-white/95 backdrop-blur-sm border border-white/40 shadow-xl hover:bg-white hover:scale-110 transition-all duration-300 -left-2 sm:-left-4 md:-left-6" />
-            <CarouselNext className="w-10 h-10 sm:w-12 sm:h-12 bg-white/95 backdrop-blur-sm border border-white/40 shadow-xl hover:bg-white hover:scale-110 transition-all duration-300 -right-2 sm:-right-4 md:-right-6" />
+            <CarouselPrevious className="hidden" />
+            <CarouselNext className="hidden" />
           </Carousel>
         </div>
       </div>

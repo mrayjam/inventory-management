@@ -658,7 +658,7 @@ export default function Purchase() {
   return (
     <div className="w-full max-w-full overflow-x-hidden min-w-0">
       {/* Header */}
-      <div className="mb-6 sm:mb-8">
+      <div className="mb-6 mr-3 sm:mb-8">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
             <h1 className="text-xl sm:text-2xl max-[1440px]:text-xl lg:text-3xl font-bold text-slate-900">

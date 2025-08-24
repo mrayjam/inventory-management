@@ -81,13 +81,28 @@ export default function Analytics() {
           <h3 className="text-lg font-semibold text-slate-900 mb-4">Revenue Summary</h3>
           {revenueData ? (
             <div className="grid grid-cols-2 gap-4">
-              <div className="bg-blue-50 rounded-lg p-4">
-                <p className="text-sm text-blue-600 font-medium">Total Revenue</p>
-                <p className="text-2xl font-bold text-blue-800">${revenueData.totalRevenue?.toFixed(2) || '0.00'}</p>
+              <div className={`rounded-lg p-4 ${
+                (advancedMetrics?.profit || 0) >= 0 ? 'bg-green-50' : 'bg-red-50'
+              }`}>
+                <p className={`text-sm font-medium ${
+                  (advancedMetrics?.profit || 0) >= 0 ? 'text-green-600' : 'text-red-600'
+                }`}>
+                  {(advancedMetrics?.profit || 0) >= 0 ? 'Profit' : 'Loss'}
+                </p>
+                <p className={`text-2xl font-bold ${
+                  (advancedMetrics?.profit || 0) >= 0 ? 'text-green-800' : 'text-red-800'
+                }`}>
+                  {(() => {
+                    const profitValue = Math.abs(advancedMetrics?.profit || 0);
+                    return profitValue >= 1000 
+                      ? `$${(profitValue / 1000).toFixed(1)}K`
+                      : `$${profitValue.toFixed(2)}`;
+                  })()}
+                </p>
               </div>
-              <div className="bg-green-50 rounded-lg p-4">
-                <p className="text-sm text-green-600 font-medium">Total Sales</p>
-                <p className="text-2xl font-bold text-green-800">{revenueData.totalSales || 0}</p>
+              <div className="bg-blue-50 rounded-lg p-4">
+                <p className="text-sm text-blue-600 font-medium">Total Sales</p>
+                <p className="text-2xl font-bold text-blue-800">{revenueData.totalSales || 0}</p>
               </div>
               <div className="bg-purple-50 rounded-lg p-4">
                 <p className="text-sm text-purple-600 font-medium">Total Purchases</p>
