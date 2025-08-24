@@ -151,7 +151,10 @@ export default function Analytics() {
                     <div className="text-right">
                       <div className="font-bold text-slate-900">{category.value}</div>
                       <div className="text-xs text-slate-500">
-                        {((category.value / categoryData.reduce((sum, cat) => sum + cat.value, 0)) * 100).toFixed(1)}%
+                        {(() => {
+                          const totalValue = categoryData.reduce((sum, cat) => sum + cat.value, 0);
+                          return totalValue > 0 ? ((category.value / totalValue) * 100).toFixed(1) : '0.0';
+                        })()}%
                       </div>
                     </div>
                   </motion.div>

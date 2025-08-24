@@ -108,7 +108,7 @@ export default function Dashboard() {
             rawValue={stats.totalProducts}
             icon={CubeIcon}
             color="blue"
-            trend={12}
+            trend={stats.productsPercentageChange || 0}
           />
         </motion.div>
         <motion.div
@@ -123,7 +123,7 @@ export default function Dashboard() {
             rawValue={stats.lowStockItems}
             icon={ExclamationTriangleIcon}
             color="red"
-            trend={-8}
+            trend={stats.lowStockPercentageChange || 0}
           />
         </motion.div>
         <motion.div
@@ -138,7 +138,7 @@ export default function Dashboard() {
             rawValue={stats.totalSuppliers}
             icon={BuildingStorefrontIcon}
             color="green"
-            trend={5}
+            trend={stats.suppliersPercentageChange || 0}
           />
         </motion.div>
         <motion.div
@@ -157,7 +157,7 @@ export default function Dashboard() {
             rawValue={stats.totalSalesAmount || 0}
             icon={ReceiptPercentIcon}
             color="purple"
-            trend={25}
+            trend={stats.salesPercentageChange || 0}
           />
         </motion.div>
         <motion.div
@@ -188,10 +188,10 @@ export default function Dashboard() {
           <StatCard
             title="Total Revenue"
             value={`$${stats.totalRevenue}`}
-           
+            rawValue={stats.totalRevenue || 0}
             icon={CurrencyDollarIcon}
             color="purple"
-            trend={stats.revenuePercentageChange}
+            trend={stats.revenuePercentageChange || 0}
           />
         </motion.div>
       </motion.div>
