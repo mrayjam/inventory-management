@@ -28,6 +28,22 @@ import { useAuth } from '../contexts/AuthContext'
 import { useDashboard } from '../contexts/DashboardContext'
 import { purchasesApi, productsApi, suppliersApi } from '../services/apiClient'
 
+// Utility function to format currency
+const formatCurrency = (amount) => {
+  if (amount === null || amount === undefined || isNaN(amount)) {
+    return '$0.00'
+  }
+  
+  const numAmount = parseFloat(amount)
+  
+  // For amounts >= 1000, use K notation
+  if (numAmount >= 1000) {
+    return `$${(numAmount / 1000).toFixed(1)}K`
+  }
+  
+  return `$${numAmount.toFixed(2)}`
+}
+
 // Purchase Detail Modal Component
 const PurchaseDetailModal = ({ isOpen, onClose, purchase, onEditPurchase }) => {
   if (!isOpen || !purchase) return null
@@ -101,7 +117,7 @@ const PurchaseDetailModal = ({ isOpen, onClose, purchase, onEditPurchase }) => {
               
               <div className="bg-green-50 rounded-lg p-4 border border-green-200">
                 <p className="text-sm font-medium text-green-700 mb-1">Total Amount</p>
-                <p className="text-xl font-bold text-green-600">${purchase.totalAmount}</p>
+                <p className="text-xl font-bold text-green-600">{formatCurrency(purchase.totalAmount)}</p>
               </div>
             </div>
 
@@ -394,7 +410,7 @@ const PurchaseModal = ({
                 </div>
               </div>
 
-              {(selectedProduct || selectedSupplier || (formData.quantity && formData.unitPrice)) && (
+              {(selectedProduct || selectedSupplier || formData.quantity || formData.unitPrice) && (
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -423,7 +439,9 @@ const PurchaseModal = ({
                     )}
                   </div>
                   
-                  {formData.quantity && formData.unitPrice && (
+                  {(formData.quantity && formData.unitPrice && 
+                    parseFloat(formData.quantity || 0) > 0 && 
+                    parseFloat(formData.unitPrice || 0) > 0) && (
                     <div className="mt-4 pt-4 border-t border-slate-200">
                       <div className="flex justify-between items-center">
                         <div>
@@ -433,7 +451,7 @@ const PurchaseModal = ({
                         </div>
                         <div className="text-right">
                           <p className="text-lg font-bold text-green-600">
-                            ${(parseFloat(formData.unitPrice || 0) * parseInt(formData.quantity || 0)).toFixed(2)}
+                            ${(parseFloat(formData.unitPrice || 0) * parseFloat(formData.quantity || 0)).toFixed(2)}
                           </p>
                           <p className="text-xs text-slate-600">Total Amount</p>
                         </div>
@@ -786,7 +804,7 @@ export default function Purchase() {
                         <p className="text-green-600 font-medium">${purchase.unitPrice}</p>
                       </td>
                       <td className="py-3 px-4">
-                        <p className="text-green-600 font-bold">${purchase.totalAmount}</p>
+                        <p className="text-green-600 font-bold">{formatCurrency(purchase.totalAmount || (purchase.quantity * purchase.unitPrice))}</p>
                       </td>
                       <td className="py-3 px-4">
                         <p className="text-slate-900">{new Date(purchase.purchaseDate).toLocaleDateString()}</p>

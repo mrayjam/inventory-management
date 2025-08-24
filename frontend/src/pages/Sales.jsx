@@ -296,14 +296,10 @@ const SaleModal = ({ isOpen, onClose, sale, mode, onSaleSaved }) => {
                     name="productId"
                     value={formData.productId}
                     onChange={handleInputChange}
-                    className="w-full h-14 border border-slate-300 bg-white/80 backdrop-blur-sm rounded-xl px-4 pt-6 pb-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 shadow-sm hover:bg-white hover:shadow-md appearance-none"
+                    className="w-full h-14 border border-slate-300 bg-white/80 backdrop-blur-sm rounded-xl px-4 pt-6 pb-2 pr-12 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 shadow-sm hover:bg-white hover:shadow-md appearance-none"
                     required
                   >
                     <option value="">Select Product</option>
-                    {(() => {
-                      console.log('Rendering products in dropdown:', products)
-                      return null
-                    })()}
                     {products.map(product => (
                       <option key={product._id || product.id} value={product._id || product.id}>
                         {product.name} - {product.sku} (Stock: {product.stock || 0})
@@ -314,7 +310,7 @@ const SaleModal = ({ isOpen, onClose, sale, mode, onSaleSaved }) => {
                     Product *
                   </label>
                   <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
-                    <CubeIcon className="w-4 h-4 text-slate-400" />
+                    <CubeIcon className="w-4 h-4 text-slate-400 min-w-[16px] flex-shrink-0" />
                   </div>
                 </div>
 
@@ -610,9 +606,9 @@ export default function Sales() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-200">
-              {currentTableSales.map((sale) => (
+              {currentTableSales.map((sale, index) => (
                 <motion.tr
-                  key={sale.id}
+                  key={sale.id || sale._id || `table-sale-${index}`}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   className="hover:bg-slate-50"
@@ -624,7 +620,7 @@ export default function Sales() {
                     </div>
                   </td>
                   <td className="px-6 py-4 text-sm text-slate-900">{sale.customer || 'Walk-in'}</td>
-                  <td className="px-6 py-4 text-sm text-slate-900">{sale.quantity}</td>
+                  <td className="px-6 py-4 text-sm text-slate-500">{sale.quantity} units</td>
                   <td className="px-6 py-4 text-sm font-medium text-green-600">${(sale.totalAmount || (sale.salePrice * sale.quantity)).toFixed(2)}</td>
                   <td className="px-6 py-4 text-sm text-slate-900">{new Date(sale.saleDate).toLocaleDateString()}</td>
                   <td className="px-6 py-4">
@@ -697,7 +693,7 @@ export default function Sales() {
           >
             <CarouselContent className="-ml-4">
               {filteredSales.map((sale, index) => (
-                <CarouselItem key={sale.id} className="pl-4 basis-full min-[694px]:basis-1/2">
+                <CarouselItem key={sale.id || sale._id || `carousel-sale-${index}`} className="pl-4 basis-full min-[694px]:basis-1/2">
                   <div className="h-full">
                     <motion.div
                       initial={{ opacity: 0, y: 20 }}
@@ -769,8 +765,8 @@ export default function Sales() {
                 </CarouselItem>
               ))}
             </CarouselContent>
-            <CarouselPrevious className="w-12 h-12 bg-white/95 backdrop-blur-sm border border-white/40 shadow-xl hover:bg-white hover:scale-110 transition-all duration-300 -left-6" />
-            <CarouselNext className="w-12 h-12 bg-white/95 backdrop-blur-sm border border-white/40 shadow-xl hover:bg-white hover:scale-110 transition-all duration-300 -right-6" />
+            <CarouselPrevious className="hidden sm:flex w-12 h-12 bg-white/95 backdrop-blur-sm border border-white/40 shadow-xl hover:bg-white hover:scale-110 transition-all duration-300 -left-6" />
+            <CarouselNext className="hidden sm:flex w-12 h-12 bg-white/95 backdrop-blur-sm border border-white/40 shadow-xl hover:bg-white hover:scale-110 transition-all duration-300 -right-6" />
           </Carousel>
         </div>
       </div>

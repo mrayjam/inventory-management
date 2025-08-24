@@ -635,9 +635,9 @@ export default function Products() {
                   </tr>
                 ))
               ) : (
-                currentTableProducts.map((product) => (
+                currentTableProducts.map((product, index) => (
                   <motion.tr
-                    key={product.id}
+                    key={product.id || product._id || `table-product-${index}`}
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     className="hover:bg-slate-50"
@@ -766,7 +766,7 @@ export default function Products() {
             >
               <CarouselContent className="-ml-4">
                 {filteredProducts.map((product, index) => (
-                <CarouselItem key={product.id} className="pl-4 basis-full min-[694px]:basis-1/2">
+                <CarouselItem key={product.id || `product-${index}`} className="pl-4 basis-full min-[694px]:basis-1/2">
                   <div className="h-full">
                     <motion.div
                       initial={{ opacity: 0, y: 20 }}
@@ -854,8 +854,8 @@ export default function Products() {
                 </CarouselItem>
               ))}
               </CarouselContent>
-              <CarouselPrevious className="w-12 h-12 bg-white/95 backdrop-blur-sm border border-white/40 shadow-xl hover:bg-white hover:scale-110 transition-all duration-300 -left-6" />
-              <CarouselNext className="w-12 h-12 bg-white/95 backdrop-blur-sm border border-white/40 shadow-xl hover:bg-white hover:scale-110 transition-all duration-300 -right-6" />
+              <CarouselPrevious className="hidden sm:flex w-12 h-12 bg-white/95 backdrop-blur-sm border border-white/40 shadow-xl hover:bg-white hover:scale-110 transition-all duration-300 -left-6" />
+              <CarouselNext className="hidden sm:flex w-12 h-12 bg-white/95 backdrop-blur-sm border border-white/40 shadow-xl hover:bg-white hover:scale-110 transition-all duration-300 -right-6" />
             </Carousel>
           )}
         </div>

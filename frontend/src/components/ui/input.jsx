@@ -25,7 +25,7 @@ const FloatingLabelInput = forwardRef(({ className, label, type, ...props }, ref
         type={type}
         className={cn(
           "flex h-14 w-full rounded-xl border border-slate-300 bg-white/80 backdrop-blur-sm px-4 pt-6 pb-2 text-sm ring-offset-background placeholder:text-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50 transition-all duration-200 shadow-sm hover:bg-white hover:shadow-md peer",
-          isDateInput && "text-base sm:text-sm",
+          isDateInput && "text-base sm:text-sm pr-2 sm:pr-3 lg:pr-4 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:right-2 sm:[&::-webkit-calendar-picker-indicator]:right-3 lg:[&::-webkit-calendar-picker-indicator]:right-4 [&::-webkit-calendar-picker-indicator]:top-1/2 [&::-webkit-calendar-picker-indicator]:-translate-y-1/2 [&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:opacity-70 hover:[&::-webkit-calendar-picker-indicator]:opacity-100",
           className
         )}
         placeholder={label}

@@ -78,7 +78,7 @@ const LoginPage = () => {
       const result = await login(formData.email, formData.password)
 
       if (result.success) {
-        toast.success('Welcome back! Redirecting...', { id: loadingToast })
+        toast.success('Welcome back! Redirecting...', { id: loadingToast, duration: 2000 })
       } else {
         setServerError(result.error)
         toast.error(result.error, { id: loadingToast })

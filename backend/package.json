@@ -10,6 +10,7 @@
     "seed": "node src/scripts/seed.js",
     "auth-seed": "node src/scripts/authSeed.js",
     "fresh": "node src/scripts/fresh.js",
+    "migrate-purchases": "node src/scripts/migratePurchases.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [

@@ -6,8 +6,19 @@ import Supplier from '../models/Supplier.js';
 export const getAllPurchases = async (req, res) => {
   try {
     const purchases = await Purchase.find().sort({ createdAt: -1 });
-    res.json(purchases);
+    
+    // Ensure totalAmount is calculated for each purchase (in case of legacy data)
+    const purchasesWithTotal = purchases.map(purchase => {
+      const purchaseObj = purchase.toJSON();
+      if (!purchaseObj.totalAmount || purchaseObj.totalAmount === 0) {
+        purchaseObj.totalAmount = purchaseObj.quantity * purchaseObj.unitPrice;
+      }
+      return purchaseObj;
+    });
+    
+    res.json(purchasesWithTotal);
   } catch (error) {
+    console.error('Error fetching purchases:', error);
     res.status(500).json({ message: 'Internal server error' });
   }
 };
@@ -21,8 +32,14 @@ export const getPurchaseById = async (req, res) => {
       return res.status(404).json({ message: 'Purchase not found' });
     }
 
-    res.json(purchase);
+    const purchaseObj = purchase.toJSON();
+    if (!purchaseObj.totalAmount || purchaseObj.totalAmount === 0) {
+      purchaseObj.totalAmount = purchaseObj.quantity * purchaseObj.unitPrice;
+    }
+
+    res.json(purchaseObj);
   } catch (error) {
+    console.error('Error fetching purchase by ID:', error);
     res.status(500).json({ message: 'Internal server error' });
   }
 };
