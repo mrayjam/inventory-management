@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Outlet, Link, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
+import Logo from './Logo'
 import { 
   ChartBarIcon, 
   CubeIcon, 
@@ -134,14 +135,7 @@ export default function Layout() {
       </div>
       {/* Mobile header */}
       <div className="lg:hidden bg-white/90 backdrop-blur-sm shadow-sm border-b border-white/20 px-4 py-3 flex items-center justify-between relative z-10">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-gradient-to-br from-indigo-600 via-purple-600 to-blue-600 rounded-lg flex items-center justify-center shadow-lg">
-            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-            </svg>
-          </div>
-          <h1 className="text-base sm:text-lg font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">InventFlow</h1>
-        </div>
+        <Logo size="small" />
         <button
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
@@ -159,15 +153,7 @@ export default function Layout() {
         <div className="hidden lg:flex w-64 bg-white/80 backdrop-blur-sm shadow-lg border-r border-white/20 flex-col relative z-10">
           <div className="p-6">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-indigo-600 via-purple-600 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                </svg>
-              </div>
-              <div>
-                <h1 className="text-lg sm:text-xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">InventFlow</h1>
-                <p className="text-[10px] sm:text-xs text-slate-500">Management Suite</p>
-              </div>
+              <Logo size="medium" showIcon={true} />
             </div>
           </div>
           
@@ -254,15 +240,8 @@ export default function Layout() {
                 <div className="p-6 border-b border-slate-200">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-gradient-to-br from-indigo-600 via-purple-600 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
-                        <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                        </svg>
-                      </div>
-                      <div>
-                        <h1 className="text-lg sm:text-xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">InventFlow</h1>
-                        <p className="text-[10px] sm:text-xs text-slate-500">Management Suite</p>
-                      </div>
+                      <Logo size="medium" showIcon={true} />
+                     
                     </div>
                     <button
                       onClick={closeMobileMenu}

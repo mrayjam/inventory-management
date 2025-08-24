@@ -154,7 +154,7 @@ const ChangePasswordPage = () => {
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ delay: 0.4, type: "spring", damping: 15 }}
-              className="inline-flex items-center justify-center w-12 h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 bg-gradient-to-r from-emerald-600 to-teal-600 rounded-full mb-3 md:mb-4"
+              className="inline-flex items-center justify-center w-12 h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 bg-gradient-to-r from-blue-500 via-blue-600 to-indigo-600 rounded-full mb-3 md:mb-4"
             >
               <ShieldCheckIcon className="w-6 h-6 md:w-7 md:h-7 lg:w-8 lg:h-8 text-white" />
             </motion.div>
@@ -188,7 +188,7 @@ const ChangePasswordPage = () => {
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-2 sm:pl-3 flex items-center pointer-events-none">
                   <LockClosedIcon className={`h-3.5 w-3.5 sm:h-4 sm:w-4 lg:h-5 lg:w-5 transition-colors duration-200 ${
-                    focusedField === 'currentPassword' ? 'text-emerald-600' : 'text-gray-400'
+                    focusedField === 'currentPassword' ? 'text-blue-600' : 'text-gray-400'
                   }`} />
                 </div>
                 <input
@@ -196,7 +196,7 @@ const ChangePasswordPage = () => {
                   name="currentPassword"
                   id="currentPassword"
                   required
-                  className={`block w-full pl-7 sm:pl-8 lg:pl-10 pr-7 sm:pr-8 lg:pr-10 py-2 sm:py-2.5 lg:py-3 text-xs sm:text-sm lg:text-base border rounded-lg sm:rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-200 ${
+                  className={`block w-full pl-7 sm:pl-8 lg:pl-10 pr-7 sm:pr-8 lg:pr-10 py-2 sm:py-2.5 lg:py-3 text-xs sm:text-sm lg:text-base border rounded-lg sm:rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
                     errors.currentPassword ? 'border-red-300 bg-red-50' : 'border-gray-200 bg-gray-50 hover:bg-white focus:bg-white'
                   }`}
                   placeholder="Enter current password"
@@ -242,7 +242,7 @@ const ChangePasswordPage = () => {
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-2 sm:pl-3 flex items-center pointer-events-none">
                   <LockClosedIcon className={`h-3.5 w-3.5 sm:h-4 sm:w-4 lg:h-5 lg:w-5 transition-colors duration-200 ${
-                    focusedField === 'newPassword' ? 'text-emerald-600' : 'text-gray-400'
+                    focusedField === 'newPassword' ? 'text-blue-600' : 'text-gray-400'
                   }`} />
                 </div>
                 <input
@@ -250,7 +250,7 @@ const ChangePasswordPage = () => {
                   name="newPassword"
                   id="newPassword"
                   required
-                  className={`block w-full pl-7 sm:pl-8 lg:pl-10 pr-7 sm:pr-8 lg:pr-10 py-2 sm:py-2.5 lg:py-3 text-xs sm:text-sm lg:text-base border rounded-lg sm:rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-200 ${
+                  className={`block w-full pl-7 sm:pl-8 lg:pl-10 pr-7 sm:pr-8 lg:pr-10 py-2 sm:py-2.5 lg:py-3 text-xs sm:text-sm lg:text-base border rounded-lg sm:rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
                     errors.newPassword ? 'border-red-300 bg-red-50' : 'border-gray-200 bg-gray-50 hover:bg-white focus:bg-white'
                   }`}
                   placeholder="Enter new password"
@@ -296,7 +296,7 @@ const ChangePasswordPage = () => {
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-2 sm:pl-3 flex items-center pointer-events-none">
                   <LockClosedIcon className={`h-3.5 w-3.5 sm:h-4 sm:w-4 lg:h-5 lg:w-5 transition-colors duration-200 ${
-                    focusedField === 'confirmPassword' ? 'text-emerald-600' : 'text-gray-400'
+                    focusedField === 'confirmPassword' ? 'text-blue-600' : 'text-gray-400'
                   }`} />
                 </div>
                 <input
@@ -304,7 +304,7 @@ const ChangePasswordPage = () => {
                   name="confirmPassword"
                   id="confirmPassword"
                   required
-                  className={`block w-full pl-7 sm:pl-8 lg:pl-10 pr-7 sm:pr-8 lg:pr-10 py-2 sm:py-2.5 lg:py-3 text-xs sm:text-sm lg:text-base border rounded-lg sm:rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-200 ${
+                  className={`block w-full pl-7 sm:pl-8 lg:pl-10 pr-7 sm:pr-8 lg:pr-10 py-2 sm:py-2.5 lg:py-3 text-xs sm:text-sm lg:text-base border rounded-lg sm:rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
                     errors.confirmPassword ? 'border-red-300 bg-red-50' : 'border-gray-200 bg-gray-50 hover:bg-white focus:bg-white'
                   }`}
                   placeholder="Confirm new password"
@@ -347,7 +347,7 @@ const ChangePasswordPage = () => {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full flex justify-center py-2.5 sm:py-3 lg:py-3.5 px-3 sm:px-4 lg:px-6 border border-transparent text-xs sm:text-sm lg:text-base font-medium rounded-lg sm:rounded-xl text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] min-h-[40px] sm:min-h-[44px] lg:min-h-[48px]"
+                className="w-full flex justify-center py-2.5 sm:py-3 lg:py-3.5 px-3 sm:px-4 lg:px-6 border border-transparent text-xs sm:text-sm lg:text-base font-medium rounded-lg sm:rounded-xl text-white bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-600 hover:from-blue-700 hover:via-blue-800 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] min-h-[40px] sm:min-h-[44px] lg:min-h-[48px]"
               >
                 {isLoading ? (
                   <motion.div
