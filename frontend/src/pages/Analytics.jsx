@@ -162,206 +162,97 @@ export default function Analytics() {
         </motion.div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="lg:col-span-2 bg-white rounded-xl shadow-sm border border-slate-200 p-6"
-        >
-          <h3 className="text-lg font-semibold text-slate-900 mb-4">Top Performing Products</h3>
-          
-          {/* Desktop Table View */}
-          <div className="hidden sm:block overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-slate-200">
-                  <th className="text-left py-3 text-sm font-medium text-slate-600">Product</th>
-                  <th className="text-right py-3 text-sm font-medium text-slate-600 px-4">Units Sold</th>
-                  <th className="text-right py-3 text-sm font-medium text-slate-600">Revenue</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {topProducts.map((product, index) => (
-                  <motion.tr
-                    key={product.productName}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.1 * index }}
-                    className="hover:bg-slate-50"
-                  >
-                    <td className="py-3">
-                      <div className="flex items-center">
-                        <div className={`w-2 h-8 rounded-full mr-3 ${
-                          index === 0 ? 'bg-yellow-400' :
-                          index === 1 ? 'bg-slate-400' :
-                          index === 2 ? 'bg-amber-600' :
-                          'bg-slate-300'
-                        }`} />
-                        <span className="font-medium text-slate-900">{product.productName}</span>
-                      </div>
-                    </td>
-                    <td className="py-3 text-right text-slate-900 px-4">{product.totalQuantity}</td>
-                    <td className="py-3 text-right font-medium text-slate-900">
-                      ${(product.totalRevenue || 0).toLocaleString()}
-                    </td>
-                  </motion.tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          
-          {/* Mobile Card View */}
-          <div className="sm:hidden space-y-3">
-            {topProducts.map((product, index) => (
-              <motion.div
-                key={product.productName}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 * index }}
-                className="bg-slate-50 rounded-xl p-4 border border-slate-200"
-              >
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center">
-                    <div className={`w-3 h-3 rounded-full mr-3 ${
-                      index === 0 ? 'bg-yellow-400' :
-                      index === 1 ? 'bg-slate-400' :
-                      index === 2 ? 'bg-amber-600' :
-                      'bg-slate-300'
-                    }`} />
-                    <span className="font-medium text-slate-900 text-sm">{product.productName}</span>
-                  </div>
-                  <span className="text-xs text-slate-500">#{index + 1}</span>
-                </div>
-                
-                <div className="flex justify-between items-center">
-                  <div className="flex space-x-4">
-                    <div className="text-center">
-                      <div className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                        {product.totalQuantity} units
-                      </div>
-                      <div className="text-xs text-slate-500 mt-1">Units Sold</div>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2 }}
+        className="bg-white rounded-xl shadow-sm border border-slate-200 p-6"
+      >
+        <h3 className="text-lg font-semibold text-slate-900 mb-4">Top Performing Products</h3>
+        
+        {/* Desktop Table View */}
+        <div className="hidden sm:block overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b border-slate-200">
+                <th className="text-left py-3 text-sm font-medium text-slate-600">Product</th>
+                <th className="text-right py-3 text-sm font-medium text-slate-600 px-4">Units Sold</th>
+                <th className="text-right py-3 text-sm font-medium text-slate-600">Revenue</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {topProducts.map((product, index) => (
+                <motion.tr
+                  key={product.productName}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.1 * index }}
+                  className="hover:bg-slate-50"
+                >
+                  <td className="py-3">
+                    <div className="flex items-center">
+                      <div className={`w-2 h-8 rounded-full mr-3 ${
+                        index === 0 ? 'bg-yellow-400' :
+                        index === 1 ? 'bg-slate-400' :
+                        index === 2 ? 'bg-amber-600' :
+                        'bg-slate-300'
+                      }`} />
+                      <span className="font-medium text-slate-900">{product.productName}</span>
                     </div>
-                    <div className="text-center">
-                      <div className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                        ${(product.totalRevenue || 0).toLocaleString()}
-                      </div>
-                      <div className="text-xs text-slate-500 mt-1">Revenue</div>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          className="bg-white rounded-xl shadow-sm border border-slate-200 p-6"
-        >
-          <h3 className="text-lg font-semibold text-slate-900 mb-6">Key Metrics</h3>
-          <div className="space-y-6">
+                  </td>
+                  <td className="py-3 text-right text-slate-900 px-4">{product.totalQuantity}</td>
+                  <td className="py-3 text-right font-medium text-slate-900">
+                    ${(product.totalRevenue || 0).toLocaleString()}
+                  </td>
+                </motion.tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        
+        {/* Mobile Card View */}
+        <div className="sm:hidden space-y-3">
+          {topProducts.map((product, index) => (
             <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.5 }}
-            >
-              <div className="flex justify-between items-center mb-3">
-                <span className="text-sm font-medium text-slate-600">Inventory Turnover</span>
-                <motion.span 
-                  className="text-sm font-bold text-slate-900"
-                  initial={{ scale: 0.8 }}
-                  animate={{ scale: 1 }}
-                  transition={{ delay: 0.7, type: "spring" }}
-                >
-                  {advancedMetrics?.inventoryTurnover ? `${advancedMetrics.inventoryTurnover}x` : 'N/A'}
-                </motion.span>
-              </div>
-              <div className="w-full bg-slate-200 rounded-full h-3 overflow-hidden">
-                <motion.div 
-                  className="bg-gradient-to-r from-blue-500 to-blue-600 h-3 rounded-full shadow-sm"
-                  initial={{ width: 0 }}
-                  animate={{ width: advancedMetrics?.inventoryTurnover ? `${Math.min(advancedMetrics.inventoryTurnover * 10, 100)}%` : '0%' }}
-                  transition={{ delay: 0.8, duration: 1.2, ease: "easeOut" }}
-                />
-              </div>
-            </motion.div>
-            
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.6 }}
-            >
-              <div className="flex justify-between items-center mb-3">
-                <span className="text-sm font-medium text-slate-600">Stock Accuracy</span>
-                <motion.span 
-                  className="text-sm font-bold text-slate-900"
-                  initial={{ scale: 0.8 }}
-                  animate={{ scale: 1 }}
-                  transition={{ delay: 0.9, type: "spring" }}
-                >
-                  N/A
-                </motion.span>
-              </div>
-              <div className="w-full bg-slate-200 rounded-full h-3 overflow-hidden">
-                <motion.div 
-                  className="bg-gradient-to-r from-gray-400 to-gray-500 h-3 rounded-full shadow-sm"
-                  initial={{ width: 0 }}
-                  animate={{ width: '0%' }}
-                  transition={{ delay: 1.0, duration: 1.2, ease: "easeOut" }}
-                />
-              </div>
-            </motion.div>
-            
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.7 }}
-            >
-              <div className="flex justify-between items-center mb-3">
-                <span className="text-sm font-medium text-slate-600">Order Fill Rate</span>
-                <motion.span 
-                  className="text-sm font-bold text-slate-900"
-                  initial={{ scale: 0.8 }}
-                  animate={{ scale: 1 }}
-                  transition={{ delay: 1.1, type: "spring" }}
-                >
-                  N/A
-                </motion.span>
-              </div>
-              <div className="w-full bg-slate-200 rounded-full h-3 overflow-hidden">
-                <motion.div 
-                  className="bg-gradient-to-r from-gray-400 to-gray-500 h-3 rounded-full shadow-sm"
-                  initial={{ width: 0 }}
-                  animate={{ width: '0%' }}
-                  transition={{ delay: 1.2, duration: 1.2, ease: "easeOut" }}
-                />
-              </div>
-            </motion.div>
-            
-            <motion.div 
-              className="pt-6 border-t border-slate-200"
+              key={product.productName}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1.4 }}
+              transition={{ delay: 0.1 * index }}
+              className="bg-slate-50 rounded-xl p-4 border border-slate-200"
             >
-              <div className="text-center bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-4">
-                <motion.div 
-                  className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"
-                  initial={{ scale: 0.5 }}
-                  animate={{ scale: 1 }}
-                  transition={{ delay: 1.6, type: "spring", damping: 15 }}
-                >
-                  ${inventoryValue > 0 ? (inventoryValue / 1000).toFixed(1) : '0.0'}k
-                </motion.div>
-                <div className="text-sm text-slate-600 font-medium">Total Inventory Value</div>
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center">
+                  <div className={`w-3 h-3 rounded-full mr-3 ${
+                    index === 0 ? 'bg-yellow-400' :
+                    index === 1 ? 'bg-slate-400' :
+                    index === 2 ? 'bg-amber-600' :
+                    'bg-slate-300'
+                  }`} />
+                  <span className="font-medium text-slate-900 text-sm">{product.productName}</span>
+                </div>
+                <span className="text-xs text-slate-500">#{index + 1}</span>
+              </div>
+              
+              <div className="flex justify-between items-center">
+                <div className="flex space-x-4">
+                  <div className="text-center">
+                    <div className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                      {product.totalQuantity} units
+                    </div>
+                    <div className="text-xs text-slate-500 mt-1">Units Sold</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                      ${(product.totalRevenue || 0).toLocaleString()}
+                    </div>
+                    <div className="text-xs text-slate-500 mt-1">Revenue</div>
+                  </div>
+                </div>
               </div>
             </motion.div>
-          </div>
-        </motion.div>
-      </div>
+          ))}
+        </div>
+      </motion.div>
     </div>
   )
 }
