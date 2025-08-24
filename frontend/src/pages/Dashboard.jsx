@@ -149,11 +149,7 @@ export default function Dashboard() {
         >
           <StatCard
             title="Total Sales"
-            value={
-              stats.totalSalesAmount > 0
-                ? `$${(stats.totalSalesAmount / 1000).toFixed(1)}K`
-                : "$0"
-            }
+            value={`$${stats.totalSalesAmount || 0}`}
             rawValue={stats.totalSalesAmount || 0}
             icon={ReceiptPercentIcon}
             color="purple"
