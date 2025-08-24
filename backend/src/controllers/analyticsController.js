@@ -62,6 +62,11 @@ export const getRevenue = async (req, res) => {
       return saleDate.getMonth() === currentMonth && saleDate.getFullYear() === currentYear;
     }).length;
 
+    const salesLastMonth = allSales.filter(sale => {
+      const saleDate = new Date(sale.saleDate);
+      return saleDate.getMonth() === lastMonth && saleDate.getFullYear() === lastMonthYear;
+    }).length;
+
     // Calculate revenue for this month and last month
     const salesThisMonthAmount = allSales.filter(sale => {
       const saleDate = new Date(sale.saleDate);
@@ -72,6 +77,10 @@ export const getRevenue = async (req, res) => {
       const saleDate = new Date(sale.saleDate);
       return saleDate.getMonth() === lastMonth && saleDate.getFullYear() === lastMonthYear;
     }).reduce((sum, sale) => sum + (sale.totalAmount || (sale.salePrice * sale.quantity)), 0);
+
+    const salesPercentageChange = salesLastMonthAmount === 0 
+      ? (salesThisMonthAmount > 0 ? 100 : 0)
+      : Math.round(((salesThisMonthAmount - salesLastMonthAmount) / Math.abs(salesLastMonthAmount)) * 100);
 
     const revenueThisMonth = salesThisMonthAmount - purchasesAmountThisMonth;
     const revenueLastMonth = salesLastMonthAmount - purchasesAmountLastMonth;
@@ -90,6 +99,7 @@ export const getRevenue = async (req, res) => {
       totalPurchasesAmount,
       purchasePercentageChange,
       revenuePercentageChange,
+      salesPercentageChange,
       salesThisMonth
     });
   } catch (error) {
