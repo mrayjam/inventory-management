@@ -20,6 +20,7 @@ import {
   Bar,
 } from "recharts";
 import StatCard from "../components/StatCard";
+import { SkeletonStatsCards, SkeletonChart } from "../components/Skeleton";
 import { useDashboard } from "../contexts/DashboardContext";
 import { analyticsApi } from "../services/apiClient";
 import { useAuth } from "../contexts/AuthContext";
@@ -62,8 +63,21 @@ export default function Dashboard() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+      <div className="w-full max-w-full overflow-x-hidden min-w-0">
+        {/* Header Skeleton */}
+        <div className="mb-6">
+          <div className="animate-pulse h-8 bg-slate-200 rounded w-64 mb-2"></div>
+          <div className="animate-pulse h-4 bg-slate-200 rounded w-96"></div>
+        </div>
+
+        {/* Stats Cards Skeleton */}
+        <SkeletonStatsCards />
+
+        {/* Charts Skeleton */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 lg:gap-8">
+          <SkeletonChart height="300px" />
+          <SkeletonChart height="340px" />
+        </div>
       </div>
     );
   }
@@ -74,16 +88,16 @@ export default function Dashboard() {
   return (
     <div className="relative w-full max-w-full overflow-x-hidden">
       <div className="mb-6 sm:mb-8">
-        <h1 className="text-xl sm:text-2xl max-[1440px]:text-xl lg:text-3xl font-bold text-slate-900">
+        <h1 className="text-xl sm:text-2xl max-[2178px]:text-xl lg:text-3xl font-bold text-slate-900">
           Dashboard
         </h1>
-        <p className="text-xs sm:text-sm max-[1440px]:text-xs lg:text-base text-slate-600 mt-1">
+        <p className="text-xs sm:text-sm max-[2178px]:text-xs lg:text-base text-slate-600 mt-1">
           Welcome back! Here's what's happening with your inventory today.
         </p>
       </div>
 
       <motion.div
-        className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-6 gap-4 sm:gap-6 mb-6 lg:mb-8 px-3"
+        className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 min-[2178px]:grid-cols-6 gap-4 sm:gap-6 mb-6 lg:mb-8 px-3"
         variants={{
           hidden: { opacity: 0 },
           show: {
@@ -191,15 +205,30 @@ export default function Dashboard() {
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.2 }}
-          className="bg-white/80 backdrop-blur-sm rounded-xl shadow-sm border border-white/30 p-3 sm:p-4 max-[1440px]:p-3 lg:p-6"
+          className="bg-white/80 backdrop-blur-sm rounded-xl shadow-sm border border-white/30 p-3 sm:p-4 max-[2178px]:p-3 lg:p-6"
         >
-          <h3 className="text-sm sm:text-base max-[1440px]:text-sm lg:text-lg font-semibold text-slate-900 mb-3 sm:mb-4">
+          <h3 className="text-sm sm:text-base max-[2178px]:text-sm lg:text-lg font-semibold text-slate-900 mb-3 sm:mb-4">
             Sales Trend
           </h3>
-          <div className="h-[200px] sm:h-[220px] max-[1440px]:h-[200px] lg:h-[280px] xl:h-[300px]">
+          <div className="h-[200px] sm:h-[220px] max-[2178px]:h-[200px] lg:h-[280px] xl:h-[300px]">
             {chartsLoading ? (
               <div className="flex items-center justify-center h-full">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                <div className="animate-pulse space-y-3">
+                  <div className="h-4 bg-slate-200 rounded w-1/3"></div>
+                  <div className="space-y-2">
+                    {Array.from({ length: 5 }).map((_, index) => (
+                      <div key={index} className="flex items-end justify-between space-x-2">
+                        {Array.from({ length: 7 }).map((_, barIndex) => (
+                          <div 
+                            key={barIndex}
+                            className="bg-slate-200 rounded-t w-full"
+                            style={{ height: `${Math.random() * 60 + 20}px` }}
+                          />
+                        ))}
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
             ) : (
               <ResponsiveContainer width="100%" height="100%">
@@ -211,14 +240,14 @@ export default function Dashboard() {
                   <XAxis
                     dataKey="month"
                     stroke="#64748b"
-                    fontSize={window.innerWidth <= 1440 ? 9 : 10}
+                    fontSize={window.innerWidth <= 2178 ? 9 : 10}
                     tickMargin={5}
                   />
                   <YAxis
                     stroke="#64748b"
-                    fontSize={window.innerWidth <= 1440 ? 9 : 10}
+                    fontSize={window.innerWidth <= 2178 ? 9 : 10}
                     tickMargin={5}
-                    width={window.innerWidth <= 1440 ? 30 : 35}
+                    width={window.innerWidth <= 2178 ? 30 : 35}
                     tickFormatter={(value) => `${(value / 1000).toFixed(0)}K`}
                   />
                   <Tooltip
@@ -226,7 +255,7 @@ export default function Dashboard() {
                       backgroundColor: "white",
                       border: "1px solid #e2e8f0",
                       borderRadius: "8px",
-                      fontSize: window.innerWidth <= 1440 ? "11px" : "12px",
+                      fontSize: window.innerWidth <= 2178 ? "11px" : "12px",
                     }}
                     formatter={(value) => [
                       `$${value.toLocaleString()}`,
@@ -250,15 +279,30 @@ export default function Dashboard() {
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.4 }}
-          className="bg-white/80 backdrop-blur-sm rounded-xl shadow-sm border border-white/30 p-3 sm:p-4 max-[1440px]:p-3 lg:p-6"
+          className="bg-white/80 backdrop-blur-sm rounded-xl shadow-sm border border-white/30 p-3 sm:p-4 max-[2178px]:p-3 lg:p-6"
         >
-          <h3 className="text-sm sm:text-base max-[1440px]:text-sm lg:text-lg font-semibold text-slate-900 mb-3 sm:mb-4">
+          <h3 className="text-sm sm:text-base max-[2178px]:text-sm lg:text-lg font-semibold text-slate-900 mb-3 sm:mb-4">
             Inventory by Category
           </h3>
-          <div className="h-[200px] sm:h-[220px] max-[1440px]:h-[200px] lg:h-[280px] xl:h-[320px]">
+          <div className="h-[200px] sm:h-[220px] max-[2178px]:h-[200px] lg:h-[280px] xl:h-[320px]">
             {chartsLoading ? (
               <div className="flex items-center justify-center h-full">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                <div className="animate-pulse space-y-3">
+                  <div className="h-4 bg-slate-200 rounded w-1/3"></div>
+                  <div className="space-y-2">
+                    {Array.from({ length: 5 }).map((_, index) => (
+                      <div key={index} className="flex items-end justify-between space-x-2">
+                        {Array.from({ length: 7 }).map((_, barIndex) => (
+                          <div 
+                            key={barIndex}
+                            className="bg-slate-200 rounded-t w-full"
+                            style={{ height: `${Math.random() * 60 + 20}px` }}
+                          />
+                        ))}
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
             ) : (
               <ResponsiveContainer width="100%" height="100%">
@@ -273,22 +317,22 @@ export default function Dashboard() {
                     angle={-45}
                     textAnchor="end"
                     height={40}
-                    fontSize={window.innerWidth <= 1440 ? 8 : 9}
+                    fontSize={window.innerWidth <= 2178 ? 8 : 9}
                     interval={0}
                     tickMargin={5}
                   />
                   <YAxis
                     stroke="#64748b"
-                    fontSize={window.innerWidth <= 1440 ? 9 : 10}
+                    fontSize={window.innerWidth <= 2178 ? 9 : 10}
                     tickMargin={5}
-                    width={window.innerWidth <= 1440 ? 30 : 35}
+                    width={window.innerWidth <= 2178 ? 30 : 35}
                   />
                   <Tooltip
                     contentStyle={{
                       backgroundColor: "white",
                       border: "1px solid #e2e8f0",
                       borderRadius: "8px",
-                      fontSize: window.innerWidth <= 1440 ? "11px" : "12px",
+                      fontSize: window.innerWidth <= 2178 ? "11px" : "12px",
                     }}
                     formatter={(value) => [value, "Items"]}
                   />

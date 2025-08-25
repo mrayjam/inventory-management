@@ -17,6 +17,7 @@ import {
 import toast from 'react-hot-toast'
 import { useAuth } from '../contexts/AuthContext'
 import { analyticsApi } from '../services/apiClient'
+import { SkeletonChart } from '../components/Skeleton'
 
 export default function Analytics() {
   const [revenueData, setRevenueData] = useState(null)
@@ -60,16 +61,26 @@ export default function Analytics() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+      <div className="w-full max-w-full overflow-x-hidden min-w-0">
+        {/* Header Skeleton */}
+        <div className="mb-8">
+          <div className="animate-pulse h-8 bg-slate-200 rounded w-48 mb-2"></div>
+          <div className="animate-pulse h-4 bg-slate-200 rounded w-80"></div>
+        </div>
+
+        {/* Charts Grid Skeleton */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+          <SkeletonChart height="400px" />
+          <SkeletonChart height="400px" />
+        </div>
       </div>
     )
   }
   return (
     <div>
       <div className="mb-8">
-        <h1 className="text-xl sm:text-2xl max-[1440px]:text-xl lg:text-3xl font-bold text-slate-900">Analytics</h1>
-        <p className="text-xs sm:text-sm max-[1440px]:text-xs lg:text-base text-slate-600 mt-1">Detailed insights into your inventory performance</p>
+        <h1 className="text-xl sm:text-2xl max-[2178px]:text-xl lg:text-3xl font-bold text-slate-900">Analytics</h1>
+        <p className="text-xs sm:text-sm max-[2178px]:text-xs lg:text-base text-slate-600 mt-1">Detailed insights into your inventory performance</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
