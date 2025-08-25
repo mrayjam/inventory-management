@@ -27,6 +27,7 @@ import toast from 'react-hot-toast'
 import { useAuth } from '../contexts/AuthContext'
 import { useDashboard } from '../contexts/DashboardContext'
 import { purchasesApi, productsApi, suppliersApi } from '../services/apiClient'
+import { SkeletonPurchasesTable, SkeletonCarousel } from '../components/Skeleton'
 
 // Utility function to format currency
 const formatCurrency = (amount) => {
@@ -470,7 +471,7 @@ const PurchaseModal = ({
                 >
                   {isLoading ? (
                     <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
+                      <div className="animate-pulse h-4 w-16 bg-white/30 rounded"></div>
                       {isEditMode ? 'Updating...' : 'Creating...'}
                     </>
                   ) : (
@@ -721,8 +722,40 @@ export default function Purchase() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+      <div className="w-full max-w-full overflow-x-hidden min-w-0">
+        {/* Header Skeleton */}
+        <div className="mb-6 mr-3 sm:mb-8">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+              <div className="animate-pulse h-8 bg-slate-200 rounded w-64 mb-2"></div>
+              <div className="animate-pulse h-4 bg-slate-200 rounded w-48"></div>
+            </div>
+            <div className="animate-pulse h-10 bg-slate-200 rounded-lg w-32"></div>
+          </div>
+        </div>
+
+        {/* Search and Filters Skeleton */}
+        <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-sm border border-white/30 mb-6">
+          <div className="p-6 border-b border-white/20">
+            <div className="space-y-4">
+              <div className="animate-pulse h-10 bg-slate-200 rounded-lg w-full"></div>
+              <div className="flex flex-wrap items-center gap-3">
+                <div className="animate-pulse h-8 bg-slate-200 rounded w-32"></div>
+                <div className="animate-pulse h-8 bg-slate-200 rounded w-32"></div>
+                <div className="animate-pulse h-8 bg-slate-200 rounded w-24"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Table/Carousel Skeleton */}
+        <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-sm border border-white/30">
+          {width > 1270 ? (
+            <SkeletonPurchasesTable />
+          ) : (
+            <SkeletonCarousel />
+          )}
+        </div>
       </div>
     )
   }
@@ -733,10 +766,10 @@ export default function Purchase() {
       <div className="mb-6 mr-3 sm:mb-8">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h1 className="text-xl sm:text-2xl max-[1440px]:text-xl lg:text-3xl font-bold text-slate-900">
+            <h1 className="text-xl sm:text-2xl max-[2178px]:text-xl lg:text-3xl font-bold text-slate-900">
               Purchase Management
             </h1>
-            <p className="text-xs sm:text-sm max-[1440px]:text-xs lg:text-base text-slate-600 mt-1">
+            <p className="text-xs sm:text-sm max-[2178px]:text-xs lg:text-base text-slate-600 mt-1">
               Manage your purchase records and inventory updates
             </p>
           </div>
@@ -831,9 +864,9 @@ export default function Purchase() {
             </button>
           </div>
         ) : (
-          <>
-            {/* Table View - Shows above 900px */}
-            <div className="hidden min-[900px]:block overflow-x-auto">
+          <div>
+            {width > 1270 ? (
+              <div className="overflow-x-auto">
               <table className="w-full">
                 <thead className="bg-slate-50">
                   <tr>
@@ -910,7 +943,7 @@ export default function Purchase() {
                         </div>
                       </td>
                     </motion.tr>
-                  ))
+                  ))}
                 </tbody>
               </table>
               
@@ -941,14 +974,13 @@ export default function Purchase() {
                   </div>
                 </div>
               )}
-            </div>
-          ) : (
-            /* Mobile Carousel View */
-            <div>
-            <Carousel className="w-full">
-              <CarouselContent className="-ml-2 md:-ml-4">
-                {filteredPurchases.map((purchase, index) => (
-                  <CarouselItem key={purchase.id} className="pl-2 md:pl-4 basis-full sm:basis-1/2">
+              </div>
+            ) : (
+              <div>
+                <Carousel className="w-full">
+                  <CarouselContent className="-ml-2 md:-ml-4">
+                    {filteredPurchases.map((purchase, index) => (
+                      <CarouselItem key={purchase.id} className="pl-2 md:pl-4 basis-full sm:basis-1/2">
                     <motion.div
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
@@ -1026,14 +1058,15 @@ export default function Purchase() {
                       </div>
                     </motion.div>
                   </CarouselItem>
-                ))}
-              </CarouselContent>
-              <CarouselPrevious className="hidden sm:flex" />
-              <CarouselNext className="hidden sm:flex" />
-            </Carousel>
-            </div>
-          )}
-        </>
+                    ))}
+                  </CarouselContent>
+                  <CarouselPrevious className="hidden sm:flex" />
+                  <CarouselNext className="hidden sm:flex" />
+                </Carousel>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Modals */}
