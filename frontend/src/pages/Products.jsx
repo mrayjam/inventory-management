@@ -23,6 +23,7 @@ import {
 import toast from 'react-hot-toast'
 import { useAuth } from '../contexts/AuthContext'
 import { productsApi } from '../services/apiClient'
+import { SkeletonCarousel } from '../components/Skeleton'
 import ImageUpload from '../components/ImageUpload'
 
 
@@ -191,8 +192,26 @@ const ProductHistoryModal = ({ isOpen, onClose, product }) => {
         </div>
 
         {loading ? (
-          <div className="flex items-center justify-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          <div className="space-y-4">
+            {Array.from({ length: 3 }).map((_, index) => (
+              <div key={index} className="animate-pulse border border-slate-200 rounded-lg p-4">
+                <div className="flex justify-between items-center mb-3">
+                  <div className="h-4 bg-slate-200 rounded w-1/4"></div>
+                  <div className="h-3 bg-slate-200 rounded w-20"></div>
+                </div>
+                <div className="grid grid-cols-2 gap-4 mb-3">
+                  <div>
+                    <div className="h-3 bg-slate-200 rounded w-16 mb-1"></div>
+                    <div className="h-4 bg-slate-200 rounded w-12"></div>
+                  </div>
+                  <div>
+                    <div className="h-3 bg-slate-200 rounded w-20 mb-1"></div>
+                    <div className="h-4 bg-slate-200 rounded w-16"></div>
+                  </div>
+                </div>
+                <div className="h-3 bg-slate-200 rounded w-3/4"></div>
+              </div>
+            ))}
           </div>
         ) : (
           <div className="space-y-4">
@@ -584,14 +603,14 @@ export default function Products() {
     <div className="w-full max-w-full overflow-x-hidden min-w-0">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-8 pr-2">
         <div>
-          <h1 className="text-xl sm:text-2xl max-[1440px]:text-xl lg:text-3xl font-bold text-slate-900">Products</h1>
-          <p className="text-xs sm:text-sm max-[1440px]:text-xs lg:text-base text-slate-600 mt-1">Manage your product inventory</p>
+          <h1 className="text-xl sm:text-2xl max-[2178px]:text-xl lg:text-3xl font-bold text-slate-900">Products</h1>
+          <p className="text-xs sm:text-sm max-[2178px]:text-xs lg:text-base text-slate-600 mt-1">Manage your product inventory</p>
         </div>
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={() => setModalState({ isOpen: true, product: null, mode: 'add' })}
-          className="bg-blue-600 text-white px-3 sm:px-4 max-[1440px]:px-3 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-700 transition-colors text-xs sm:text-sm max-[1440px]:text-xs lg:text-base"
+          className="bg-blue-600 text-white px-3 sm:px-4 max-[2178px]:px-3 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-700 transition-colors text-xs sm:text-sm max-[2178px]:text-xs lg:text-base"
         >
           <PlusIcon className="h-4 w-4 sm:h-5 sm:w-5" />
           Add Product
