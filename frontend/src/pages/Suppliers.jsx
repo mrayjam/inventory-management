@@ -193,6 +193,8 @@ const SupplierModal = ({ isOpen, onClose, supplier, mode, onSupplierSaved }) => 
 
 export default function Suppliers() {
   const [searchTerm, setSearchTerm] = useState('')
+  const [categoryFilter, setCategoryFilter] = useState('')
+  const [statusFilter, setStatusFilter] = useState('')
   const [modalState, setModalState] = useState({ isOpen: false, supplier: null, mode: 'add' })
   const [suppliers, setSuppliers] = useState([])
   const [loading, setLoading] = useState(true)
@@ -223,13 +225,28 @@ export default function Suppliers() {
   // Reset pagination when search term changes
   useEffect(() => {
     setCurrentTablePage(1)
-  }, [searchTerm])
+  }, [searchTerm, categoryFilter, statusFilter])
 
-  const filteredSuppliers = suppliers.filter(supplier =>
-    supplier.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    supplier.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    supplier.category.toLowerCase().includes(searchTerm.toLowerCase())
-  )
+  const clearFilters = () => {
+    setSearchTerm('')
+    setCategoryFilter('')
+    setStatusFilter('')
+  }
+
+  // Get unique categories for filter dropdown
+  const categories = [...new Set(suppliers.map(supplier => supplier.category).filter(Boolean))].sort()
+
+  const filteredSuppliers = suppliers.filter(supplier => {
+    const matchesSearch = supplier.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         supplier.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         supplier.category.toLowerCase().includes(searchTerm.toLowerCase())
+    
+    const matchesCategory = !categoryFilter || supplier.category === categoryFilter
+    
+    const matchesStatus = !statusFilter || supplier.status === statusFilter
+    
+    return matchesSearch && matchesCategory && matchesStatus
+  })
 
   // Pagination logic
   const totalTablePages = Math.ceil(filteredSuppliers.length / tableItemsPerPage)
@@ -337,56 +354,104 @@ export default function Suppliers() {
         </motion.button>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-slate-200">
-        <div className="p-6 border-b border-slate-200">
-          <div className="relative">
-            <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-slate-400" />
-            <input
-              type="text"
-              placeholder="Search suppliers..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+      <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-sm border border-white/30">
+        <div className="p-6 border-b border-white/20">
+          {/* Search and Filters */}
+          <div className="space-y-4">
+            <div className="relative">
+              <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-slate-400" />
+              <input
+                type="text"
+                placeholder="Search by name, email, or category..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+              />
+            </div>
+            
+            {/* Filter Row */}
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="flex items-center gap-2">
+                <label className="text-xs font-medium text-slate-600 whitespace-nowrap">Category:</label>
+                <select
+                  value={categoryFilter}
+                  onChange={(e) => setCategoryFilter(e.target.value)}
+                  className="px-3 py-1 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs bg-white"
+                >
+                  <option value="">All Categories</option>
+                  {categories.map(category => (
+                    <option key={category} value={category}>{category}</option>
+                  ))}
+                </select>
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <label className="text-xs font-medium text-slate-600 whitespace-nowrap">Status:</label>
+                <select
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value)}
+                  className="px-3 py-1 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs bg-white"
+                >
+                  <option value="">All Statuses</option>
+                  <option value="Active">Active</option>
+                  <option value="Inactive">Inactive</option>
+                </select>
+              </div>
+              
+              {(searchTerm || categoryFilter || statusFilter) && (
+                <button
+                  onClick={clearFilters}
+                  className="px-3 py-1 text-xs font-medium text-slate-600 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition-colors"
+                >
+                  Clear Filters
+                </button>
+              )}
+              
+              <div className="text-xs text-slate-500 ml-auto">
+                {filteredSuppliers.length} supplier{filteredSuppliers.length !== 1 ? 's' : ''} found
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Desktop Table View */}
-        <div className="hidden md:block px-6 py-6 overflow-x-auto">
+        {/* Table View - Shows above 900px */}
+        <div className="hidden min-[900px]:block overflow-x-auto">
           <table className="w-full">
-            <thead>
-              <tr className="border-b border-slate-200">
-                <th className="text-left py-3 text-sm font-medium text-slate-600">Name</th>
-                <th className="text-left py-3 text-sm font-medium text-slate-600">Contact</th>
-                <th className="text-left py-3 text-sm font-medium text-slate-600">Email</th>
-                <th className="text-center py-3 text-sm font-medium text-slate-600">Status</th>
-                <th className="text-center py-3 text-sm font-medium text-slate-600">Actions</th>
+            <thead className="bg-slate-50">
+              <tr>
+                <th className="text-left px-4 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider">Name</th>
+                <th className="text-left px-4 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider">Contact</th>
+                <th className="text-left px-4 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider">Email</th>
+                <th className="text-center px-4 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider">Status</th>
+                <th className="text-center px-4 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody>
               {currentTableSuppliers.map((supplier, index) => (
                 <motion.tr
                   key={supplier.id}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.05 }}
-                  className="hover:bg-slate-50"
+                  className={`border-b border-slate-100 transition-all duration-200 hover:bg-slate-100/50 ${
+                    index % 2 === 0 ? 'bg-white' : 'bg-slate-50/30'
+                  }`}
                 >
-                  <td className="py-4">
+                  <td className="px-4 py-3">
                     <div>
-                      <div className="font-medium text-slate-900">{supplier.name}</div>
-                      <div className="text-sm text-slate-500">{supplier.category}</div>
+                      <div className="font-medium text-slate-900 text-xs sm:text-sm">{supplier.name}</div>
+                      <div className="text-xs text-slate-500">{supplier.category}</div>
                     </div>
                   </td>
-                  <td className="py-4">
-                    <div className="text-sm text-slate-900">{supplier.phone}</div>
-                    <div className="text-sm text-slate-500">{supplier.address}</div>
+                  <td className="px-4 py-3">
+                    <div className="text-xs sm:text-sm text-slate-700">{supplier.phone}</div>
+                    <div className="text-xs text-slate-500 truncate max-w-[150px]">{supplier.address}</div>
                   </td>
-                  <td className="py-4">
-                    <div className="text-sm text-slate-900">{supplier.email}</div>
+                  <td className="px-4 py-3">
+                    <span className="text-xs sm:text-sm text-slate-700 truncate max-w-[180px] block">{supplier.email}</span>
                   </td>
-                  <td className="py-4 text-center">
-                    <span className={`inline-flex px-3 py-1 text-xs font-semibold rounded-full ${
+                  <td className="px-4 py-3 text-center">
+                    <span className={`inline-flex items-center justify-center px-2 py-1 text-xs sm:text-sm font-semibold rounded-full ${
                       supplier.status === 'Active' 
                         ? 'bg-green-100 text-green-800' 
                         : 'bg-red-100 text-red-800'
@@ -394,35 +459,33 @@ export default function Suppliers() {
                       {supplier.status}
                     </span>
                   </td>
-                  <td className="py-4 text-center">
-                    <div className="flex justify-center gap-2">
-                      <motion.button
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.9 }}
+                  <td className="px-4 py-3">
+                    <div className="flex justify-center gap-1">
+                      <button
                         onClick={() => setModalState({ isOpen: true, supplier, mode: 'edit' })}
-                        className="text-blue-600 hover:text-blue-800 p-2 rounded-lg hover:bg-blue-50 transition-colors"
+                        className="text-blue-600 hover:text-blue-800 p-2 rounded-lg hover:bg-blue-100 transition-colors"
+                        title="Edit supplier"
                       >
-                        <PencilIcon className="h-4 w-4" />
-                      </motion.button>
-                      <motion.button
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.9 }}
+                        <PencilIcon className="h-3 w-3 sm:h-4 sm:w-4" />
+                      </button>
+                      <button
                         onClick={() => handleDelete(supplier.id)}
-                        className="text-red-600 hover:text-red-800 p-2 rounded-lg hover:bg-red-50 transition-colors"
+                        className="text-red-600 hover:text-red-800 p-2 rounded-lg hover:bg-red-100 transition-colors"
+                        title="Delete supplier"
                       >
-                        <TrashIcon className="h-4 w-4" />
-                      </motion.button>
+                        <TrashIcon className="h-3 w-3 sm:h-4 sm:w-4" />
+                      </button>
                     </div>
                   </td>
                 </motion.tr>
-              ))}
+              ))
             </tbody>
           </table>
           
           {/* Pagination Controls */}
-          {totalTablePages > 1 && (
-            <div className="flex items-center justify-between mt-4 px-4">
-              <div className="text-sm text-slate-600">
+          {!loading && totalTablePages > 1 && (
+            <div className="px-4 py-3 border-t border-slate-200 flex items-center justify-between">
+              <div className="text-xs sm:text-sm text-slate-500">
                 Showing {tableStartIndex + 1} to {Math.min(tableEndIndex, filteredSuppliers.length)} of {filteredSuppliers.length} suppliers
               </div>
               <div className="flex items-center gap-2">
@@ -431,9 +494,9 @@ export default function Suppliers() {
                   disabled={currentTablePage === 1}
                   className="p-2 rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
-                  <ChevronLeftIcon className="h-4 w-4" />
+                  <ChevronLeftIcon className="h-3 w-3 sm:h-4 sm:w-4" />
                 </button>
-                <span className="text-sm text-slate-600">
+                <span className="text-xs sm:text-sm text-slate-600">
                   Page {currentTablePage} of {totalTablePages}
                 </span>
                 <button
@@ -441,15 +504,15 @@ export default function Suppliers() {
                   disabled={currentTablePage === totalTablePages}
                   className="p-2 rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
-                  <ChevronRightIcon className="h-4 w-4" />
+                  <ChevronRightIcon className="h-3 w-3 sm:h-4 sm:w-4" />
                 </button>
               </div>
             </div>
           )}
         </div>
 
-        {/* Mobile Carousel View */}
-        <div className="block md:hidden px-3 sm:px-4 py-6">
+        {/* Carousel View - Shows at 900px and below */}
+        <div className="max-[900px]:block min-[901px]:hidden px-3 sm:px-4 py-6">
           <Carousel
             opts={{
               align: "start",

@@ -254,7 +254,7 @@ const PurchaseModal = ({
     
     const unitPrice = parseFloat(formData.unitPrice)
     if (isNaN(unitPrice) || unitPrice < 0.01) {
-      toast.error('Unit price must be a decimal number ≥ 0.01')
+      toast.error('Unit price must be a decimal number >= 0.01')
       return false
     }
 
@@ -526,6 +526,8 @@ export default function Purchase() {
   const [suppliers, setSuppliers] = useState([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
+  const [supplierFilter, setSupplierFilter] = useState('')
+  const [dateFilter, setDateFilter] = useState('')
   const [currentTablePage, setCurrentTablePage] = useState(1)
   const tableItemsPerPage = 3
   const { width } = useWindowSize()
@@ -552,7 +554,13 @@ export default function Purchase() {
   // Reset pagination when search term changes
   useEffect(() => {
     setCurrentTablePage(1)
-  }, [searchTerm])
+  }, [searchTerm, supplierFilter, dateFilter])
+
+  const clearFilters = () => {
+    setSearchTerm('')
+    setSupplierFilter('')
+    setDateFilter('')
+  }
 
   const loadAllData = async () => {
     if (!token) return
@@ -686,12 +694,24 @@ export default function Purchase() {
     })
   }
 
-  // Filter purchases based on search term
-  const filteredPurchases = purchases.filter(purchase =>
-    (purchase.productName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (purchase.supplierName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (purchase.productSku || '').toLowerCase().includes(searchTerm.toLowerCase())
-  )
+  // Get unique suppliers for filter dropdown
+  const uniqueSuppliers = [...new Set(purchases.map(purchase => purchase.supplierName).filter(Boolean))].sort()
+
+  // Filter purchases based on search term and filters
+  const filteredPurchases = purchases.filter(purchase => {
+    const matchesSearch = (purchase.productName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         (purchase.supplierName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         (purchase.productSku || '').toLowerCase().includes(searchTerm.toLowerCase())
+    
+    const matchesSupplier = !supplierFilter || purchase.supplierName === supplierFilter
+    
+    const matchesDate = !dateFilter || 
+                       (dateFilter === 'today' && new Date(purchase.purchaseDate).toDateString() === new Date().toDateString()) ||
+                       (dateFilter === 'week' && new Date(purchase.purchaseDate) >= new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)) ||
+                       (dateFilter === 'month' && new Date(purchase.purchaseDate) >= new Date(Date.now() - 30 * 24 * 60 * 60 * 1000))
+    
+    return matchesSearch && matchesSupplier && matchesDate
+  })
 
   // Table view pagination (3 rows per page)
   const totalTablePages = Math.ceil(filteredPurchases.length / tableItemsPerPage)
@@ -733,48 +753,97 @@ export default function Purchase() {
         </div>
       </div>
 
-      {/* Search */}
-      <div className="relative mb-6">
-        <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-        <input
-          type="text"
-          placeholder="Search purchases..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/80 backdrop-blur-sm"
-        />
+      {/* Search and Filters */}
+      <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-sm border border-white/30 mb-6">
+        <div className="p-6 border-b border-white/20">
+          <div className="space-y-4">
+            <div className="relative">
+              <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-slate-400" />
+              <input
+                type="text"
+                placeholder="Search by product, supplier, or SKU..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+              />
+            </div>
+            
+            {/* Filter Row */}
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="flex items-center gap-2">
+                <label className="text-xs font-medium text-slate-600 whitespace-nowrap">Supplier:</label>
+                <select
+                  value={supplierFilter}
+                  onChange={(e) => setSupplierFilter(e.target.value)}
+                  className="px-3 py-1 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs bg-white"
+                >
+                  <option value="">All Suppliers</option>
+                  {uniqueSuppliers.map(supplier => (
+                    <option key={supplier} value={supplier}>{supplier}</option>
+                  ))}
+                </select>
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <label className="text-xs font-medium text-slate-600 whitespace-nowrap">Date Range:</label>
+                <select
+                  value={dateFilter}
+                  onChange={(e) => setDateFilter(e.target.value)}
+                  className="px-3 py-1 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs bg-white"
+                >
+                  <option value="">All Time</option>
+                  <option value="today">Today</option>
+                  <option value="week">Last 7 Days</option>
+                  <option value="month">Last 30 Days</option>
+                </select>
+              </div>
+              
+              {(searchTerm || supplierFilter || dateFilter) && (
+                <button
+                  onClick={clearFilters}
+                  className="px-3 py-1 text-xs font-medium text-slate-600 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition-colors"
+                >
+                  Clear Filters
+                </button>
+              )}
+              
+              <div className="text-xs text-slate-500 ml-auto">
+                {filteredPurchases.length} purchase{filteredPurchases.length !== 1 ? 's' : ''} found
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
-      {filteredPurchases.length === 0 ? (
-        <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-sm border border-white/30 p-8 text-center">
-          <ShoppingCartIcon className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No purchases found</h3>
-          <p className="text-gray-600 mb-4">
-            {searchTerm ? 'No purchases match your search criteria.' : 'Start by adding your first purchase.'}
-          </p>
-          <button
-            onClick={handleCreatePurchase}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            Add Purchase
-          </button>
-        </div>
-      ) : (
-        <>
-          {width >= 1217 ? (
-            /* Desktop Table View */
-            <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-sm border border-white/30 overflow-hidden">
-            <div className="overflow-x-auto">
+      <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-sm border border-white/30">
+        {filteredPurchases.length === 0 ? (
+          <div className="p-8 text-center">
+            <ShoppingCartIcon className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No purchases found</h3>
+            <p className="text-gray-600 mb-4">
+              {searchTerm || supplierFilter || dateFilter ? 'No purchases match your search criteria.' : 'Start by adding your first purchase.'}
+            </p>
+            <button
+              onClick={handleCreatePurchase}
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              Add Purchase
+            </button>
+          </div>
+        ) : (
+          <>
+            {/* Table View - Shows above 900px */}
+            <div className="hidden min-[900px]:block overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-slate-50/50 border-b border-slate-200">
+                <thead className="bg-slate-50">
                   <tr>
-                    <th className="text-left py-3 px-4 font-semibold text-slate-700">Product</th>
-                    <th className="text-left py-3 px-4 font-semibold text-slate-700">Supplier</th>
-                    <th className="text-left py-3 px-4 font-semibold text-slate-700">Quantity</th>
-                    <th className="text-left py-3 px-4 font-semibold text-slate-700">Unit Price</th>
-                    <th className="text-left py-3 px-4 font-semibold text-slate-700">Total</th>
-                    <th className="text-left py-3 px-4 font-semibold text-slate-700">Date</th>
-                    <th className="text-left py-3 px-4 font-semibold text-slate-700">Actions</th>
+                    <th className="text-left px-4 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider">Product</th>
+                    <th className="text-left px-4 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider">Supplier</th>
+                    <th className="text-left px-4 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider">Quantity</th>
+                    <th className="text-left px-4 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider">Unit Price</th>
+                    <th className="text-left px-4 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider">Total</th>
+                    <th className="text-left px-4 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider">Date</th>
+                    <th className="text-center px-4 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -784,89 +853,94 @@ export default function Purchase() {
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: index * 0.05 }}
-                      className="border-b border-slate-100 hover:bg-slate-50/50 transition-colors"
+                      className={`border-b border-slate-100 transition-all duration-200 hover:bg-slate-100/50 ${
+                        index % 2 === 0 ? 'bg-white' : 'bg-slate-50/30'
+                      }`}
                     >
-                      <td className="py-3 px-4">
+                      <td className="px-4 py-3">
                         <div>
-                          <p className="font-medium text-slate-900">{purchase.productName}</p>
-                          <p className="text-sm text-slate-600">SKU: {purchase.productSku}</p>
+                          <div className="font-medium text-slate-900 text-xs sm:text-sm">{purchase.productName}</div>
+                          <div className="text-xs text-slate-500">SKU: {purchase.productSku}</div>
                         </div>
                       </td>
-                      <td className="py-3 px-4">
-                        <p className="text-slate-900">{purchase.supplierName}</p>
+                      <td className="px-4 py-3">
+                        <span className="text-xs sm:text-sm text-slate-700">{purchase.supplierName}</span>
                       </td>
-                      <td className="py-3 px-4">
-                        <span className="text-slate-500 px-2 py-1 text-sm font-medium">
-                          {purchase.quantity} units
+                      <td className="px-4 py-3">
+                        <span className="inline-flex items-center justify-center px-2 py-1 text-xs sm:text-sm font-semibold bg-blue-100 text-blue-800 rounded-full">
+                          {purchase.quantity}
                         </span>
                       </td>
-                      <td className="py-3 px-4">
-                        <p className="text-green-600 font-medium">${purchase.unitPrice}</p>
+                      <td className="px-4 py-3">
+                        <span className="inline-flex items-center justify-center px-2 py-1 text-xs sm:text-sm font-semibold bg-gray-100 text-gray-800 rounded-full">
+                          ${purchase.unitPrice}
+                        </span>
                       </td>
-                      <td className="py-3 px-4">
-                        <p className="text-green-600 font-bold">{formatCurrency(purchase.totalAmount || (purchase.quantity * purchase.unitPrice))}</p>
+                      <td className="px-4 py-3">
+                        <span className="inline-flex items-center justify-center px-2 py-1 text-xs sm:text-sm font-semibold bg-green-100 text-green-800 rounded-full">
+                          {formatCurrency(purchase.totalAmount || (purchase.quantity * purchase.unitPrice))}
+                        </span>
                       </td>
-                      <td className="py-3 px-4">
-                        <p className="text-slate-900">{new Date(purchase.purchaseDate).toLocaleDateString()}</p>
+                      <td className="px-4 py-3">
+                        <span className="text-xs sm:text-sm text-slate-700">{new Date(purchase.purchaseDate).toLocaleDateString()}</span>
                       </td>
-                      <td className="py-3 px-4">
-                        <div className="flex items-center gap-2">
+                      <td className="px-4 py-3">
+                        <div className="flex justify-center gap-1">
                           <button
                             onClick={() => handleViewPurchase(purchase)}
-                            className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                            className="text-gray-600 hover:text-gray-800 p-2 rounded-lg hover:bg-gray-100 transition-colors"
                             title="View details"
                           >
-                            <EyeIcon className="w-4 h-4" />
+                            <EyeIcon className="h-3 w-3 sm:h-4 sm:w-4" />
                           </button>
                           <button
                             onClick={() => handleEditPurchase(purchase)}
-                            className="p-2 text-yellow-600 hover:bg-yellow-50 rounded-lg transition-colors"
+                            className="text-blue-600 hover:text-blue-800 p-2 rounded-lg hover:bg-blue-100 transition-colors"
                             title="Edit purchase"
                           >
-                            <PencilIcon className="w-4 h-4" />
+                            <PencilIcon className="h-3 w-3 sm:h-4 sm:w-4" />
                           </button>
                           <button
                             onClick={() => handleDeletePurchase(purchase)}
-                            className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                            className="text-red-600 hover:text-red-800 p-2 rounded-lg hover:bg-red-100 transition-colors"
                             title="Delete purchase"
                           >
-                            <TrashIcon className="w-4 h-4" />
+                            <TrashIcon className="h-3 w-3 sm:h-4 sm:w-4" />
                           </button>
                         </div>
                       </td>
                     </motion.tr>
-                  ))}
+                  ))
                 </tbody>
               </table>
-            </div>
-            
-            {/* Pagination Controls */}
-            {totalTablePages > 1 && (
-              <div className="flex items-center justify-between mt-4 px-4">
-                <div className="text-sm text-slate-600">
-                  Showing {tableStartIndex + 1} to {Math.min(tableEndIndex, filteredPurchases.length)} of {filteredPurchases.length} purchases
+              
+              {/* Pagination Controls */}
+              {!loading && totalTablePages > 1 && (
+                <div className="px-4 py-3 border-t border-slate-200 flex items-center justify-between">
+                  <div className="text-xs sm:text-sm text-slate-500">
+                    Showing {tableStartIndex + 1} to {Math.min(tableEndIndex, filteredPurchases.length)} of {filteredPurchases.length} purchases
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => setCurrentTablePage(prev => Math.max(prev - 1, 1))}
+                      disabled={currentTablePage === 1}
+                      className="p-2 rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    >
+                      <ChevronLeftIcon className="h-3 w-3 sm:h-4 sm:w-4" />
+                    </button>
+                    <span className="text-xs sm:text-sm text-slate-600">
+                      Page {currentTablePage} of {totalTablePages}
+                    </span>
+                    <button
+                      onClick={() => setCurrentTablePage(prev => Math.min(prev + 1, totalTablePages))}
+                      disabled={currentTablePage === totalTablePages}
+                      className="p-2 rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    >
+                      <ChevronRightIcon className="h-3 w-3 sm:h-4 sm:w-4" />
+                    </button>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => setCurrentTablePage(prev => Math.max(prev - 1, 1))}
-                    disabled={currentTablePage === 1}
-                    className="p-2 rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                  >
-                    <ChevronLeftIcon className="h-4 w-4" />
-                  </button>
-                  <span className="text-sm text-slate-600">
-                    Page {currentTablePage} of {totalTablePages}
-                  </span>
-                  <button
-                    onClick={() => setCurrentTablePage(prev => Math.min(prev + 1, totalTablePages))}
-                    disabled={currentTablePage === totalTablePages}
-                    className="p-2 rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                  >
-                    <ChevronRightIcon className="h-4 w-4" />
-                  </button>
-                </div>
-              </div>
-            )}
+              )}
             </div>
           ) : (
             /* Mobile Carousel View */
@@ -960,7 +1034,7 @@ export default function Purchase() {
             </div>
           )}
         </>
-      )}
+      </div>
 
       {/* Modals */}
       <AnimatePresence>

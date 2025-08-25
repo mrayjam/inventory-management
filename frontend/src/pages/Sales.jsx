@@ -436,6 +436,8 @@ const SaleModal = ({ isOpen, onClose, sale, mode, onSaleSaved }) => {
 
 export default function Sales() {
   const [searchTerm, setSearchTerm] = useState('')
+  const [customerFilter, setCustomerFilter] = useState('')
+  const [dateFilter, setDateFilter] = useState('')
   const [modalState, setModalState] = useState({ isOpen: false, sale: null, mode: 'add' })
   const [detailModal, setDetailModal] = useState({ isOpen: false, sale: null })
   const [sales, setSales] = useState([])
@@ -465,11 +467,23 @@ export default function Sales() {
     }
   }, [token])
 
-  const filteredSales = sales.filter(sale =>
-    sale.productName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    sale.productSku.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (sale.customer && sale.customer.toLowerCase().includes(searchTerm.toLowerCase()))
-  )
+  // Get unique customers for filter dropdown
+  const customers = [...new Set(sales.map(sale => sale.customer || 'Walk-in').filter(Boolean))].sort()
+
+  const filteredSales = sales.filter(sale => {
+    const matchesSearch = sale.productName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         sale.productSku.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         (sale.customer && sale.customer.toLowerCase().includes(searchTerm.toLowerCase()))
+    
+    const matchesCustomer = !customerFilter || (sale.customer || 'Walk-in') === customerFilter
+    
+    const matchesDate = !dateFilter || 
+                       (dateFilter === 'today' && new Date(sale.saleDate).toDateString() === new Date().toDateString()) ||
+                       (dateFilter === 'week' && new Date(sale.saleDate) >= new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)) ||
+                       (dateFilter === 'month' && new Date(sale.saleDate) >= new Date(Date.now() - 30 * 24 * 60 * 60 * 1000))
+    
+    return matchesSearch && matchesCustomer && matchesDate
+  })
 
   const totalTablePages = Math.ceil(filteredSales.length / tableItemsPerPage)
   const tableStartIndex = (currentTablePage - 1) * tableItemsPerPage
@@ -478,7 +492,13 @@ export default function Sales() {
 
   useEffect(() => {
     setCurrentTablePage(1)
-  }, [searchTerm])
+  }, [searchTerm, customerFilter, dateFilter])
+
+  const clearFilters = () => {
+    setSearchTerm('')
+    setCustomerFilter('')
+    setDateFilter('')
+  }
 
   const handleSaleSaved = async (action, saleId, saleData) => {
     try {
@@ -580,15 +600,62 @@ export default function Sales() {
 
       <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-sm border border-white/30">
         <div className="p-6 border-b border-white/20">
-          <div className="relative">
-            <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-slate-400" />
-            <input
-              type="text"
-              placeholder="Search sales..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+          {/* Search and Filters */}
+          <div className="space-y-4">
+            <div className="relative">
+              <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-slate-400" />
+              <input
+                type="text"
+                placeholder="Search by product, SKU, or customer..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+              />
+            </div>
+            
+            {/* Filter Row */}
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="flex items-center gap-2">
+                <label className="text-xs font-medium text-slate-600 whitespace-nowrap">Customer:</label>
+                <select
+                  value={customerFilter}
+                  onChange={(e) => setCustomerFilter(e.target.value)}
+                  className="px-3 py-1 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs bg-white"
+                >
+                  <option value="">All Customers</option>
+                  {customers.map(customer => (
+                    <option key={customer} value={customer}>{customer}</option>
+                  ))}
+                </select>
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <label className="text-xs font-medium text-slate-600 whitespace-nowrap">Date Range:</label>
+                <select
+                  value={dateFilter}
+                  onChange={(e) => setDateFilter(e.target.value)}
+                  className="px-3 py-1 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs bg-white"
+                >
+                  <option value="">All Time</option>
+                  <option value="today">Today</option>
+                  <option value="week">Last 7 Days</option>
+                  <option value="month">Last 30 Days</option>
+                </select>
+              </div>
+              
+              {(searchTerm || customerFilter || dateFilter) && (
+                <button
+                  onClick={clearFilters}
+                  className="px-3 py-1 text-xs font-medium text-slate-600 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition-colors"
+                >
+                  Clear Filters
+                </button>
+              )}
+              
+              <div className="text-xs text-slate-500 ml-auto">
+                {filteredSales.length} sale{filteredSales.length !== 1 ? 's' : ''} found
+              </div>
+            </div>
           </div>
         </div>
 
@@ -597,66 +664,80 @@ export default function Sales() {
           <table className="w-full">
             <thead className="bg-slate-50">
               <tr>
-                <th className="text-left px-6 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider">Product</th>
-                <th className="text-left px-6 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider">Customer</th>
-                <th className="text-left px-6 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider">Quantity</th>
-                <th className="text-left px-6 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider">Total</th>
-                <th className="text-left px-6 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider">Date</th>
-                <th className="text-left px-6 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider">Actions</th>
+                <th className="text-left px-4 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider">Product</th>
+                <th className="text-left px-4 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider">Customer</th>
+                <th className="text-left px-4 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider">Quantity</th>
+                <th className="text-left px-4 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider">Total</th>
+                <th className="text-left px-4 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider">Date</th>
+                <th className="text-center px-4 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-200">
+            <tbody>
               {currentTableSales.map((sale, index) => (
                 <motion.tr
                   key={sale.id || sale._id || `table-sale-${index}`}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  className="hover:bg-slate-50"
+                  className={`border-b border-slate-100 transition-all duration-200 hover:bg-slate-100/50 ${
+                    index % 2 === 0 ? 'bg-white' : 'bg-slate-50/30'
+                  }`}
                 >
-                  <td className="px-6 py-4">
+                  <td className="px-4 py-3">
                     <div>
-                      <div className="font-medium text-slate-900">{sale.productName}</div>
-                      <div className="text-sm text-slate-500">SKU: {sale.productSku}</div>
+                      <div className="font-medium text-slate-900 text-xs sm:text-sm">{sale.productName}</div>
+                      <div className="text-xs text-slate-500">SKU: {sale.productSku}</div>
                     </div>
                   </td>
-                  <td className="px-6 py-4 text-sm text-slate-900">{sale.customer || 'Walk-in'}</td>
-                  <td className="px-6 py-4 text-sm text-slate-500">{sale.quantity} units</td>
-                  <td className="px-6 py-4 text-sm font-medium text-green-600">${(sale.totalAmount || (sale.salePrice * sale.quantity)).toFixed(2)}</td>
-                  <td className="px-6 py-4 text-sm text-slate-900">{new Date(sale.saleDate).toLocaleDateString()}</td>
-                  <td className="px-6 py-4">
-                    <div className="flex gap-2">
+                  <td className="px-4 py-3">
+                    <span className="text-xs sm:text-sm text-slate-700">{sale.customer || 'Walk-in'}</span>
+                  </td>
+                  <td className="px-4 py-3">
+                    <span className="inline-flex items-center justify-center px-2 py-1 text-xs sm:text-sm font-semibold bg-blue-100 text-blue-800 rounded-full">
+                      {sale.quantity}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3">
+                    <span className="inline-flex items-center justify-center px-2 py-1 text-xs sm:text-sm font-semibold bg-green-100 text-green-800 rounded-full">
+                      ${(sale.totalAmount || (sale.salePrice * sale.quantity)).toFixed(2)}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3">
+                    <span className="text-xs sm:text-sm text-slate-700">{new Date(sale.saleDate).toLocaleDateString()}</span>
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="flex justify-center gap-1">
                       <button
                         onClick={() => setDetailModal({ isOpen: true, sale })}
-                        className="text-gray-600 hover:text-gray-800 p-1"
+                        className="text-gray-600 hover:text-gray-800 p-2 rounded-lg hover:bg-gray-100 transition-colors"
                         title="View Details"
                       >
-                        <EyeIcon className="h-4 w-4" />
+                        <EyeIcon className="h-3 w-3 sm:h-4 sm:w-4" />
                       </button>
                       <button
                         onClick={() => setModalState({ isOpen: true, sale, mode: 'edit' })}
-                        className="text-blue-600 hover:text-blue-800 p-1"
+                        className="text-blue-600 hover:text-blue-800 p-2 rounded-lg hover:bg-blue-100 transition-colors"
                         title="Edit Sale"
                       >
-                        <PencilIcon className="h-4 w-4" />
+                        <PencilIcon className="h-3 w-3 sm:h-4 sm:w-4" />
                       </button>
                       <button
                         onClick={() => handleDelete(sale.id)}
-                        className="text-red-600 hover:text-red-800 p-1"
+                        className="text-red-600 hover:text-red-800 p-2 rounded-lg hover:bg-red-100 transition-colors"
                         title="Delete Sale"
                       >
-                        <TrashIcon className="h-4 w-4" />
+                        <TrashIcon className="h-3 w-3 sm:h-4 sm:w-4" />
                       </button>
                     </div>
                   </td>
                 </motion.tr>
-              ))}
+              ))
             </tbody>
           </table>
           
           {/* Pagination Controls */}
-          {totalTablePages > 1 && (
-            <div className="px-6 py-4 border-t border-slate-200 flex items-center justify-between">
-              <div className="text-sm text-slate-500">
+          {!loading && totalTablePages > 1 && (
+            <div className="px-4 py-3 border-t border-slate-200 flex items-center justify-between">
+              <div className="text-xs sm:text-sm text-slate-500">
                 Showing {tableStartIndex + 1} to {Math.min(tableEndIndex, filteredSales.length)} of {filteredSales.length} sales
               </div>
               <div className="flex items-center gap-2">
@@ -665,9 +746,9 @@ export default function Sales() {
                   disabled={currentTablePage === 1}
                   className="p-2 rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
-                  <ChevronLeftIcon className="h-4 w-4" />
+                  <ChevronLeftIcon className="h-3 w-3 sm:h-4 sm:w-4" />
                 </button>
-                <span className="text-sm text-slate-600">
+                <span className="text-xs sm:text-sm text-slate-600">
                   Page {currentTablePage} of {totalTablePages}
                 </span>
                 <button
@@ -675,7 +756,7 @@ export default function Sales() {
                   disabled={currentTablePage === totalTablePages}
                   className="p-2 rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
-                  <ChevronRightIcon className="h-4 w-4" />
+                  <ChevronRightIcon className="h-3 w-3 sm:h-4 sm:w-4" />
                 </button>
               </div>
             </div>
