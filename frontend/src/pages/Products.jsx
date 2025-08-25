@@ -18,13 +18,12 @@ import {
   EyeIcon,
   ClockIcon,
   ChevronLeftIcon,
-  ChevronRightIcon
+  ChevronRightIcon,
+  PhotoIcon
 } from '@heroicons/react/24/outline'
 import toast from 'react-hot-toast'
 import { useAuth } from '../contexts/AuthContext'
 import { productsApi } from '../services/apiClient'
-import { SkeletonCarousel } from '../components/Skeleton'
-import ImageUpload from '../components/ImageUpload'
 
 
 const ProductDetailModal = ({ isOpen, onClose, product, onEditProduct, onViewHistory }) => {
@@ -65,7 +64,7 @@ const ProductDetailModal = ({ isOpen, onClose, product, onEditProduct, onViewHis
           
           <div className="aspect-w-16 aspect-h-9">
             <img
-              src={product.images && product.images.length > 0 ? product.images[0].url : product.imageUrl || 'https://via.placeholder.com/300'}
+              src={product.images && product.images.length > 0 ? product.images[0].url : product.imageUrl || 'https://images.unsplash.com/photo-1586880244386-8b3e34c8382c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&q=80'}
               alt={product.name}
               className="w-full h-48 sm:h-64 object-cover rounded-t-xl"
             />
@@ -262,26 +261,55 @@ const ProductHistoryModal = ({ isOpen, onClose, product }) => {
 }
 
 const ProductModal = ({ isOpen, onClose, product, mode, onProductSaved }) => {
-  const [selectedImages, setSelectedImages] = useState([])
-  const [deletedImageIds, setDeletedImageIds] = useState([])
+  const [currentImage, setCurrentImage] = useState(null) // Current image to display
+  const [newImageFile, setNewImageFile] = useState(null) // New file selected
+  const [removeCurrentImage, setRemoveCurrentImage] = useState(false) // Flag to remove existing image
 
   useEffect(() => {
     if (!isOpen) {
-      setSelectedImages([])
-      setDeletedImageIds([])
+      setCurrentImage(null)
+      setNewImageFile(null)
+      setRemoveCurrentImage(false)
     } else {
-      setSelectedImages([])
-      setDeletedImageIds([])
+      // Set current image for edit mode - check both images array and imageUrl
+      if (mode === 'edit') {
+        if (product?.images && product.images.length > 0) {
+          setCurrentImage(product.images[0]) // Take the first image from images array
+        } else if (product?.imageUrl && product.imageUrl !== 'https://images.unsplash.com/photo-1586880244386-8b3e34c8382c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&q=80') {
+          // Product has a real imageUrl (not the fallback)
+          setCurrentImage({ url: product.imageUrl, publicId: null })
+        } else {
+          setCurrentImage(null) // No existing image
+        }
+      } else {
+        setCurrentImage(null)
+      }
+      setNewImageFile(null)
+      setRemoveCurrentImage(false)
     }
-  }, [isOpen, product])
+  }, [isOpen, product, mode])
 
   if (!isOpen) return null
 
-  const handleImagesChange = (images, removedImageId) => {
-    if (removedImageId) {
-      setDeletedImageIds(prev => [...prev, removedImageId])
-    } else if (images) {
-      setSelectedImages(images)
+  const handleImageSelect = (event) => {
+    const file = event.target.files[0]
+    if (file) {
+      setNewImageFile(file)
+      // Create preview URL for the new image
+      const previewUrl = URL.createObjectURL(file)
+      setCurrentImage({ url: previewUrl, isNew: true })
+    }
+  }
+
+  const handleRemoveImage = () => {
+    if (currentImage?.isNew) {
+      // Remove new image
+      setNewImageFile(null)
+      setCurrentImage(mode === 'edit' && product?.images?.length > 0 ? product.images[0] : null)
+    } else {
+      // Mark existing image for removal
+      setRemoveCurrentImage(true)
+      setCurrentImage(null)
     }
   }
 
@@ -290,30 +318,61 @@ const ProductModal = ({ isOpen, onClose, product, mode, onProductSaved }) => {
     
     const formData = new FormData()
     
+    // Always include basic product data
     formData.append('name', e.target.name.value)
     formData.append('category', e.target.category.value)
     formData.append('sku', e.target.sku.value)
     formData.append('description', e.target.description.value || '')
     
-    if (deletedImageIds.length > 0) {
-      formData.append('deletedImages', JSON.stringify(deletedImageIds))
-    }
+    // Determine if product has existing image (either in images array or imageUrl that's not fallback)
+    const hasExistingImage = (product?.images?.length > 0) || 
+      (product?.imageUrl && product.imageUrl !== 'https://images.unsplash.com/photo-1586880244386-8b3e34c8382c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&q=80')
     
-    const validFiles = (selectedImages || [])
-      .filter(file => {
-        const isValidFile = file instanceof File && file.size > 0 && file.type.startsWith('image/')
-        if (!isValidFile && file) {
-          console.warn('Invalid file object detected and filtered out:', file)
-        }
-        return isValidFile
-      })
-    
-    console.log('Frontend - Processing', validFiles.length, 'valid image files')
-    console.log('Frontend - Deleted image IDs:', deletedImageIds)
-    
-    validFiles.forEach((file) => {
-      formData.append('images', file)
+    console.log('Form submission - Image state:', {
+      mode,
+      hasNewImage: !!newImageFile,
+      removeCurrentImage,
+      hasExistingImage,
+      productImageUrl: product?.imageUrl,
+      productImagesLength: product?.images?.length || 0
     })
+    
+    // Handle image logic with three clear states
+    if (mode === 'edit') {
+      // STATE 1: Image explicitly removed (set to fallback)
+      if (removeCurrentImage && hasExistingImage) {
+        if (product?.images?.length > 0) {
+          formData.append('deletedImages', JSON.stringify([product.images[0].publicId]))
+        }
+        console.log('Image state: REMOVED - will use fallback')
+      }
+      
+      // STATE 2: New image uploaded (replace with new)
+      if (newImageFile) {
+        // If replacing existing image with publicId, also mark old one for deletion
+        if (product?.images?.length > 0 && product.images[0].publicId && !removeCurrentImage) {
+          formData.append('deletedImages', JSON.stringify([product.images[0].publicId]))
+        }
+        formData.append('images', newImageFile)
+        console.log('Image state: NEW IMAGE - replacing existing')
+      }
+      
+      // STATE 3: Image untouched (keep existing)
+      // If neither removeCurrentImage nor newImageFile, send no image data
+      // Backend will preserve existing image
+      if (!removeCurrentImage && !newImageFile) {
+        console.log('Image state: UNTOUCHED - keeping existing image')
+        console.log('No image data sent - backend should preserve existing image')
+      }
+    } else {
+      // For add mode, include new image if selected
+      if (newImageFile) {
+        formData.append('images', newImageFile)
+        console.log('Image state: NEW PRODUCT with image')
+      } else {
+        console.log('Image state: NEW PRODUCT without image - will use fallback')
+      }
+    }
     
     try {
       if (mode === 'add') {
@@ -322,8 +381,6 @@ const ProductModal = ({ isOpen, onClose, product, mode, onProductSaved }) => {
         await onProductSaved('update', product.id, formData)
       }
       onClose()
-      setSelectedImages([])
-      setDeletedImageIds([])
     } catch (error) {
       console.error('Failed to save product:', error)
     }
@@ -415,12 +472,73 @@ const ProductModal = ({ isOpen, onClose, product, mode, onProductSaved }) => {
           </div>
 
           <div className="space-y-6">
-            <ImageUpload
-              onImagesChange={handleImagesChange}
-              existingImages={product?.images || []}
-              maxImages={5}
-              maxSizeInMB={5}
-            />
+            {/* Image Upload Section */}
+            <div className="space-y-4">
+              <label className="block text-sm font-medium text-gray-700">
+                Product Image
+              </label>
+              
+              {/* Image Preview */}
+              <div className="flex flex-col sm:flex-row sm:items-start gap-4">
+                {currentImage ? (
+                  <div className="relative inline-block flex-shrink-0">
+                    <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-lg overflow-hidden border-2 border-gray-200 bg-gray-50 shadow-sm">
+                      <img
+                        src={currentImage.url}
+                        alt="Product preview"
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"%3E%3Cpath stroke-linecap="round" stroke-linejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"/%3E%3C/svg%3E'
+                        }}
+                      />
+                    </div>
+                    {/* Remove button */}
+                    <button
+                      type="button"
+                      onClick={handleRemoveImage}
+                      className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1.5 hover:bg-red-600 transition-colors shadow-md"
+                      title="Remove image"
+                    >
+                      <XMarkIcon className="h-3 w-3 sm:h-4 sm:w-4" />
+                    </button>
+                    {/* Badge to show if it's current or new */}
+                    <div className="absolute bottom-1 left-1 bg-black/75 text-white text-xs px-2 py-1 rounded backdrop-blur-sm">
+                      {currentImage.isNew ? 'New' : 'Current'}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 flex items-center justify-center flex-shrink-0">
+                    <PhotoIcon className="h-6 w-6 sm:h-8 sm:w-8 text-gray-400" />
+                  </div>
+                )}
+                
+                {/* Upload button and info */}
+                <div className="flex flex-col justify-center space-y-2">
+                  <input
+                    type="file"
+                    id="image-upload"
+                    accept="image/*"
+                    onChange={handleImageSelect}
+                    className="hidden"
+                  />
+                  <label
+                    htmlFor="image-upload"
+                    className="inline-flex items-center px-3 py-2 sm:px-4 sm:py-2 border border-gray-300 shadow-sm text-xs sm:text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 cursor-pointer transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                  >
+                    <PhotoIcon className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
+                    {currentImage ? 'Change Image' : 'Upload Image'}
+                  </label>
+                  <p className="text-xs text-gray-500">
+                    JPEG, PNG, WebP up to 5MB
+                  </p>
+                  {currentImage && (
+                    <p className="text-xs text-green-600 font-medium">
+                      ✓ Image selected
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
           </div>
           
           <div className="flex flex-col sm:flex-row gap-3 pt-6 border-t border-gray-200">
@@ -736,7 +854,7 @@ export default function Products() {
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
                         <img
-                          src={product.images && product.images.length > 0 ? product.images[0].url : product.imageUrl || 'https://via.placeholder.com/300'}
+                          src={product.images && product.images.length > 0 ? product.images[0].url : product.imageUrl || 'https://images.unsplash.com/photo-1586880244386-8b3e34c8382c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&q=80'}
                           alt={product.name}
                           className="h-10 w-10 rounded-lg object-cover cursor-pointer hover:opacity-80 transition-opacity"
                           onClick={() => setDetailModal({ isOpen: true, product })}
@@ -879,7 +997,7 @@ export default function Products() {
                     >
                       <div className="relative h-40 flex-shrink-0">
                         <img
-                          src={product.images && product.images.length > 0 ? product.images[0].url : product.imageUrl || 'https://via.placeholder.com/300'}
+                          src={product.images && product.images.length > 0 ? product.images[0].url : product.imageUrl || 'https://images.unsplash.com/photo-1586880244386-8b3e34c8382c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&q=80'}
                           alt={product.name}
                           className="w-full h-full object-cover cursor-pointer hover:opacity-90 transition-opacity"
                           onClick={() => setDetailModal({ isOpen: true, product })}

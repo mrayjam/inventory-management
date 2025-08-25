@@ -179,18 +179,27 @@ const SuperAdminPanel = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-br from-indigo-100 via-purple-50 to-blue-100"></div>
+      
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="max-w-4xl mx-auto"
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.6, type: "spring", damping: 25 }}
+        className="relative z-10 w-full max-w-sm sm:max-w-md max-[455px]:max-w-[95%]"
       >
-        <div className="bg-white shadow sm:rounded-lg">
-          <div className="px-4 py-5 sm:p-6">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Super Admin Panel</h2>
+        <div className="bg-white/90 backdrop-blur-xl shadow-2xl rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 border border-white/20">
+          <div className="text-center mb-4 sm:mb-6 lg:mb-8">
+            <motion.h2
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.3, duration: 0.5 }}
+              className="text-xl md:text-2xl lg:text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent mb-4 sm:mb-6"
+            >
+              Super Admin Panel
+            </motion.h2>
             
-            <div className="border-b border-gray-200 mb-6">
+            <div className="border-b border-gray-200 mb-4 sm:mb-6">
               <nav className="-mb-px flex space-x-8">
                 <button
                   onClick={() => setActiveTab('create')}
@@ -222,9 +231,13 @@ const SuperAdminPanel = () => {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.3 }}
               >
-                <form onSubmit={handleCreateSubmit} className="space-y-6">
-                  <div>
-                    <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+                <form onSubmit={handleCreateSubmit} className="space-y-3 sm:space-y-4 lg:space-y-6">
+                  <motion.div
+                    initial={{ x: -20, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    transition={{ delay: 0.4, duration: 0.5 }}
+                  >
+                    <label htmlFor="name" className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2">
                       Full Name
                     </label>
                     <input
@@ -232,25 +245,31 @@ const SuperAdminPanel = () => {
                       name="name"
                       id="name"
                       required
-                      className={`mt-1 block w-full px-3 py-2 border ${
-                        createErrors.name ? 'border-red-300' : 'border-gray-300'
-                      } rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
+                      className={`block w-full px-2 sm:px-3 lg:px-4 py-2 sm:py-2.5 lg:py-3 text-xs sm:text-sm lg:text-base border rounded-lg sm:rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
+                        createErrors.name ? 'border-red-300 bg-red-50' : 'border-gray-200 bg-gray-50 hover:bg-white focus:bg-white'
+                      }`}
+                      placeholder="Enter full name"
                       value={createForm.name}
                       onChange={handleCreateChange}
                     />
                     {createErrors.name && (
                       <motion.p
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        className="mt-1 text-sm text-red-600"
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="mt-2 text-sm text-red-600"
                       >
                         {createErrors.name}
                       </motion.p>
                     )}
-                  </div>
+                  </motion.div>
 
-                  <div>
-                    <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                  <motion.div
+                    initial={{ x: -20, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    transition={{ delay: 0.5, duration: 0.5 }}
+                  >
+                    <label htmlFor="email" className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2">
                       Email Address
                     </label>
                     <input
@@ -258,25 +277,31 @@ const SuperAdminPanel = () => {
                       name="email"
                       id="email"
                       required
-                      className={`mt-1 block w-full px-3 py-2 border ${
-                        createErrors.email ? 'border-red-300' : 'border-gray-300'
-                      } rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
+                      className={`block w-full px-2 sm:px-3 lg:px-4 py-2 sm:py-2.5 lg:py-3 text-xs sm:text-sm lg:text-base border rounded-lg sm:rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
+                        createErrors.email ? 'border-red-300 bg-red-50' : 'border-gray-200 bg-gray-50 hover:bg-white focus:bg-white'
+                      }`}
+                      placeholder="Enter email address"
                       value={createForm.email}
                       onChange={handleCreateChange}
                     />
                     {createErrors.email && (
                       <motion.p
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        className="mt-1 text-sm text-red-600"
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="mt-2 text-sm text-red-600"
                       >
                         {createErrors.email}
                       </motion.p>
                     )}
-                  </div>
+                  </motion.div>
 
-                  <div>
-                    <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                  <motion.div
+                    initial={{ x: -20, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    transition={{ delay: 0.6, duration: 0.5 }}
+                  >
+                    <label htmlFor="password" className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2">
                       Password
                     </label>
                     <input
@@ -284,40 +309,46 @@ const SuperAdminPanel = () => {
                       name="password"
                       id="password"
                       required
-                      className={`mt-1 block w-full px-3 py-2 border ${
-                        createErrors.password ? 'border-red-300' : 'border-gray-300'
-                      } rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
+                      className={`block w-full px-2 sm:px-3 lg:px-4 py-2 sm:py-2.5 lg:py-3 text-xs sm:text-sm lg:text-base border rounded-lg sm:rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
+                        createErrors.password ? 'border-red-300 bg-red-50' : 'border-gray-200 bg-gray-50 hover:bg-white focus:bg-white'
+                      }`}
+                      placeholder="Enter password"
                       value={createForm.password}
                       onChange={handleCreateChange}
                     />
                     {createErrors.password && (
                       <motion.p
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        className="mt-1 text-sm text-red-600"
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="mt-2 text-sm text-red-600"
                       >
                         {createErrors.password}
                       </motion.p>
                     )}
-                  </div>
+                  </motion.div>
 
-                  <div>
+                  <motion.div
+                    initial={{ y: 20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ delay: 0.7, duration: 0.5 }}
+                  >
                     <button
                       type="submit"
                       disabled={isLoading}
-                      className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="w-full flex justify-center py-2.5 sm:py-3 lg:py-3.5 px-3 sm:px-4 lg:px-6 border border-transparent text-xs sm:text-sm lg:text-base font-medium rounded-lg sm:rounded-xl text-white bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-600 hover:from-blue-700 hover:via-blue-800 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] min-h-[40px] sm:min-h-[44px] lg:min-h-[48px]"
                     >
                       {isLoading ? (
                         <motion.div
                           animate={{ rotate: 360 }}
                           transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                          className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
+                          className="w-3.5 h-3.5 sm:w-4 sm:h-4 lg:w-5 lg:h-5 border-2 border-white border-t-transparent rounded-full"
                         />
                       ) : (
                         'Create Admin'
                       )}
                     </button>
-                  </div>
+                  </motion.div>
                 </form>
               </motion.div>
             )}
@@ -328,18 +359,22 @@ const SuperAdminPanel = () => {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.3 }}
               >
-                <form onSubmit={handleResetSubmit} className="space-y-6">
-                  <div>
-                    <label htmlFor="adminId" className="block text-sm font-medium text-gray-700">
+                <form onSubmit={handleResetSubmit} className="space-y-3 sm:space-y-4 lg:space-y-6">
+                  <motion.div
+                    initial={{ x: -20, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    transition={{ delay: 0.4, duration: 0.5 }}
+                  >
+                    <label htmlFor="adminId" className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2">
                       Select Admin
                     </label>
                     <select
                       name="adminId"
                       id="adminId"
                       required
-                      className={`mt-1 block w-full px-3 py-2 border ${
-                        resetErrors.adminId ? 'border-red-300' : 'border-gray-300'
-                      } rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
+                      className={`block w-full px-2 sm:px-3 lg:px-4 py-2 sm:py-2.5 lg:py-3 text-xs sm:text-sm lg:text-base border rounded-lg sm:rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
+                        resetErrors.adminId ? 'border-red-300 bg-red-50' : 'border-gray-200 bg-gray-50 hover:bg-white focus:bg-white'
+                      }`}
                       value={resetForm.adminId}
                       onChange={handleResetChange}
                     >
@@ -352,17 +387,22 @@ const SuperAdminPanel = () => {
                     </select>
                     {resetErrors.adminId && (
                       <motion.p
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        className="mt-1 text-sm text-red-600"
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="mt-2 text-sm text-red-600"
                       >
                         {resetErrors.adminId}
                       </motion.p>
                     )}
-                  </div>
+                  </motion.div>
 
-                  <div>
-                    <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700">
+                  <motion.div
+                    initial={{ x: -20, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    transition={{ delay: 0.5, duration: 0.5 }}
+                  >
+                    <label htmlFor="newPassword" className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2">
                       New Password
                     </label>
                     <input
@@ -370,46 +410,55 @@ const SuperAdminPanel = () => {
                       name="newPassword"
                       id="newPassword"
                       required
-                      className={`mt-1 block w-full px-3 py-2 border ${
-                        resetErrors.newPassword ? 'border-red-300' : 'border-gray-300'
-                      } rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
+                      className={`block w-full px-2 sm:px-3 lg:px-4 py-2 sm:py-2.5 lg:py-3 text-xs sm:text-sm lg:text-base border rounded-lg sm:rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
+                        resetErrors.newPassword ? 'border-red-300 bg-red-50' : 'border-gray-200 bg-gray-50 hover:bg-white focus:bg-white'
+                      }`}
+                      placeholder="Enter new password"
                       value={resetForm.newPassword}
                       onChange={handleResetChange}
                     />
                     {resetErrors.newPassword && (
                       <motion.p
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        className="mt-1 text-sm text-red-600"
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="mt-2 text-sm text-red-600"
                       >
                         {resetErrors.newPassword}
                       </motion.p>
                     )}
-                  </div>
+                  </motion.div>
 
-                  <div>
+                  <motion.div
+                    initial={{ y: 20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ delay: 0.6, duration: 0.5 }}
+                  >
                     <button
                       type="submit"
                       disabled={isLoading}
-                      className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="w-full flex justify-center py-2.5 sm:py-3 lg:py-3.5 px-3 sm:px-4 lg:px-6 border border-transparent text-xs sm:text-sm lg:text-base font-medium rounded-lg sm:rounded-xl text-white bg-gradient-to-r from-red-600 via-red-700 to-red-600 hover:from-red-700 hover:via-red-800 hover:to-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] min-h-[40px] sm:min-h-[44px] lg:min-h-[48px]"
                     >
                       {isLoading ? (
                         <motion.div
                           animate={{ rotate: 360 }}
                           transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                          className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
+                          className="w-3.5 h-3.5 sm:w-4 sm:h-4 lg:w-5 lg:h-5 border-2 border-white border-t-transparent rounded-full"
                         />
                       ) : (
                         'Reset Password'
                       )}
                     </button>
-                  </div>
+                  </motion.div>
                 </form>
               </motion.div>
             )}
           </div>
         </div>
       </motion.div>
+      
+      <div className="absolute top-10 left-10 w-32 h-32 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full opacity-20 blur-xl"></div>
+      <div className="absolute bottom-10 right-10 w-40 h-40 bg-gradient-to-r from-pink-400 to-indigo-500 rounded-full opacity-20 blur-xl"></div>
     </div>
   )
 }

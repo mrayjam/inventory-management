@@ -128,12 +128,13 @@ const ChangePasswordPage = () => {
 
   return (
     <>
-      <div className="min-h-screen py-4 px-4 sm:py-6 sm:px-6 lg:px-8 flex items-center justify-center overflow-x-hidden">
+      <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-indigo-100 via-purple-50 to-blue-100"></div>
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.6, type: "spring", damping: 25 }}
-          className="w-full max-w-sm sm:max-w-md max-[455px]:max-w-[95%]"
+          className="relative z-10 w-full max-w-sm sm:max-w-md max-[455px]:max-w-[95%]"
         >
         <motion.div
           className="bg-white/90 backdrop-blur-xl shadow-2xl rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 border border-white/20 relative"
@@ -363,6 +364,9 @@ const ChangePasswordPage = () => {
           </form>
         </motion.div>
       </motion.div>
+      
+      <div className="absolute top-10 left-10 w-32 h-32 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full opacity-20 blur-xl"></div>
+      <div className="absolute bottom-10 right-10 w-40 h-40 bg-gradient-to-r from-pink-400 to-indigo-500 rounded-full opacity-20 blur-xl"></div>
     </div>
 
     <AnimatePresence>

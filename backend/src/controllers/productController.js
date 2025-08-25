@@ -134,7 +134,7 @@ export const createProduct = async (req, res) => {
       name,
       category,
       sku: sku.toUpperCase(),
-      imageUrl: images.length > 0 ? images[0].url : 'https://via.placeholder.com/300',
+      imageUrl: images.length > 0 ? images[0].url : 'https://images.unsplash.com/photo-1586880244386-8b3e34c8382c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&q=80',
       images,
       description: description || 'No description provided'
     });
@@ -212,7 +212,9 @@ export const updateProduct = async (req, res) => {
 
     let historyEvents = [];
     let currentImages = [...(product.images || [])];
+    let imageFieldChanged = false; // Track if image field was explicitly changed
 
+    // Handle deleted images (explicit removal)
     if (updates.deletedImages) {
       console.log('Processing deleted images:', updates.deletedImages);
       let deletedImageIds = [];
@@ -227,6 +229,7 @@ export const updateProduct = async (req, res) => {
       }
 
       if (Array.isArray(deletedImageIds) && deletedImageIds.length > 0) {
+        // Delete from Cloudinary
         for (const publicId of deletedImageIds) {
           try {
             await getCloudinary().uploader.destroy(publicId);
@@ -236,7 +239,9 @@ export const updateProduct = async (req, res) => {
           }
         }
         
+        // Remove from current images array
         currentImages = currentImages.filter(img => !deletedImageIds.includes(img.publicId));
+        imageFieldChanged = true;
         historyEvents.push({
           action: 'image_removed',
           details: `Removed ${deletedImageIds.length} image(s)`
@@ -245,6 +250,7 @@ export const updateProduct = async (req, res) => {
       delete updates.deletedImages;
     }
 
+    // Handle new uploaded images (explicit addition)
     if (req.files && req.files.length > 0) {
       console.log('Processing new uploaded files:', req.files.length);
       const newImages = [];
@@ -261,14 +267,27 @@ export const updateProduct = async (req, res) => {
       });
 
       currentImages = [...currentImages, ...newImages];
+      imageFieldChanged = true;
       historyEvents.push({
         action: 'image_added',
         details: `Added ${newImages.length} new image(s)`
       });
     }
 
-    updates.images = currentImages;
-    updates.imageUrl = currentImages.length > 0 ? currentImages[0].url : 'https://via.placeholder.com/300';
+    // Three-state logic: only update images if explicitly changed
+    if (imageFieldChanged) {
+      console.log('Image field was explicitly changed, updating images');
+      updates.images = currentImages;
+      updates.imageUrl = currentImages.length > 0 
+        ? currentImages[0].url 
+        : 'https://images.unsplash.com/photo-1586880244386-8b3e34c8382c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&q=80';
+      
+      console.log('Final images array:', currentImages.length, 'images');
+      console.log('Images being saved:', currentImages.map(img => ({ url: img.url, publicId: img.publicId })));
+    } else {
+      console.log('Image field was not changed, preserving existing images');
+      // Don't include images or imageUrl in updates to preserve existing values
+    }
 
     console.log('Final updates object:', updates);
 
