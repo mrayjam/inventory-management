@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import toast from 'react-hot-toast'
 import { useAuth } from '../contexts/AuthContext'
 import { suppliersApi } from '../services/apiClient'
+import { SkeletonSuppliersTable, SkeletonCarousel } from '../components/Skeleton'
 import {
   Carousel,
   CarouselContent,
@@ -330,8 +331,41 @@ export default function Suppliers() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+      <div className="w-full max-w-full overflow-x-hidden min-w-0">
+        {/* Header Skeleton */}
+        <div className="mb-6">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+              <div className="animate-pulse h-8 bg-slate-200 rounded w-48 mb-2"></div>
+              <div className="animate-pulse h-4 bg-slate-200 rounded w-64"></div>
+            </div>
+            <div className="animate-pulse h-10 bg-slate-200 rounded-lg w-32"></div>
+          </div>
+        </div>
+
+        {/* Search and Filters Skeleton */}
+        <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-sm border border-white/30 mb-6">
+          <div className="p-6 border-b border-white/20">
+            <div className="space-y-4">
+              <div className="animate-pulse h-10 bg-slate-200 rounded-lg w-full"></div>
+              <div className="flex flex-wrap items-center gap-3">
+                <div className="animate-pulse h-8 bg-slate-200 rounded w-32"></div>
+                <div className="animate-pulse h-8 bg-slate-200 rounded w-32"></div>
+                <div className="animate-pulse h-8 bg-slate-200 rounded w-24"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Table/Carousel Skeleton */}
+        <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-sm border border-white/30">
+          <SkeletonSuppliersTable />
+        </div>
+
+        {/* Mobile Carousel Skeleton */}
+        <div className="max-[900px]:block min-[901px]:hidden">
+          <SkeletonCarousel />
+        </div>
       </div>
     )
   }
@@ -340,14 +374,14 @@ export default function Suppliers() {
     <div className="w-full max-w-full overflow-x-hidden min-w-0">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 mr-3 sm:mb-8">
         <div>
-          <h1 className="text-xl sm:text-2xl max-[1440px]:text-xl lg:text-3xl font-bold text-slate-900">Suppliers</h1>
-          <p className="text-xs sm:text-sm max-[1440px]:text-xs lg:text-base text-slate-600 mt-1">Manage your supplier relationships</p>
+          <h1 className="text-xl sm:text-2xl max-[2178px]:text-xl lg:text-3xl font-bold text-slate-900">Suppliers</h1>
+          <p className="text-xs sm:text-sm max-[2178px]:text-xs lg:text-base text-slate-600 mt-1">Manage your supplier relationships</p>
         </div>
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={() => setModalState({ isOpen: true, supplier: null, mode: 'add' })}
-          className="bg-blue-600 text-white px-3 sm:px-4 max-[1440px]:px-3 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-700 transition-colors text-xs sm:text-sm max-[1440px]:text-xs lg:text-base"
+          className="bg-blue-600 text-white px-3 sm:px-4 max-[2178px]:px-3 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-700 transition-colors text-xs sm:text-sm max-[2178px]:text-xs lg:text-base"
         >
           <PlusIcon className="h-4 w-4 sm:h-5 sm:w-5" />
           Add Supplier
@@ -478,7 +512,7 @@ export default function Suppliers() {
                     </div>
                   </td>
                 </motion.tr>
-              ))
+              ))}
             </tbody>
           </table>
           
