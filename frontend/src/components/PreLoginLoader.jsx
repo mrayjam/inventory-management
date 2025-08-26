@@ -5,7 +5,6 @@ const PreLoginLoader = ({ onComplete }) => {
   const [percentage, setPercentage] = useState(0)
   const [isPaused, setIsPaused] = useState(false)
   const timerRef = useRef(null)
-  const pausedTimeRef = useRef(0)
 
   useEffect(() => {
     const duration = 3000 // 3 seconds total

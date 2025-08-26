@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, memo } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { useDropzone } from 'react-dropzone'
 import { AnimatePresence, motion } from 'framer-motion'
 import { 
@@ -63,7 +63,6 @@ const ImageUpload = ({
       setSelectedImages(updatedImages)
       
       const validFileObjects = updatedImages.map(img => img.file).filter(file => file instanceof File)
-      console.log('ImageUpload - Sending', validFileObjects.length, 'valid File objects to parent')
       onImagesChange(validFileObjects)
     }
   }, [selectedImages, visibleExistingImages, maxImages, maxSizeInMB, onImagesChange])
@@ -82,7 +81,6 @@ const ImageUpload = ({
     setSelectedImages(updatedImages)
     
     const validFileObjects = updatedImages.map(img => img.file).filter(file => file instanceof File)
-    console.log('ImageUpload - After removal, sending', validFileObjects.length, 'valid File objects to parent')
     onImagesChange(validFileObjects)
   }
 
