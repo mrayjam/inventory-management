@@ -2,9 +2,6 @@ import axios from 'axios'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api'
 
-// Simple in-memory cache
-const cache = new Map()
-const CACHE_DURATION = 5 * 60 * 1000 // 5 minutes
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
