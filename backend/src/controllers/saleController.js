@@ -45,8 +45,6 @@ export const getSaleById = async (req, res) => {
 export const createSale = async (req, res) => {
   try {
     const { productId, quantity, salePrice, customer = '', saleDate } = req.body;
-
-    // Validate required fields
     if (!productId) {
       return res.status(400).json({ message: 'Product ID is required' });
     }
@@ -58,21 +56,15 @@ export const createSale = async (req, res) => {
     if (salePrice === undefined || salePrice === null || salePrice < 0) {
       return res.status(400).json({ message: 'Sale price is required and cannot be negative' });
     }
-
-    // Find product and validate existence
     const product = await Product.findById(productId);
     if (!product) {
       return res.status(404).json({ message: 'Product not found' });
     }
-
-    // Validate sufficient stock
     if (product.stock < quantity) {
       return res.status(400).json({ 
         message: `Insufficient stock. Available: ${product.stock}, Requested: ${quantity}` 
       });
     }
-
-    // Create sale document
     const sale = new Sale({
       productId,
       productName: product.name,
@@ -85,13 +77,9 @@ export const createSale = async (req, res) => {
     });
 
     await sale.save();
-
-    // Update product stock
     const oldStock = product.stock;
     product.stock -= quantity;
     await product.save();
-
-    // Create product history record
     await new ProductHistory({
       product: product._id,
       action: 'stock_changed',
@@ -101,8 +89,6 @@ export const createSale = async (req, res) => {
       newValue: product.stock,
       details: `Stock decreased by ${quantity} units via sale (${oldStock} → ${product.stock})`
     }).save();
-
-    // Return both sale and updated product
     res.status(201).json({
       success: true,
       sale: sale.toJSON(),
@@ -111,8 +97,6 @@ export const createSale = async (req, res) => {
     });
   } catch (error) {
     console.error('Create sale error:', error);
-    
-    // Handle validation errors
     if (error.name === 'ValidationError') {
       return res.status(400).json({ 
         message: 'Validation error', 
@@ -120,8 +104,6 @@ export const createSale = async (req, res) => {
         error: error.message
       });
     }
-    
-    // Handle cast errors (invalid ObjectId)
     if (error.name === 'CastError' && error.kind === 'ObjectId') {
       return res.status(400).json({ 
         message: 'Invalid product ID format',

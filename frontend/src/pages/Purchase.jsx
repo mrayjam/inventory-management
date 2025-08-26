@@ -29,23 +29,18 @@ import { useDashboard } from '../contexts/DashboardContext'
 import { purchasesApi, productsApi, suppliersApi } from '../services/apiClient'
 import { SkeletonPurchasesTable, SkeletonCarousel } from '../components/Skeleton'
 
-// Utility function to format currency
 const formatCurrency = (amount) => {
   if (amount === null || amount === undefined || isNaN(amount)) {
     return '$0.00'
   }
   
   const numAmount = parseFloat(amount)
-  
-  // For amounts >= 1000, use K notation
   if (numAmount >= 1000) {
     return `$${(numAmount / 1000).toFixed(1)}K`
   }
   
   return `$${numAmount.toFixed(2)}`
 }
-
-// Purchase Detail Modal Component
 const PurchaseDetailModal = ({ isOpen, onClose, purchase, onEditPurchase }) => {
   if (!isOpen || !purchase) return null
 
@@ -159,8 +154,6 @@ const PurchaseDetailModal = ({ isOpen, onClose, purchase, onEditPurchase }) => {
     </motion.div>
   )
 }
-
-// Purchase Form Modal Component
 const PurchaseModal = ({ 
   isOpen, 
   onClose, 
@@ -497,8 +490,6 @@ const PurchaseModal = ({
     </motion.div>
   )
 }
-
-// Custom hook for window size
 const useWindowSize = () => {
   const [windowSize, setWindowSize] = useState({
     width: typeof window !== 'undefined' ? window.innerWidth : 0
@@ -512,15 +503,13 @@ const useWindowSize = () => {
     }
 
     window.addEventListener('resize', handleResize)
-    handleResize() // Set initial size
+    handleResize()
 
     return () => window.removeEventListener('resize', handleResize)
   }, [])
 
   return windowSize
 }
-
-// Main Purchase Component
 export default function Purchase() {
   const [purchases, setPurchases] = useState([])
   const [products, setProducts] = useState([])
@@ -532,8 +521,6 @@ export default function Purchase() {
   const [currentTablePage, setCurrentTablePage] = useState(1)
   const tableItemsPerPage = 3
   const { width } = useWindowSize()
-  
-  // Modal states
   const [purchaseModal, setPurchaseModal] = useState({ 
     isOpen: false, 
     purchase: null, 
@@ -546,13 +533,9 @@ export default function Purchase() {
   
   const { token } = useAuth()
   const { refreshStats } = useDashboard()
-
-  // Load initial data
   useEffect(() => {
     loadAllData()
   }, [token])
-
-  // Reset pagination when search term changes
   useEffect(() => {
     setCurrentTablePage(1)
   }, [searchTerm, supplierFilter, dateFilter])
@@ -594,8 +577,6 @@ export default function Purchase() {
       console.error('Failed to refresh purchases:', error)
     }
   }
-
-  // Modal handlers
   const handleCreatePurchase = () => {
     setPurchaseModal({ isOpen: true, purchase: null, isLoading: false })
   }
@@ -615,8 +596,6 @@ export default function Purchase() {
   const handleCloseDetailModal = () => {
     setDetailModal({ isOpen: false, purchase: null })
   }
-
-  // CRUD operations
   const handleSavePurchase = async (purchaseData) => {
     setPurchaseModal(prev => ({ ...prev, isLoading: true }))
     const loadingToast = toast.loading(
@@ -694,11 +673,7 @@ export default function Purchase() {
       }
     })
   }
-
-  // Get unique suppliers for filter dropdown
   const uniqueSuppliers = [...new Set(purchases.map(purchase => purchase.supplierName).filter(Boolean))].sort()
-
-  // Filter purchases based on search term and filters
   const filteredPurchases = purchases.filter(purchase => {
     const matchesSearch = (purchase.productName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
                          (purchase.supplierName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -713,8 +688,6 @@ export default function Purchase() {
     
     return matchesSearch && matchesSupplier && matchesDate
   })
-
-  // Table view pagination (3 rows per page)
   const totalTablePages = Math.ceil(filteredPurchases.length / tableItemsPerPage)
   const tableStartIndex = (currentTablePage - 1) * tableItemsPerPage
   const tableEndIndex = tableStartIndex + tableItemsPerPage
@@ -723,7 +696,6 @@ export default function Purchase() {
   if (loading) {
     return (
       <div className="w-full max-w-full overflow-x-hidden min-w-0">
-        {/* Header Skeleton */}
         <div className="mb-6 mr-3 sm:mb-8">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
@@ -734,7 +706,6 @@ export default function Purchase() {
           </div>
         </div>
 
-        {/* Search and Filters Skeleton */}
         <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-sm border border-white/30 mb-6">
           <div className="p-6 border-b border-white/20">
             <div className="space-y-4">
@@ -748,7 +719,6 @@ export default function Purchase() {
           </div>
         </div>
 
-        {/* Table/Carousel Skeleton */}
         <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-sm border border-white/30">
           {width > 1270 ? (
             <SkeletonPurchasesTable />
@@ -762,7 +732,6 @@ export default function Purchase() {
 
   return (
     <div className="w-full max-w-full overflow-x-hidden min-w-0">
-      {/* Header */}
       <div className="mb-6 mr-3 sm:mb-8">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
@@ -786,7 +755,6 @@ export default function Purchase() {
         </div>
       </div>
 
-      {/* Search and Filters */}
       <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-sm border border-white/30 mb-6">
         <div className="p-6 border-b border-white/20">
           <div className="space-y-4">
@@ -801,7 +769,6 @@ export default function Purchase() {
               />
             </div>
             
-            {/* Filter Row */}
             <div className="flex flex-wrap items-center gap-3">
               <div className="flex items-center gap-2">
                 <label className="text-xs font-medium text-slate-600 whitespace-nowrap">Supplier:</label>
@@ -947,7 +914,6 @@ export default function Purchase() {
                 </tbody>
               </table>
               
-              {/* Pagination Controls */}
               {!loading && totalTablePages > 1 && (
                 <div className="px-4 py-3 border-t border-slate-200 flex items-center justify-between">
                   <div className="text-xs sm:text-sm text-slate-500">
@@ -1069,7 +1035,6 @@ export default function Purchase() {
         )}
       </div>
 
-      {/* Modals */}
       <AnimatePresence>
         {purchaseModal.isOpen && (
           <PurchaseModal

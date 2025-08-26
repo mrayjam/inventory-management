@@ -52,12 +52,11 @@ const productSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Indexes for performance optimization
-productSchema.index({ category: 1 }); // For filtering by category
-productSchema.index({ name: 'text', description: 'text' }); // Text search
-productSchema.index({ createdAt: -1 }); // For sorting by creation date
-productSchema.index({ stock: 1 }); // For stock filtering
-productSchema.index({ price: 1 }); // For price filtering
+productSchema.index({ category: 1 });
+productSchema.index({ name: 'text', description: 'text' });
+productSchema.index({ createdAt: -1 });
+productSchema.index({ stock: 1 });
+productSchema.index({ price: 1 });
 
 productSchema.methods.toJSON = function() {
   const product = this.toObject();

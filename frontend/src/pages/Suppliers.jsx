@@ -66,7 +66,6 @@ const SupplierModal = ({ isOpen, onClose, supplier, mode, onSupplierSaved }) => 
         className="bg-white/95 backdrop-blur-xl rounded-2xl p-4 sm:p-6 lg:p-8 w-full max-w-xs sm:max-w-lg xl:max-w-2xl shadow-2xl border border-white/20 max-h-[90vh] overflow-y-auto relative"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Close Button */}
         <button
           onClick={onClose}
           className="absolute top-4 right-4 p-2 rounded-lg hover:bg-gray-100 transition-colors z-10"
@@ -222,8 +221,6 @@ export default function Suppliers() {
       loadSuppliers()
     }
   }, [token])
-
-  // Reset pagination when search term changes
   useEffect(() => {
     setCurrentTablePage(1)
   }, [searchTerm, categoryFilter, statusFilter])
@@ -233,8 +230,6 @@ export default function Suppliers() {
     setCategoryFilter('')
     setStatusFilter('')
   }
-
-  // Get unique categories for filter dropdown
   const categories = [...new Set(suppliers.map(supplier => supplier.category).filter(Boolean))].sort()
 
   const filteredSuppliers = suppliers.filter(supplier => {
@@ -248,8 +243,6 @@ export default function Suppliers() {
     
     return matchesSearch && matchesCategory && matchesStatus
   })
-
-  // Pagination logic
   const totalTablePages = Math.ceil(filteredSuppliers.length / tableItemsPerPage)
   const tableStartIndex = (currentTablePage - 1) * tableItemsPerPage
   const tableEndIndex = tableStartIndex + tableItemsPerPage
@@ -332,7 +325,6 @@ export default function Suppliers() {
   if (loading) {
     return (
       <div className="w-full max-w-full overflow-x-hidden min-w-0">
-        {/* Header Skeleton */}
         <div className="mb-6">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
@@ -343,7 +335,6 @@ export default function Suppliers() {
           </div>
         </div>
 
-        {/* Search and Filters Skeleton */}
         <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-sm border border-white/30 mb-6">
           <div className="p-6 border-b border-white/20">
             <div className="space-y-4">
@@ -357,12 +348,10 @@ export default function Suppliers() {
           </div>
         </div>
 
-        {/* Table/Carousel Skeleton */}
         <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-sm border border-white/30">
           <SkeletonSuppliersTable />
         </div>
 
-        {/* Mobile Carousel Skeleton */}
         <div className="max-[900px]:block min-[901px]:hidden">
           <SkeletonCarousel />
         </div>
@@ -390,7 +379,6 @@ export default function Suppliers() {
 
       <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-sm border border-white/30">
         <div className="p-6 border-b border-white/20">
-          {/* Search and Filters */}
           <div className="space-y-4">
             <div className="relative">
               <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-slate-400" />
@@ -403,7 +391,6 @@ export default function Suppliers() {
               />
             </div>
             
-            {/* Filter Row */}
             <div className="flex flex-wrap items-center gap-3">
               <div className="flex items-center gap-2">
                 <label className="text-xs font-medium text-slate-600 whitespace-nowrap">Category:</label>
@@ -448,7 +435,6 @@ export default function Suppliers() {
           </div>
         </div>
 
-        {/* Table View - Shows above 900px */}
         <div className="hidden min-[900px]:block overflow-x-auto">
           <table className="w-full">
             <thead className="bg-slate-50">
@@ -516,7 +502,6 @@ export default function Suppliers() {
             </tbody>
           </table>
           
-          {/* Pagination Controls */}
           {!loading && totalTablePages > 1 && (
             <div className="px-4 py-3 border-t border-slate-200 flex items-center justify-between">
               <div className="text-xs sm:text-sm text-slate-500">
@@ -545,7 +530,6 @@ export default function Suppliers() {
           )}
         </div>
 
-        {/* Carousel View - Shows at 900px and below */}
         <div className="max-[900px]:block min-[901px]:hidden px-3 sm:px-4 py-6">
           <Carousel
             opts={{

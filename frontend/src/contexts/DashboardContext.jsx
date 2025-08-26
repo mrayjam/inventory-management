@@ -43,8 +43,6 @@ export const DashboardProvider = ({ children }) => {
       
       const lowStockProducts = products.filter(p => p.stock < 20)
       const activeSuppliers = suppliers.filter(s => s.status === 'Active')
-      
-      // Only update if values are different to prevent unnecessary re-animations
       const newStats = {
         totalProducts: products.length,
         lowStockItems: lowStockProducts.length,

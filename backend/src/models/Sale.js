@@ -47,13 +47,11 @@ const saleSchema = new mongoose.Schema({
 }, {
   timestamps: true
 });
-
-// Indexes for performance optimization
-saleSchema.index({ productId: 1 }); // For product-based queries
-saleSchema.index({ saleDate: -1 }); // For date sorting
-saleSchema.index({ createdAt: -1 }); // For recent sales
-saleSchema.index({ createdBy: 1 }); // For user-based queries
-saleSchema.index({ productId: 1, saleDate: -1 }); // Compound index for analytics
+saleSchema.index({ productId: 1 });
+saleSchema.index({ saleDate: -1 });
+saleSchema.index({ createdAt: -1 });
+saleSchema.index({ createdBy: 1 });
+saleSchema.index({ productId: 1, saleDate: -1 });
 
 saleSchema.pre('save', function(next) {
   this.totalAmount = this.quantity * this.salePrice;

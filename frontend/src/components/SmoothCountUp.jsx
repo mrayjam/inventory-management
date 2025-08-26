@@ -2,10 +2,6 @@ import React, { memo } from 'react'
 import { motion } from 'framer-motion'
 import { useFormattedCountUp } from '../hooks/useCountUp'
 
-/**
- * Example component demonstrating smooth count-up animations
- * This shows how to implement count-up without loading flickers
- */
 const SmoothCountUp = memo(function SmoothCountUp({
   value,
   prefix = '',
@@ -15,7 +11,6 @@ const SmoothCountUp = memo(function SmoothCountUp({
   className = '',
   preserveValue = true
 }) {
-  // Parse numeric value from any format
   const numericValue = typeof value === 'string' 
     ? parseFloat(value.replace(/[^0-9.-]/g, '')) || 0 
     : value || 0
@@ -51,27 +46,3 @@ const SmoothCountUp = memo(function SmoothCountUp({
 })
 
 export default SmoothCountUp
-
-/**
- * Usage Examples:
- * 
- * // Basic usage
- * <SmoothCountUp value={1250} prefix="$" />
- * 
- * // With custom delay and formatting
- * <SmoothCountUp 
- *   value={45678} 
- *   prefix="$" 
- *   suffix="K" 
- *   delay={200}
- *   duration={2000}
- * />
- * 
- * // Preserve value during load
- * <SmoothCountUp 
- *   value={stats.totalRevenue} 
- *   prefix="$" 
- *   preserveValue={true}
- *   className="text-2xl text-green-600"
- * />
- */

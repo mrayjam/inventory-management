@@ -6,8 +6,6 @@ import Supplier from '../models/Supplier.js';
 export const getAllPurchases = async (req, res) => {
   try {
     const purchases = await Purchase.find().sort({ createdAt: -1 });
-    
-    // Ensure totalAmount is calculated for each purchase (in case of legacy data)
     const purchasesWithTotal = purchases.map(purchase => {
       const purchaseObj = purchase.toJSON();
       if (!purchaseObj.totalAmount || purchaseObj.totalAmount === 0) {

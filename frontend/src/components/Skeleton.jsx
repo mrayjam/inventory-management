@@ -1,6 +1,3 @@
-// Skeleton Components for Loading States
-
-// Base skeleton element
 const SkeletonBase = ({ className = "", width = "full" }) => {
   const widthClasses = {
     full: "w-full",
@@ -19,8 +16,6 @@ const SkeletonBase = ({ className = "", width = "full" }) => {
     <div className={`animate-pulse bg-slate-200 rounded ${widthClasses[width]} ${className}`} />
   )
 }
-
-// Stats Cards Skeleton (for Dashboard)
 export const SkeletonStatsCards = ({ count = 6 }) => (
   <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 min-[2178px]:grid-cols-6 gap-4 sm:gap-6 mb-6 lg:mb-8 px-3">
     {Array.from({ length: count }).map((_, index) => (
@@ -38,8 +33,6 @@ export const SkeletonStatsCards = ({ count = 6 }) => (
     ))}
   </div>
 )
-
-// Chart Skeleton
 export const SkeletonChart = ({ height = "300px" }) => (
   <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-sm border border-white/30 p-3 sm:p-4 lg:p-6">
     <SkeletonBase className="h-4 mb-4" width="1/3" />
@@ -56,8 +49,6 @@ export const SkeletonChart = ({ height = "300px" }) => (
     </div>
   </div>
 )
-
-// Table Skeleton
 export const SkeletonTable = ({ columns = 5, rows = 3 }) => (
   <div className="overflow-x-auto">
     <table className="w-full">
@@ -78,14 +69,12 @@ export const SkeletonTable = ({ columns = 5, rows = 3 }) => (
             {Array.from({ length: columns }).map((_, colIndex) => (
               <td key={colIndex} className="px-4 py-3">
                 {colIndex === columns - 1 ? (
-                  // Actions column
                   <div className="flex justify-center gap-1">
                     <SkeletonBase className="h-8 w-8 rounded-lg" />
                     <SkeletonBase className="h-8 w-8 rounded-lg" />
                     <SkeletonBase className="h-8 w-8 rounded-lg" />
                   </div>
                 ) : colIndex === 0 ? (
-                  // First column (usually has image/icon + text)
                   <div className="flex items-center gap-3">
                     <SkeletonBase className="h-10 w-10 rounded-lg" />
                     <div className="flex-1">
@@ -94,7 +83,6 @@ export const SkeletonTable = ({ columns = 5, rows = 3 }) => (
                     </div>
                   </div>
                 ) : (
-                  // Regular columns
                   <SkeletonBase className="h-6 rounded-full" width="3/4" />
                 )}
               </td>
@@ -105,28 +93,18 @@ export const SkeletonTable = ({ columns = 5, rows = 3 }) => (
     </table>
   </div>
 )
-
-// Products Table Skeleton (specific to Products page)
 export const SkeletonProductsTable = () => (
   <SkeletonTable columns={5} rows={3} />
 )
-
-// Purchases Table Skeleton
 export const SkeletonPurchasesTable = () => (
   <SkeletonTable columns={7} rows={3} />
 )
-
-// Sales Table Skeleton  
 export const SkeletonSalesTable = () => (
   <SkeletonTable columns={6} rows={3} />
 )
-
-// Suppliers Table Skeleton
 export const SkeletonSuppliersTable = () => (
   <SkeletonTable columns={5} rows={3} />
 )
-
-// Carousel Skeleton (for mobile views)
 export const SkeletonCarousel = ({ itemCount = 3 }) => (
   <div className="px-3 sm:px-4 lg:px-6 py-6">
     <div className="flex gap-4 overflow-hidden">
@@ -177,8 +155,6 @@ export const SkeletonCarousel = ({ itemCount = 3 }) => (
     </div>
   </div>
 )
-
-// Form Modal Skeleton
 export const SkeletonModal = () => (
   <div className="fixed inset-0 bg-black/20 backdrop-blur-md flex items-center justify-center z-50 p-3 sm:p-4">
     <div className="bg-white/95 backdrop-blur-xl rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-white/20">
@@ -209,8 +185,6 @@ export const SkeletonModal = () => (
     </div>
   </div>
 )
-
-// Full Page Loading Skeleton
 export const SkeletonPage = () => (
   <div className="flex items-center justify-center h-64">
     <div className="text-center">

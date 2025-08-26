@@ -1,14 +1,10 @@
 import mongoose from 'mongoose';
 import Purchase from '../models/Purchase.js';
 import connectDatabase from '../config/database.js';
-
-// Script to migrate existing purchases and ensure totalAmount is calculated
 const migratePurchases = async () => {
   try {
     await connectDatabase();
     console.log('Connected to database');
-
-    // Find all purchases without totalAmount or with totalAmount = 0
     const purchases = await Purchase.find({
       $or: [
         { totalAmount: { $exists: false } },
@@ -28,8 +24,6 @@ const migratePurchases = async () => {
     }
 
     console.log(`Successfully updated ${updatedCount} purchases`);
-    
-    // Verify the update
     const remainingPurchases = await Purchase.find({
       $or: [
         { totalAmount: { $exists: false } },
@@ -51,8 +45,6 @@ const migratePurchases = async () => {
     console.log('Database connection closed');
   }
 };
-
-// Run the migration if this file is executed directly
 if (import.meta.url === `file://${process.argv[1]}`) {
   migratePurchases();
 }
