@@ -52,6 +52,8 @@ export const AuthProvider = ({ children }) => {
     setUser(null)
     localStorage.removeItem('authToken')
     localStorage.removeItem('authUser')
+    // Set flag to indicate this is a logout redirect
+    sessionStorage.setItem('justLoggedOut', 'true')
   }
 
   const changePassword = async (currentPassword, newPassword) => {
