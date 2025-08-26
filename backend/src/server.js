@@ -42,6 +42,12 @@ if (process.env.NODE_ENV === 'development') {
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
+// Compression middleware for better performance
+import compression from 'compression';
+if (process.env.NODE_ENV === 'production') {
+  app.use(compression());
+}
+
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 app.get('/api/health', (req, res) => {

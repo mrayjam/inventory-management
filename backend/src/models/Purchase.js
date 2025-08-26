@@ -52,6 +52,14 @@ const purchaseSchema = new mongoose.Schema({
   timestamps: true
 });
 
+// Indexes for performance optimization
+purchaseSchema.index({ product: 1 }); // For product-based queries
+purchaseSchema.index({ supplier: 1 }); // For supplier-based queries
+purchaseSchema.index({ purchaseDate: -1 }); // For date sorting
+purchaseSchema.index({ createdAt: -1 }); // For recent purchases
+purchaseSchema.index({ createdBy: 1 }); // For user-based queries
+purchaseSchema.index({ product: 1, purchaseDate: -1 }); // Compound index for analytics
+
 purchaseSchema.pre('save', function(next) {
   this.totalAmount = this.quantity * this.unitPrice;
   next();
