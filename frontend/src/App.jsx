@@ -82,8 +82,12 @@ function App() {
                         <SuperAdminPanel />
                       </Suspense>
                     </ProtectedRoute>
-                  } 
-                />
+                  }/>
+                  <Route path="*" element={
+                  <Suspense fallback={<PageLoader />}>
+                    <Dashboard />
+                  </Suspense>
+                } />
               </Route>
             </Routes>
           </div>
