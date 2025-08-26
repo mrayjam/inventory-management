@@ -1,10 +1,10 @@
-import { useState } from 'react'
-import { Outlet, Link, useLocation } from 'react-router-dom'
-import { motion, AnimatePresence } from 'framer-motion'
-import Logo from './Logo'
-import { 
-  ChartBarIcon, 
-  CubeIcon, 
+import { useState } from "react";
+import { Outlet, Link, useLocation } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import Logo from "./Logo";
+import {
+  ChartBarIcon,
+  CubeIcon,
   BuildingStorefrontIcon,
   HomeIcon,
   KeyIcon,
@@ -13,36 +13,38 @@ import {
   Bars3Icon,
   XMarkIcon,
   ShoppingCartIcon,
-  CurrencyDollarIcon
-} from '@heroicons/react/24/outline'
-import { useAuth } from '../contexts/AuthContext'
+  CurrencyDollarIcon,
+} from "@heroicons/react/24/outline";
+import { useAuth } from "../contexts/AuthContext";
 
 export default function Layout() {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-  const location = useLocation()
-  const { user, logout, isSuperAdmin } = useAuth()
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const location = useLocation();
+  const { user, logout, isSuperAdmin } = useAuth();
 
   const navigation = [
-    { name: 'Dashboard', href: '/', icon: HomeIcon },
-    { name: 'Products', href: '/products', icon: CubeIcon },
-    { name: 'Suppliers', href: '/suppliers', icon: BuildingStorefrontIcon },
-    { name: 'Sales', href: '/sales', icon: CurrencyDollarIcon },
-    { name: 'Purchases', href: '/purchases', icon: ShoppingCartIcon },
-    { name: 'Analytics', href: '/analytics', icon: ChartBarIcon },
-  ]
+    { name: "Dashboard", href: "/", icon: HomeIcon },
+    { name: "Products", href: "/products", icon: CubeIcon },
+    { name: "Suppliers", href: "/suppliers", icon: BuildingStorefrontIcon },
+    { name: "Purchases", href: "/purchases", icon: ShoppingCartIcon },
+    { name: "Sales", href: "/sales", icon: CurrencyDollarIcon },
+    { name: "Analytics", href: "/analytics", icon: ChartBarIcon },
+  ];
 
   const userMenu = [
-    { name: 'Change Password', href: '/change-password', icon: KeyIcon },
-    ...(isSuperAdmin() ? [{ name: 'Super Admin', href: '/super-admin', icon: UserPlusIcon }] : []),
-  ]
+    { name: "Change Password", href: "/change-password", icon: KeyIcon },
+    ...(isSuperAdmin()
+      ? [{ name: "Super Admin", href: "/super-admin", icon: UserPlusIcon }]
+      : []),
+  ];
 
   const handleLogout = () => {
-    logout()
-  }
+    logout();
+  };
 
   const closeMobileMenu = () => {
-    setIsMobileMenuOpen(false)
-  }
+    setIsMobileMenuOpen(false);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 relative overflow-hidden">
@@ -58,7 +60,7 @@ export default function Layout() {
           transition={{
             duration: 20,
             repeat: Infinity,
-            ease: "easeInOut"
+            ease: "easeInOut",
           }}
         />
         <motion.div
@@ -72,7 +74,7 @@ export default function Layout() {
             duration: 25,
             repeat: Infinity,
             ease: "easeInOut",
-            delay: 5
+            delay: 5,
           }}
         />
         <motion.div
@@ -86,7 +88,7 @@ export default function Layout() {
             duration: 30,
             repeat: Infinity,
             ease: "easeInOut",
-            delay: 10
+            delay: 10,
           }}
         />
         <motion.div
@@ -100,10 +102,10 @@ export default function Layout() {
             duration: 18,
             repeat: Infinity,
             ease: "easeInOut",
-            delay: 8
+            delay: 8,
           }}
         />
-        
+
         {/* Floating Polygons */}
         <motion.div
           className="absolute top-1/3 left-1/3 w-16 h-16 bg-gradient-to-br from-blue-300/30 to-indigo-300/30 rounded-lg"
@@ -115,7 +117,7 @@ export default function Layout() {
           transition={{
             duration: 35,
             repeat: Infinity,
-            ease: "easeInOut"
+            ease: "easeInOut",
           }}
         />
         <motion.div
@@ -129,7 +131,7 @@ export default function Layout() {
             duration: 28,
             repeat: Infinity,
             ease: "easeInOut",
-            delay: 15
+            delay: 15,
           }}
         />
       </div>
@@ -156,57 +158,63 @@ export default function Layout() {
               <Logo size="medium" showIcon={true} />
             </div>
           </div>
-          
+
           <nav className="mt-6 flex-1">
             {navigation.map((item) => {
-              const Icon = item.icon
-              const isActive = location.pathname === item.href
+              const Icon = item.icon;
+              const isActive = location.pathname === item.href;
               return (
                 <Link
                   key={item.name}
                   to={item.href}
                   className={`flex items-center px-4 sm:px-6 py-2 sm:py-3 text-xs sm:text-sm font-medium transition-colors ${
                     isActive
-                      ? 'bg-blue-50 text-blue-700 border-r-2 border-blue-700'
-                      : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                      ? "bg-blue-50 text-blue-700 border-r-2 border-blue-700"
+                      : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
                   }`}
                 >
                   <Icon className="mr-2 sm:mr-3 h-4 w-4 sm:h-5 sm:w-5" />
                   {item.name}
                 </Link>
-              )
+              );
             })}
           </nav>
 
           <div className="border-t border-slate-200 p-4">
             <div className="flex items-center mb-4">
               <div className="flex-1">
-                <p className="text-xs sm:text-sm font-medium text-slate-700">{user?.name}</p>
-                <p className="text-[10px] sm:text-xs text-slate-500">{user?.email}</p>
-                <p className="text-[10px] sm:text-xs text-slate-400 capitalize">{user?.role?.replace('_', ' ')}</p>
+                <p className="text-xs sm:text-sm font-medium text-slate-700">
+                  {user?.name}
+                </p>
+                <p className="text-[10px] sm:text-xs text-slate-500">
+                  {user?.email}
+                </p>
+                <p className="text-[10px] sm:text-xs text-slate-400 capitalize">
+                  {user?.role?.replace("_", " ")}
+                </p>
               </div>
             </div>
-            
+
             <div className="space-y-1">
               {userMenu.map((item) => {
-                const Icon = item.icon
-                const isActive = location.pathname === item.href
+                const Icon = item.icon;
+                const isActive = location.pathname === item.href;
                 return (
                   <Link
                     key={item.name}
                     to={item.href}
                     className={`flex items-center px-2 sm:px-3 py-1 sm:py-2 text-xs sm:text-sm font-medium rounded-md transition-colors ${
                       isActive
-                        ? 'bg-blue-50 text-blue-700'
-                        : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                        ? "bg-blue-50 text-blue-700"
+                        : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
                     }`}
                   >
                     <Icon className="mr-2 sm:mr-3 h-3 w-3 sm:h-4 sm:w-4" />
                     {item.name}
                   </Link>
-                )
+                );
               })}
-              
+
               <button
                 onClick={handleLogout}
                 className="w-full flex items-center px-2 sm:px-3 py-1 sm:py-2 text-xs sm:text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-md transition-colors"
@@ -241,7 +249,6 @@ export default function Layout() {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <Logo size="medium" showIcon={true} />
-                     
                     </div>
                     <button
                       onClick={closeMobileMenu}
@@ -254,8 +261,8 @@ export default function Layout() {
 
                 <nav className="flex-1 py-4">
                   {navigation.map((item, index) => {
-                    const Icon = item.icon
-                    const isActive = location.pathname === item.href
+                    const Icon = item.icon;
+                    const isActive = location.pathname === item.href;
                     return (
                       <motion.div
                         key={item.name}
@@ -268,31 +275,35 @@ export default function Layout() {
                           onClick={closeMobileMenu}
                           className={`flex items-center px-4 sm:px-6 py-2 sm:py-3 text-sm font-medium transition-colors ${
                             isActive
-                              ? 'bg-blue-50 text-blue-700 border-r-2 border-blue-700'
-                              : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                              ? "bg-blue-50 text-blue-700 border-r-2 border-blue-700"
+                              : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
                           }`}
                         >
                           <Icon className="mr-3 h-4 w-4 sm:h-5 sm:w-5" />
                           {item.name}
                         </Link>
                       </motion.div>
-                    )
+                    );
                   })}
                 </nav>
 
                 <div className="border-t border-slate-200 p-4">
                   <div className="flex items-center mb-4">
                     <div className="flex-1">
-                      <p className="text-sm font-medium text-slate-700">{user?.name}</p>
+                      <p className="text-sm font-medium text-slate-700">
+                        {user?.name}
+                      </p>
                       <p className="text-xs text-slate-500">{user?.email}</p>
-                      <p className="text-xs text-slate-400 capitalize">{user?.role?.replace('_', ' ')}</p>
+                      <p className="text-xs text-slate-400 capitalize">
+                        {user?.role?.replace("_", " ")}
+                      </p>
                     </div>
                   </div>
-                  
+
                   <div className="space-y-1">
                     {userMenu.map((item) => {
-                      const Icon = item.icon
-                      const isActive = location.pathname === item.href
+                      const Icon = item.icon;
+                      const isActive = location.pathname === item.href;
                       return (
                         <Link
                           key={item.name}
@@ -300,16 +311,16 @@ export default function Layout() {
                           onClick={closeMobileMenu}
                           className={`flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
                             isActive
-                              ? 'bg-blue-50 text-blue-700'
-                              : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                              ? "bg-blue-50 text-blue-700"
+                              : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
                           }`}
                         >
                           <Icon className="mr-3 h-4 w-4" />
                           {item.name}
                         </Link>
-                      )
+                      );
                     })}
-                    
+
                     <button
                       onClick={handleLogout}
                       className="w-full flex items-center px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-md transition-colors"
@@ -323,7 +334,7 @@ export default function Layout() {
             </>
           )}
         </AnimatePresence>
-        
+
         {/* Main Content */}
         <div className="flex-1 min-h-screen overflow-x-hidden">
           <main className="p-3 sm:p-4 lg:p-8 min-h-full">
@@ -334,5 +345,5 @@ export default function Layout() {
         </div>
       </div>
     </div>
-  )
+  );
 }
