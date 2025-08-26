@@ -25,6 +25,7 @@ export const DashboardProvider = ({ children }) => {
   })
   const [isInitialLoad, setIsInitialLoad] = useState(true)
   const [isDataReady, setIsDataReady] = useState(false)
+  const [loading, setLoading] = useState(true)
   
   const { token } = useAuth()
 
@@ -32,6 +33,7 @@ export const DashboardProvider = ({ children }) => {
     if (!token) return
     
     try {
+      setLoading(true)
       
       const [products, suppliers, revenueData] = await Promise.all([
         productsApi.getAll(),
@@ -56,12 +58,14 @@ export const DashboardProvider = ({ children }) => {
       
       setStats(newStats)
       setIsDataReady(true)
+      setLoading(false)
       
       if (isInitialLoad) {
         setIsInitialLoad(false)
       }
     } catch (error) {
       console.error('Failed to refresh dashboard stats:', error)
+      setLoading(false)
       if (error.response?.status === 401) {
         return
       }
@@ -70,7 +74,7 @@ export const DashboardProvider = ({ children }) => {
         setIsInitialLoad(false)
       }
     }
-  }, [token])
+  }, [token, isInitialLoad])
 
   const incrementPurchases = () => {
     setStats(prev => ({
@@ -87,6 +91,7 @@ export const DashboardProvider = ({ children }) => {
 
   const value = {
     stats,
+    loading,
     isDataReady,
     refreshStats,
     incrementPurchases
