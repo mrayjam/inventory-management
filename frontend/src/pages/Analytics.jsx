@@ -42,6 +42,7 @@ export default function Analytics() {
           analyticsApi.getAdvancedMetrics()
         ])
         
+        console.log(revenueResponse)
         setRevenueData(revenueResponse)
         setTopProducts(topProductsResponse)
         setCategoryData(categoryDistribution)
@@ -93,47 +94,66 @@ export default function Analytics() {
           {revenueData ? (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 lg:gap-x-3 lg:gap-y-6 lg:h-[220px] xl:h-[240px]">
               <div className={`rounded-lg p-4 lg:p-6 xl:p-8 h-20 lg:h-auto flex flex-col justify-between relative overflow-hidden ${
-                (advancedMetrics?.profit || 0) >= 0 ? 'bg-green-50' : 'bg-red-50'
+                (() => {
+                  const revenue = revenueData?.totalRevenue || 0;
+                  return revenue > 0 ? 'bg-green-50' : revenue < 0 ? 'bg-red-50' : 'bg-gray-50';
+                })()
               }`}>
                 <div>
-                  <p className={`text-sm lg:text-base xl:text-lg font-semibold ${
-                    (advancedMetrics?.profit || 0) >= 0 ? 'text-green-600' : 'text-red-600'
-                  }`}>
-                    {(advancedMetrics?.profit || 0) >= 0 ? 'Profit' : 'Loss'}
-                  </p>
-                  <p className={`text-2xl lg:text-3xl xl:text-4xl font-bold ${
-                    (advancedMetrics?.profit || 0) >= 0 ? 'text-green-800' : 'text-red-800'
+                  <p className={`text-xs lg:text-sm xl:text-base font-semibold ${
+                    (() => {
+                      const revenue = revenueData?.totalRevenue || 0;
+                      return revenue > 0 ? 'text-green-600' : revenue < 0 ? 'text-red-600' : 'text-gray-600';
+                    })()
                   }`}>
                     {(() => {
-                      const profitValue = Math.abs(advancedMetrics?.profit || 0);
-                      return profitValue >= 1000 
-                        ? `$${(profitValue / 1000).toFixed(1)}K`
-                        : `$${profitValue.toFixed(2)}`;
+                      const revenue = revenueData?.totalRevenue || 0;
+                      return revenue > 0 ? 'Profit' : revenue < 0 ? 'Loss' : 'Total Revenue';
+                    })()}
+                  </p>
+                  <p className={`text-lg lg:text-xl xl:text-2xl font-bold ${
+                    (() => {
+                      const revenue = revenueData?.totalRevenue || 0;
+                      return revenue > 0 ? 'text-green-800' : revenue < 0 ? 'text-red-800' : 'text-gray-800';
+                    })()
+                  }`}>
+                    {(() => {
+                      const revenue = revenueData?.totalRevenue || 0;
+                      const revenueValue = Math.abs(revenue);
+                      const sign = revenue < 0 ? '-' : '';
+                      return revenueValue >= 1000 
+                        ? `${sign}$${(revenueValue / 1000).toFixed(1)}K`
+                        : `${sign}$${revenueValue.toFixed(2)}`;
                     })()}
                   </p>
                 </div>
                 <div className={`absolute bottom-0 left-0 right-0 h-1 lg:h-1.5 xl:h-2 ${
-                  (advancedMetrics?.profit || 0) >= 0 ? 'bg-gradient-to-r from-green-400 to-green-600' : 'bg-gradient-to-r from-red-400 to-red-600'
+                  (() => {
+                    const revenue = revenueData?.totalRevenue || 0;
+                    return revenue > 0 ? 'bg-gradient-to-r from-green-400 to-green-600' : 
+                           revenue < 0 ? 'bg-gradient-to-r from-red-400 to-red-600' : 
+                           'bg-gradient-to-r from-gray-400 to-gray-600';
+                  })()
                 }`}></div>
               </div>
               <div className="bg-blue-50 rounded-lg p-4 lg:p-6 xl:p-8 h-20 lg:h-auto flex flex-col justify-between relative overflow-hidden">
                 <div>
-                  <p className="text-sm lg:text-base xl:text-lg text-blue-600 font-semibold">Total Sales</p>
-                  <p className="text-2xl lg:text-3xl xl:text-4xl font-bold text-blue-800">{revenueData.totalSales || 0}</p>
+                  <p className="text-xs lg:text-sm xl:text-base text-blue-600 font-semibold">Total Sales</p>
+                  <p className="text-lg lg:text-xl xl:text-2xl font-bold text-blue-800">{revenueData.totalSales || 0}</p>
                 </div>
                 <div className="absolute bottom-0 left-0 right-0 h-1 lg:h-1.5 xl:h-2 bg-gradient-to-r from-blue-400 to-blue-600"></div>
               </div>
-              <div className="bg-purple-50 rounded-lg p-4 lg:p-6 xl:p-8 h-20 lg:h-auto flex flex-col justify-between relative overflow-hidden">
+              <div className="bg-purple-50 rounded-lg p-4 lg:p-6 xl:p-8 h-24 lg:h-28 xl:h-auto flex flex-col justify-between relative overflow-hidden">
                 <div>
-                  <p className="text-sm lg:text-base xl:text-lg text-purple-600 font-semibold">Total Purchases</p>
-                  <p className="text-2xl lg:text-3xl xl:text-4xl font-bold text-purple-800">{revenueData.totalPurchases || 0}</p>
+                  <p className="text-xs lg:text-sm xl:text-base text-purple-600 font-semibold">Total Purchases</p>
+                  <p className="text-lg lg:text-xl xl:text-2xl font-bold text-purple-800">{revenueData.totalPurchases || 0}</p>
                 </div>
                 <div className="absolute bottom-0 left-0 right-0 h-1 lg:h-1.5 xl:h-2 bg-gradient-to-r from-purple-400 to-purple-600"></div>
               </div>
-              <div className="bg-orange-50 rounded-lg p-4 lg:p-6 xl:p-8 h-20 lg:h-auto flex flex-col justify-between relative overflow-hidden">
+              <div className="bg-orange-50 rounded-lg p-4 lg:p-6 xl:p-8 h-24 lg:h-28 xl:h-auto flex flex-col justify-between relative overflow-hidden">
                 <div>
-                  <p className="text-sm lg:text-base xl:text-lg text-orange-600 font-semibold">Sales This Month</p>
-                  <p className="text-2xl lg:text-3xl xl:text-4xl font-bold text-orange-800">{revenueData.salesThisMonth || 0}</p>
+                  <p className="text-xs lg:text-sm xl:text-base text-orange-600 font-semibold">Sales This Month</p>
+                  <p className="text-lg lg:text-xl xl:text-2xl font-bold text-orange-800">{revenueData.salesThisMonth || 0}</p>
                 </div>
                 <div className="absolute bottom-0 left-0 right-0 h-1 lg:h-1.5 xl:h-2 bg-gradient-to-r from-orange-400 to-orange-600"></div>
               </div>
