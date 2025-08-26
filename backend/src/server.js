@@ -102,8 +102,8 @@ app.use((error, req, res, next) => {
   });
 });
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`📱 Environment: ${process.env.NODE_ENV}`);
-  console.log(`🔗 API URL: http://localhost:${PORT}/api`);
-  console.log(`❤️  Health check: http://localhost:${PORT}/api/health`);
+  console.log(`Server running on port ${PORT}`);
+  console.log(`Environment: ${process.env.NODE_ENV}`);
+  console.log(`API URL: http://localhost:${PORT}/api`);
+  console.log(`Health check: http://localhost:${PORT}/api/health`);
 });
