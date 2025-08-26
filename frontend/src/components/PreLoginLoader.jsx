@@ -7,8 +7,8 @@ const PreLoginLoader = ({ onComplete }) => {
   const timerRef = useRef(null)
 
   useEffect(() => {
-    const duration = 3000 // 3 seconds total
-    const interval = 50 // Update every 50ms for smooth animation
+    const duration = 3000
+    const interval = 50
     const increment = 100 / (duration / interval)
 
     const startTimer = () => {
@@ -18,7 +18,7 @@ const PreLoginLoader = ({ onComplete }) => {
             const next = prev + increment
             if (next >= 100) {
               clearInterval(timerRef.current)
-              setTimeout(() => onComplete(), 500) // Small delay before transitioning
+              setTimeout(() => onComplete(), 500)
               return 100
             }
             return next
