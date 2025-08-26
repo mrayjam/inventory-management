@@ -847,6 +847,7 @@ export default function Products() {
                     key={product.id || product._id || `table-product-${index}`}
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
+                    transition={{ delay: 0.5 + (0.1 * index), duration: 1.2, ease: "easeOut" }}
                     className={`border-b border-slate-100 transition-all duration-200 hover:bg-slate-100/50 ${
                       index % 2 === 0 ? 'bg-white' : 'bg-slate-50/30'
                     }`}
