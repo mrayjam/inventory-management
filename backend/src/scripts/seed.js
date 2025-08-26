@@ -10,6 +10,13 @@ import Sale from '../models/Sale.js';
 
 dotenv.config();
 
+const getDateFromToday = (daysOffset = 0) => {
+  const today = new Date();
+  const date = new Date(today);
+  date.setDate(today.getDate() + daysOffset);
+  return date;
+};
+
 const seedData = async () => {
   try {
     
@@ -51,7 +58,7 @@ const seedData = async () => {
     ];
 
     await User.insertMany(users);
-    console.log('✅ Users seeded (passwords hashed)');
+    console.log('Users seeded (passwords hashed)');
 
     const suppliers = [
       {
@@ -89,7 +96,7 @@ const seedData = async () => {
     ];
 
     const createdSuppliers = await Supplier.insertMany(suppliers);
-    console.log('✅ Suppliers seeded');
+    console.log('Suppliers seeded');
 
     const products = [
       {
@@ -135,7 +142,7 @@ const seedData = async () => {
     ];
 
     const createdProducts = await Product.insertMany(products);
-    console.log('✅ Products seeded');
+    console.log('Products seeded');
 
     const purchases = [
       {
@@ -146,7 +153,7 @@ const seedData = async () => {
         supplierName: 'TechCorp Solutions',
         quantity: 50,
         unitPrice: 75.99,
-        purchaseDate: new Date('2024-01-15'),
+        purchaseDate: getDateFromToday(0),
         createdBy: 'admin@example.com'
       },
       {
@@ -157,7 +164,7 @@ const seedData = async () => {
         supplierName: 'FashionHub Inc',
         quantity: 100,
         unitPrice: 15.99,
-        purchaseDate: new Date('2024-01-20'),
+        purchaseDate: getDateFromToday(1),
         createdBy: 'admin@example.com'
       },
       {
@@ -168,7 +175,7 @@ const seedData = async () => {
         supplierName: 'BookWorld Publishing',
         quantity: 30,
         unitPrice: 35.99,
-        purchaseDate: new Date('2024-02-01'),
+        purchaseDate: getDateFromToday(2),
         createdBy: 'john@example.com'
       },
       {
@@ -179,7 +186,7 @@ const seedData = async () => {
         supplierName: 'GreenThumb Gardens',
         quantity: 25,
         unitPrice: 120.99,
-        purchaseDate: new Date('2024-02-10'),
+        purchaseDate: getDateFromToday(3),
         createdBy: 'jane@example.com'
       },
       {
@@ -190,13 +197,13 @@ const seedData = async () => {
         supplierName: 'TechCorp Solutions',
         quantity: 20,
         unitPrice: 73.99,
-        purchaseDate: new Date('2024-03-01'),
+        purchaseDate: getDateFromToday(5),
         createdBy: 'admin@example.com'
       }
     ];
 
     await Purchase.insertMany(purchases);
-    console.log('✅ Purchases seeded');
+    console.log('Purchases seeded');
 
     const sales = [
       {
@@ -206,7 +213,7 @@ const seedData = async () => {
         quantity: 2,
         salePrice: 99.99,
         customer: 'John Smith',
-        saleDate: new Date('2024-02-15'),
+        saleDate: getDateFromToday(1),
         createdBy: 'admin@example.com'
       },
       {
@@ -216,7 +223,7 @@ const seedData = async () => {
         quantity: 5,
         salePrice: 24.99,
         customer: 'Sarah Johnson',
-        saleDate: new Date('2024-02-16'),
+        saleDate: getDateFromToday(2),
         createdBy: 'admin@example.com'
       },
       {
@@ -226,7 +233,7 @@ const seedData = async () => {
         quantity: 1,
         salePrice: 99.99,
         customer: 'Mike Davis',
-        saleDate: new Date('2024-02-18'),
+        saleDate: getDateFromToday(3),
         createdBy: 'john@example.com'
       },
       {
@@ -236,7 +243,7 @@ const seedData = async () => {
         quantity: 1,
         salePrice: 159.99,
         customer: 'Lisa Wilson',
-        saleDate: new Date('2024-02-20'),
+        saleDate: getDateFromToday(4),
         createdBy: 'jane@example.com'
       },
       {
@@ -246,7 +253,7 @@ const seedData = async () => {
         quantity: 3,
         salePrice: 24.99,
         customer: 'Emma Brown',
-        saleDate: new Date('2024-02-22'),
+        saleDate: getDateFromToday(5),
         createdBy: 'admin@example.com'
       },
       {
@@ -256,7 +263,7 @@ const seedData = async () => {
         quantity: 2,
         salePrice: 49.99,
         customer: 'David Lee',
-        saleDate: new Date('2024-02-25'),
+        saleDate: getDateFromToday(6),
         createdBy: 'john@example.com'
       },
       {
@@ -266,22 +273,22 @@ const seedData = async () => {
         quantity: 1,
         salePrice: 99.99,
         customer: '',
-        saleDate: new Date('2024-03-05'),
+        saleDate: getDateFromToday(7),
         createdBy: 'admin@example.com'
       }
     ];
 
     await Sale.insertMany(sales);
-    console.log('✅ Sales seeded');
+    console.log('Sales seeded');
 
-    console.log('🎉 Database seeded successfully!');
+    console.log('Database seeded successfully!');
     console.log('\n📋 Default login credentials:');
     console.log('Admin: admin@example.com / password123');
     console.log('Super Admin: superadmin@example.com / password123');
 
     process.exit(0);
   } catch (error) {
-    console.error('❌ Error seeding database:', error);
+    console.error('Error seeding database:', error);
     process.exit(1);
   }
 };

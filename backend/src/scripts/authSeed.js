@@ -7,15 +7,15 @@ dotenv.config();
 
 const seedAuthUsers = async () => {
   try {
-    console.log('🔐 Authentication Users Seeder');
+    console.log('Authentication Users Seeder');
     console.log('===============================');
     
     await connectDatabase();
-    console.log('✅ Connected to MongoDB');
+    console.log('Connected to MongoDB');
 
-    console.log('🗑️  Clearing existing users...');
+    console.log('Clearing existing users...');
     await User.deleteMany({});
-    console.log('✅ Cleared existing users');
+    console.log('Cleared existing users');
 
     const authUsers = [
       {
@@ -47,7 +47,7 @@ const seedAuthUsers = async () => {
     console.log('👤 Creating authentication users...');
     const createdUsers = await User.insertMany(authUsers);
     
-    console.log('✅ Authentication users created successfully!');
+    console.log('Authentication users created successfully!');
     console.log(`📊 Total users created: ${createdUsers.length}`);
     
     console.log('\n📋 User Accounts Created:');
@@ -70,7 +70,7 @@ const seedAuthUsers = async () => {
 
     process.exit(0);
   } catch (error) {
-    console.error('❌ Error seeding authentication users:', error);
+    console.error('Error seeding authentication users:', error);
     
     if (error.code === 11000) {
       console.error('💡 Duplicate key error - users may already exist');
@@ -89,5 +89,5 @@ const handleExit = () => {
 process.on('SIGINT', handleExit);
 process.on('SIGTERM', handleExit);
 
-console.log('🚀 Starting authentication users seeder...');
+console.log('Starting authentication users seeder...');
 seedAuthUsers();
