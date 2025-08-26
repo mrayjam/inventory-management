@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
 import { Suspense, lazy } from 'react'
 import { AuthProvider } from './contexts/AuthContext'
@@ -85,7 +85,7 @@ function App() {
                   }/>
                   <Route path="*" element={
                   <Suspense fallback={<PageLoader />}>
-                    <Dashboard />
+                    <Navigate to="/" replace />
                   </Suspense>
                 } />
               </Route>
