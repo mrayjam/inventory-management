@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, memo } from 'react'
 import { useDropzone } from 'react-dropzone'
 import { AnimatePresence, motion } from 'framer-motion'
 import { 
