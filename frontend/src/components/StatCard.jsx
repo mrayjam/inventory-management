@@ -74,9 +74,9 @@ const StatCard = memo(function StatCard({
         </div>
         <motion.div 
           className={`flex-shrink-0 p-3 md:p-4 rounded-2xl bg-opacity-10 shadow-lg ${colorClasses[color]} self-center`}
-          initial={{ scale: 0, rotate: -180 }}
-          animate={{ scale: 1, rotate: 0 }}
-          transition={{ delay: 0.3, type: "spring", damping: 15 }}
+          initial={{ opacity: 0, scale: 0 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.5, duration: 1.2, ease: "easeOut" }}
           whileHover={{ scale: 1.1, rotate: 5 }}
         >
           <Icon className={`h-6 w-6 md:h-7 md:w-7 ${colorClasses[color].split(' ')[1]} drop-shadow-sm`} />
