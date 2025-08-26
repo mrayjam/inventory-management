@@ -22,7 +22,7 @@ export const useCountUp = (end, duration = 3000, start = 0) => {
       }
     }
 
-    if (end > 0) {
+    if (end !== 0) {
       animationFrame = requestAnimationFrame(animation)
     } else {
       setCount(0)
