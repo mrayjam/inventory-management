@@ -23,7 +23,8 @@ export const DashboardProvider = ({ children }) => {
     totalPurchases: 0,
     totalPurchasesAmount: 0
   })
-  const [loading, setLoading] = useState(true)
+  const [isInitialLoad, setIsInitialLoad] = useState(true)
+  const [isDataReady, setIsDataReady] = useState(false)
   
   const { token } = useAuth()
 
@@ -31,6 +32,7 @@ export const DashboardProvider = ({ children }) => {
     if (!token) return
     
     try {
+      
       const [products, suppliers, revenueData] = await Promise.all([
         productsApi.getAll(),
         suppliersApi.getAll(),
@@ -40,7 +42,8 @@ export const DashboardProvider = ({ children }) => {
       const lowStockProducts = products.filter(p => p.stock < 20)
       const activeSuppliers = suppliers.filter(s => s.status === 'Active')
       
-      setStats({
+      // Only update if values are different to prevent unnecessary re-animations
+      const newStats = {
         totalProducts: products.length,
         lowStockItems: lowStockProducts.length,
         totalSuppliers: activeSuppliers.length,
@@ -49,20 +52,23 @@ export const DashboardProvider = ({ children }) => {
         totalRevenue: revenueData?.totalRevenue ?? 0,
         totalPurchases: revenueData?.totalPurchases ?? 0,
         totalPurchasesAmount: revenueData?.totalPurchasesAmount ?? 0
-      })
+      }
+      
+      setStats(newStats)
+      setIsDataReady(true)
+      
+      if (isInitialLoad) {
+        setIsInitialLoad(false)
+      }
     } catch (error) {
       console.error('Failed to refresh dashboard stats:', error)
       if (error.response?.status === 401) {
         return
       }
-      setStats(prev => ({
-        ...prev,
-        totalSales: 0,
-        totalSalesAmount: 0,
-        totalRevenue: 0,
-        totalPurchases: 0,
-        totalPurchasesAmount: 0
-      }))
+      
+      if (isInitialLoad) {
+        setIsInitialLoad(false)
+      }
     }
   }, [token])
 
@@ -74,20 +80,14 @@ export const DashboardProvider = ({ children }) => {
   }
 
   useEffect(() => {
-    const loadInitialData = async () => {
-      setLoading(true)
-      await refreshStats()
-      setLoading(false)
+    if (token && isInitialLoad) {
+      refreshStats()
     }
-
-    if (token) {
-      loadInitialData()
-    }
-  }, [token, refreshStats])
+  }, [token, isInitialLoad, refreshStats])
 
   const value = {
     stats,
-    loading,
+    isDataReady,
     refreshStats,
     incrementPurchases
   }

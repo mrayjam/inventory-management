@@ -91,37 +91,51 @@ export default function Analytics() {
         >
           <h3 className="text-lg font-semibold text-slate-900 mb-4">Revenue Summary</h3>
           {revenueData ? (
-            <div className="grid grid-cols-2 gap-4">
-              <div className={`rounded-lg p-4 ${
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 lg:gap-x-3 lg:gap-y-6 lg:h-[220px] xl:h-[240px]">
+              <div className={`rounded-lg p-4 lg:p-6 xl:p-8 h-20 lg:h-auto flex flex-col justify-between relative overflow-hidden ${
                 (advancedMetrics?.profit || 0) >= 0 ? 'bg-green-50' : 'bg-red-50'
               }`}>
-                <p className={`text-sm font-medium ${
-                  (advancedMetrics?.profit || 0) >= 0 ? 'text-green-600' : 'text-red-600'
-                }`}>
-                  {(advancedMetrics?.profit || 0) >= 0 ? 'Profit' : 'Loss'}
-                </p>
-                <p className={`text-2xl font-bold ${
-                  (advancedMetrics?.profit || 0) >= 0 ? 'text-green-800' : 'text-red-800'
-                }`}>
-                  {(() => {
-                    const profitValue = Math.abs(advancedMetrics?.profit || 0);
-                    return profitValue >= 1000 
-                      ? `$${(profitValue / 1000).toFixed(1)}K`
-                      : `$${profitValue.toFixed(2)}`;
-                  })()}
-                </p>
+                <div>
+                  <p className={`text-sm lg:text-base xl:text-lg font-semibold ${
+                    (advancedMetrics?.profit || 0) >= 0 ? 'text-green-600' : 'text-red-600'
+                  }`}>
+                    {(advancedMetrics?.profit || 0) >= 0 ? 'Profit' : 'Loss'}
+                  </p>
+                  <p className={`text-2xl lg:text-3xl xl:text-4xl font-bold ${
+                    (advancedMetrics?.profit || 0) >= 0 ? 'text-green-800' : 'text-red-800'
+                  }`}>
+                    {(() => {
+                      const profitValue = Math.abs(advancedMetrics?.profit || 0);
+                      return profitValue >= 1000 
+                        ? `$${(profitValue / 1000).toFixed(1)}K`
+                        : `$${profitValue.toFixed(2)}`;
+                    })()}
+                  </p>
+                </div>
+                <div className={`absolute bottom-0 left-0 right-0 h-1 lg:h-1.5 xl:h-2 ${
+                  (advancedMetrics?.profit || 0) >= 0 ? 'bg-gradient-to-r from-green-400 to-green-600' : 'bg-gradient-to-r from-red-400 to-red-600'
+                }`}></div>
               </div>
-              <div className="bg-blue-50 rounded-lg p-4">
-                <p className="text-sm text-blue-600 font-medium">Total Sales</p>
-                <p className="text-2xl font-bold text-blue-800">{revenueData.totalSales || 0}</p>
+              <div className="bg-blue-50 rounded-lg p-4 lg:p-6 xl:p-8 h-20 lg:h-auto flex flex-col justify-between relative overflow-hidden">
+                <div>
+                  <p className="text-sm lg:text-base xl:text-lg text-blue-600 font-semibold">Total Sales</p>
+                  <p className="text-2xl lg:text-3xl xl:text-4xl font-bold text-blue-800">{revenueData.totalSales || 0}</p>
+                </div>
+                <div className="absolute bottom-0 left-0 right-0 h-1 lg:h-1.5 xl:h-2 bg-gradient-to-r from-blue-400 to-blue-600"></div>
               </div>
-              <div className="bg-purple-50 rounded-lg p-4">
-                <p className="text-sm text-purple-600 font-medium">Total Purchases</p>
-                <p className="text-2xl font-bold text-purple-800">{revenueData.totalPurchases || 0}</p>
+              <div className="bg-purple-50 rounded-lg p-4 lg:p-6 xl:p-8 h-20 lg:h-auto flex flex-col justify-between relative overflow-hidden">
+                <div>
+                  <p className="text-sm lg:text-base xl:text-lg text-purple-600 font-semibold">Total Purchases</p>
+                  <p className="text-2xl lg:text-3xl xl:text-4xl font-bold text-purple-800">{revenueData.totalPurchases || 0}</p>
+                </div>
+                <div className="absolute bottom-0 left-0 right-0 h-1 lg:h-1.5 xl:h-2 bg-gradient-to-r from-purple-400 to-purple-600"></div>
               </div>
-              <div className="bg-orange-50 rounded-lg p-4">
-                <p className="text-sm text-orange-600 font-medium">Sales This Month</p>
-                <p className="text-2xl font-bold text-orange-800">{revenueData.salesThisMonth || 0}</p>
+              <div className="bg-orange-50 rounded-lg p-4 lg:p-6 xl:p-8 h-20 lg:h-auto flex flex-col justify-between relative overflow-hidden">
+                <div>
+                  <p className="text-sm lg:text-base xl:text-lg text-orange-600 font-semibold">Sales This Month</p>
+                  <p className="text-2xl lg:text-3xl xl:text-4xl font-bold text-orange-800">{revenueData.salesThisMonth || 0}</p>
+                </div>
+                <div className="absolute bottom-0 left-0 right-0 h-1 lg:h-1.5 xl:h-2 bg-gradient-to-r from-orange-400 to-orange-600"></div>
               </div>
             </div>
           ) : (

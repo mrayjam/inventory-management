@@ -212,24 +212,7 @@ export default function Dashboard() {
           </h3>
           <div className="h-[200px] sm:h-[220px] max-[2178px]:h-[200px] lg:h-[280px] xl:h-[300px]">
             {chartsLoading ? (
-              <div className="flex items-center justify-center h-full">
-                <div className="animate-pulse space-y-3">
-                  <div className="h-4 bg-slate-200 rounded w-1/3"></div>
-                  <div className="space-y-2">
-                    {Array.from({ length: 5 }).map((_, index) => (
-                      <div key={index} className="flex items-end justify-between space-x-2">
-                        {Array.from({ length: 7 }).map((_, barIndex) => (
-                          <div 
-                            key={barIndex}
-                            className="bg-slate-200 rounded-t w-full"
-                            style={{ height: `${Math.random() * 60 + 20}px` }}
-                          />
-                        ))}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
+              <SkeletonChart height="100%" />
             ) : (
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart
@@ -286,24 +269,7 @@ export default function Dashboard() {
           </h3>
           <div className="h-[200px] sm:h-[220px] max-[2178px]:h-[200px] lg:h-[280px] xl:h-[320px]">
             {chartsLoading ? (
-              <div className="flex items-center justify-center h-full">
-                <div className="animate-pulse space-y-3">
-                  <div className="h-4 bg-slate-200 rounded w-1/3"></div>
-                  <div className="space-y-2">
-                    {Array.from({ length: 5 }).map((_, index) => (
-                      <div key={index} className="flex items-end justify-between space-x-2">
-                        {Array.from({ length: 7 }).map((_, barIndex) => (
-                          <div 
-                            key={barIndex}
-                            className="bg-slate-200 rounded-t w-full"
-                            style={{ height: `${Math.random() * 60 + 20}px` }}
-                          />
-                        ))}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
+              <SkeletonChart height="100%" />
             ) : (
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart

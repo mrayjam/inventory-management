@@ -1,18 +1,28 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
+import { Suspense, lazy } from 'react'
 import { AuthProvider } from './contexts/AuthContext'
 import { DashboardProvider } from './contexts/DashboardContext'
 import ProtectedRoute from './components/ProtectedRoute'
 import Layout from './components/Layout'
 import LoginPage from './pages/LoginPage'
-import Dashboard from './pages/Dashboard'
-import Products from './pages/Products'
-import Suppliers from './pages/Suppliers'
-import Sales from './pages/Sales'
-import Purchase from './pages/Purchase'
-import Analytics from './pages/Analytics'
-import ChangePasswordPage from './pages/ChangePasswordPage'
-import SuperAdminPanel from './pages/SuperAdminPanel'
+
+// Lazy load heavy pages
+const Dashboard = lazy(() => import('./pages/Dashboard'))
+const Products = lazy(() => import('./pages/Products'))
+const Suppliers = lazy(() => import('./pages/Suppliers'))
+const Sales = lazy(() => import('./pages/Sales'))
+const Purchase = lazy(() => import('./pages/Purchase'))
+const Analytics = lazy(() => import('./pages/Analytics'))
+const ChangePasswordPage = lazy(() => import('./pages/ChangePasswordPage'))
+const SuperAdminPanel = lazy(() => import('./pages/SuperAdminPanel'))
+
+// Loading component for suspense - no spinner, just empty space
+const PageLoader = () => (
+  <div className="min-h-[400px]">
+    {/* No loading spinner - instant content */}
+  </div>
+)
 
 function App() {
   return (
@@ -32,18 +42,48 @@ function App() {
                   </ProtectedRoute>
                 }
               >
-                <Route index element={<Dashboard />} />
-                <Route path="products" element={<Products />} />
-                <Route path="suppliers" element={<Suppliers />} />
-                <Route path="sales" element={<Sales />} />
-                <Route path="purchases" element={<Purchase />} />
-                <Route path="analytics" element={<Analytics />} />
-                <Route path="change-password" element={<ChangePasswordPage />} />
+                <Route index element={
+                  <Suspense fallback={<PageLoader />}>
+                    <Dashboard />
+                  </Suspense>
+                } />
+                <Route path="products" element={
+                  <Suspense fallback={<PageLoader />}>
+                    <Products />
+                  </Suspense>
+                } />
+                <Route path="suppliers" element={
+                  <Suspense fallback={<PageLoader />}>
+                    <Suppliers />
+                  </Suspense>
+                } />
+                <Route path="sales" element={
+                  <Suspense fallback={<PageLoader />}>
+                    <Sales />
+                  </Suspense>
+                } />
+                <Route path="purchases" element={
+                  <Suspense fallback={<PageLoader />}>
+                    <Purchase />
+                  </Suspense>
+                } />
+                <Route path="analytics" element={
+                  <Suspense fallback={<PageLoader />}>
+                    <Analytics />
+                  </Suspense>
+                } />
+                <Route path="change-password" element={
+                  <Suspense fallback={<PageLoader />}>
+                    <ChangePasswordPage />
+                  </Suspense>
+                } />
                 <Route 
                   path="super-admin" 
                   element={
                     <ProtectedRoute requireSuperAdmin={true}>
-                      <SuperAdminPanel />
+                      <Suspense fallback={<PageLoader />}>
+                        <SuperAdminPanel />
+                      </Suspense>
                     </ProtectedRoute>
                   } 
                 />
