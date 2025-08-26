@@ -11,7 +11,6 @@ export const useCountUp = (end, duration = 3000, start = 0) => {
       if (!startTime) startTime = timestamp
       const progress = Math.min((timestamp - startTime) / duration, 1)
       
-      // Smooth easing function
       const easeOutCubic = 1 - Math.pow(1 - progress, 3)
       const currentCount = Math.floor(easeOutCubic * (end - start) + start)
       
