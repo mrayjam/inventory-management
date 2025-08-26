@@ -1,30 +1,37 @@
 import { motion } from 'framer-motion'
 import { useCountUp } from '../hooks/useCountUp'
+import { memo, useMemo } from 'react'
 
-export default function StatCard({ title, value, icon: Icon, color = 'blue', rawValue }) {
-  const colorClasses = {
+const StatCard = memo(function StatCard({ 
+  title, 
+  value, 
+  icon: Icon, 
+  color = 'blue', 
+  rawValue
+}) {
+  const colorClasses = useMemo(() => ({
     blue: 'bg-blue-500 text-gray-200 shadow-blue-500/20',
     green: 'bg-green-500 text-gray-200 shadow-green-500/20',
     yellow: 'bg-yellow-500 text-gray-200 shadow-yellow-500/20',
     red: 'bg-red-500 text-gray-200 shadow-red-500/20',
     purple: 'bg-purple-500 text-gray-200 shadow-purple-500/20',
     orange: 'bg-orange-500 text-gray-200 shadow-orange-500/20',
-  }
+  }), [])
 
-  const bgClasses = {
+  const bgClasses = useMemo(() => ({
     blue: 'bg-blue-50 border-blue-100',
     green: 'bg-green-50 border-green-100', 
     yellow: 'bg-yellow-50 border-yellow-100',
     red: 'bg-red-50 border-red-100',
     purple: 'bg-purple-50 border-purple-100',
     orange: 'bg-orange-50 border-orange-100'
-  }
+  }), [])
 
   const safeValue = value ?? 0
   const safeRawValue = rawValue ?? (typeof safeValue === 'string' ? parseFloat(safeValue.replace(/[^0-9.-]/g, '')) || 0 : safeValue)
   
   const numericValue = safeRawValue || (typeof safeValue === 'string' ? parseFloat(safeValue.replace(/[^0-9.-]/g, '')) || 0 : safeValue)
-  const animatedValue = useCountUp(numericValue, 2000)
+  const animatedValue = useCountUp(numericValue, 3000)
   
   const displayValue = typeof safeValue === 'string' && safeValue.includes('$') 
     ? `${animatedValue < 0 ? '-' : ''}$${Math.abs(animatedValue) > 1000 ? (Math.abs(animatedValue) / 1000).toFixed(1) : Math.abs(animatedValue)}${Math.abs(animatedValue) > 1000 ? 'K' : ''}`
@@ -77,4 +84,6 @@ export default function StatCard({ title, value, icon: Icon, color = 'blue', raw
       </div>
     </motion.div>
   )
-}
+})
+
+export default StatCard
