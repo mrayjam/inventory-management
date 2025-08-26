@@ -48,7 +48,6 @@ export default function Layout() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 relative overflow-hidden">
-      {/* Animated Background Shapes */}
       <div className="fixed inset-0 pointer-events-none z-0">
         <motion.div
           className="absolute -top-24 -left-24 w-96 h-96 bg-gradient-to-br from-blue-200/20 to-purple-200/20 rounded-full blur-3xl"
@@ -106,7 +105,6 @@ export default function Layout() {
           }}
         />
 
-        {/* Floating Polygons */}
         <motion.div
           className="absolute top-1/3 left-1/3 w-16 h-16 bg-gradient-to-br from-blue-300/30 to-indigo-300/30 rounded-lg"
           animate={{
@@ -135,7 +133,6 @@ export default function Layout() {
           }}
         />
       </div>
-      {/* Mobile header */}
       <div className="lg:hidden bg-white/90 backdrop-blur-sm shadow-sm border-b border-white/20 px-4 py-3 flex items-center justify-between relative z-10">
         <Logo size="small" />
         <button
@@ -151,7 +148,6 @@ export default function Layout() {
       </div>
 
       <div className="flex relative z-10">
-        {/* Desktop Sidebar */}
         <div className="hidden lg:flex w-64 bg-white/80 backdrop-blur-sm shadow-lg border-r border-white/20 flex-col relative z-10">
           <div className="p-6">
             <div className="flex items-center gap-3">
@@ -226,7 +222,6 @@ export default function Layout() {
           </div>
         </div>
 
-        {/* Mobile Sliding Menu */}
         <AnimatePresence>
           {isMobileMenuOpen && (
             <>
@@ -335,7 +330,6 @@ export default function Layout() {
           )}
         </AnimatePresence>
 
-        {/* Main Content */}
         <div className="flex-1 min-h-screen overflow-x-hidden">
           <main className="p-3 sm:p-4 lg:p-8 min-h-full">
             <div className="bg-white/50 backdrop-blur-sm rounded-2xl p-3 sm:p-4 lg:p-6 shadow-sm border border-white/20 min-h-[calc(100vh-1.5rem)] sm:min-h-[calc(100vh-2rem)] lg:min-h-[calc(100vh-4rem)] max-w-full">

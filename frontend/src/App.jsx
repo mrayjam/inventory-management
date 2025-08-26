@@ -7,7 +7,6 @@ import ProtectedRoute from './components/ProtectedRoute'
 import Layout from './components/Layout'
 import LoginPage from './pages/LoginPage'
 
-// Lazy load heavy pages
 const Dashboard = lazy(() => import('./pages/Dashboard'))
 const Products = lazy(() => import('./pages/Products'))
 const Suppliers = lazy(() => import('./pages/Suppliers'))
@@ -17,10 +16,8 @@ const Analytics = lazy(() => import('./pages/Analytics'))
 const ChangePasswordPage = lazy(() => import('./pages/ChangePasswordPage'))
 const SuperAdminPanel = lazy(() => import('./pages/SuperAdminPanel'))
 
-// Loading component for suspense - no spinner, just empty space
 const PageLoader = () => (
   <div className="min-h-[400px]">
-    {/* No loading spinner - instant content */}
   </div>
 )
 
