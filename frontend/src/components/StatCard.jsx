@@ -30,7 +30,7 @@ const StatCard = memo(function StatCard({
   const safeValue = value ?? 0
   const safeRawValue = rawValue ?? (typeof safeValue === 'string' ? parseFloat(safeValue.replace(/[^0-9.-]/g, '')) || 0 : safeValue)
   
-  const numericValue = safeRawValue || (typeof safeValue === 'string' ? parseFloat(safeValue.replace(/[^0-9.-]/g, '')) || 0 : safeValue)
+  const numericValue = safeRawValue ?? (typeof safeValue === 'string' ? parseFloat(safeValue.replace(/[^0-9.-]/g, '')) || 0 : safeValue)
   const animatedValue = useCountUp(numericValue, 3000)
   
   const displayValue = typeof safeValue === 'string' && safeValue.includes('$') 
