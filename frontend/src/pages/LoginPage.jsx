@@ -1,10 +1,11 @@
 import { useState } from 'react'
 import { Navigate, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { EyeIcon, EyeSlashIcon, EnvelopeIcon, LockClosedIcon, SparklesIcon } from '@heroicons/react/24/outline'
+import { EyeIcon, EyeSlashIcon, EnvelopeIcon, LockClosedIcon } from '@heroicons/react/24/outline'
 import toast from 'react-hot-toast'
 import { useAuth } from '../contexts/AuthContext'
 import Logo from '../components/Logo'
+import PreLoginLoader from '../components/PreLoginLoader'
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({
@@ -16,6 +17,7 @@ const LoginPage = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [focusedField, setFocusedField] = useState('')
+  const [showLoader, setShowLoader] = useState(true)
 
   const { login, isAuthenticated } = useAuth()
   const location = useLocation()
@@ -94,7 +96,17 @@ const LoginPage = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+    <AnimatePresence mode="wait">
+      {showLoader ? (
+        <PreLoginLoader key="loader" onComplete={() => setShowLoader(false)} />
+      ) : (
+        <motion.div 
+          key="login"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden"
+        >
       <div className="absolute inset-0 bg-gradient-to-br from-indigo-100 via-purple-50 to-blue-100"></div>
       
       <motion.div
@@ -279,9 +291,11 @@ const LoginPage = () => {
         </div>
       </motion.div>
       
-      <div className="absolute top-10 left-10 w-32 h-32 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full opacity-20 blur-xl"></div>
-      <div className="absolute bottom-10 right-10 w-40 h-40 bg-gradient-to-r from-pink-400 to-indigo-500 rounded-full opacity-20 blur-xl"></div>
-    </div>
+          <div className="absolute top-10 left-10 w-32 h-32 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full opacity-20 blur-xl"></div>
+          <div className="absolute bottom-10 right-10 w-40 h-40 bg-gradient-to-r from-pink-400 to-indigo-500 rounded-full opacity-20 blur-xl"></div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   )
 }
 
