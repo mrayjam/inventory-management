@@ -17,7 +17,24 @@ const LoginPage = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [focusedField, setFocusedField] = useState('')
-  const [showLoader, setShowLoader] = useState(true)
+  const [showLoader, setShowLoader] = useState(() => {
+    // Only show loader on first visit, not when redirected from logout
+    const hasVisitedLoginBefore = sessionStorage.getItem('hasVisitedLogin')
+    const justLoggedOut = sessionStorage.getItem('justLoggedOut')
+    
+    if (justLoggedOut) {
+      // Clear the logout flag and don't show loader
+      sessionStorage.removeItem('justLoggedOut')
+      return false
+    }
+    
+    if (hasVisitedLoginBefore) {
+      return false
+    }
+    
+    sessionStorage.setItem('hasVisitedLogin', 'true')
+    return true
+  })
 
   const { login, isAuthenticated } = useAuth()
   const location = useLocation()
