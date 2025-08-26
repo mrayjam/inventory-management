@@ -53,7 +53,6 @@ const productSchema = new mongoose.Schema({
 });
 
 // Indexes for performance optimization
-productSchema.index({ sku: 1 }); // Unique index already exists, but explicit
 productSchema.index({ category: 1 }); // For filtering by category
 productSchema.index({ name: 'text', description: 'text' }); // Text search
 productSchema.index({ createdAt: -1 }); // For sorting by creation date
