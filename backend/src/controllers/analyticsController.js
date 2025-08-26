@@ -4,7 +4,6 @@ import Product from '../models/Product.js';
 
 export const getRevenue = async (req, res) => {
   try {
-    console.log('Analytics: Fetching revenue data...');
     
     const now = new Date();
     const currentMonth = now.getMonth();
@@ -13,7 +12,6 @@ export const getRevenue = async (req, res) => {
     const allSales = await Sale.find();
     const allPurchases = await Purchase.find();
     
-    console.log(`Analytics: Found ${allSales.length} sales and ${allPurchases.length} purchases`);
 
     // Calculate monetary amounts
     const totalSalesAmount = allSales.reduce((sum, sale) => {
@@ -36,7 +34,6 @@ export const getRevenue = async (req, res) => {
       return saleDate.getMonth() === currentMonth && saleDate.getFullYear() === currentYear;
     }).length;
 
-    console.log(`Analytics: Revenue calculated - Total: $${totalRevenue.toFixed(2)}`);
 
     res.json({
       totalRevenue,
@@ -226,7 +223,6 @@ export const getAdvancedMetrics = async (req, res) => {
     // Since we don't have historical inventory data, we'll use current inventory value
     const inventoryTurnover = totalInventoryValue > 0 ? totalPurchaseCost / totalInventoryValue : 0;
 
-    console.log(`Analytics: Advanced metrics calculated - Profit: $${profit.toFixed(2)} (Sales: $${totalSalesAmount.toFixed(2)}, Purchases: $${totalPurchasesAmount.toFixed(2)})`);
 
     res.json({
       profit,

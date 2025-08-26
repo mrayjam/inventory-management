@@ -94,9 +94,6 @@ export const getProductById = async (req, res) => {
 
 export const createProduct = async (req, res) => {
   try {
-    console.log('Create Product Request:');
-    console.log('Body:', req.body);
-    console.log('Files:', req.files);
 
     const { name, category, sku, description } = req.body;
     const userId = req.user?.id;
@@ -116,13 +113,7 @@ export const createProduct = async (req, res) => {
 
     const images = [];
     if (req.files && req.files.length > 0) {
-      console.log('Processing uploaded files:', req.files.length);
       req.files.forEach((file, index) => {
-        console.log(`File ${index}:`, {
-          originalname: file.originalname,
-          path: file.path,
-          filename: file.filename
-        });
         images.push({
           url: file.path,
           publicId: file.filename
@@ -139,7 +130,6 @@ export const createProduct = async (req, res) => {
       description: description || 'No description provided'
     });
 
-    console.log('Creating product with data:', product);
     await product.save();
 
     if (userId) {
@@ -158,7 +148,6 @@ export const createProduct = async (req, res) => {
     responseData.stock = 0;
     responseData.price = 0;
 
-    console.log('Product created successfully:', product.id);
 
     res.json({
       success: true,
@@ -185,10 +174,6 @@ export const createProduct = async (req, res) => {
 
 export const updateProduct = async (req, res) => {
   try {
-    console.log('Update Product Request:');
-    console.log('ID:', req.params.id);
-    console.log('Body:', req.body);
-    console.log('Files:', req.files);
 
     const { id } = req.params;
     const updates = req.body;
@@ -252,14 +237,8 @@ export const updateProduct = async (req, res) => {
 
     // Handle new uploaded images (explicit addition)
     if (req.files && req.files.length > 0) {
-      console.log('Processing new uploaded files:', req.files.length);
       const newImages = [];
       req.files.forEach((file, index) => {
-        console.log(`New File ${index}:`, {
-          originalname: file.originalname,
-          path: file.path,
-          filename: file.filename
-        });
         newImages.push({
           url: file.path,
           publicId: file.filename
@@ -276,20 +255,15 @@ export const updateProduct = async (req, res) => {
 
     // Three-state logic: only update images if explicitly changed
     if (imageFieldChanged) {
-      console.log('Image field was explicitly changed, updating images');
       updates.images = currentImages;
       updates.imageUrl = currentImages.length > 0 
         ? currentImages[0].url 
         : 'https://images.unsplash.com/photo-1586880244386-8b3e34c8382c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&q=80';
       
-      console.log('Final images array:', currentImages.length, 'images');
-      console.log('Images being saved:', currentImages.map(img => ({ url: img.url, publicId: img.publicId })));
     } else {
-      console.log('Image field was not changed, preserving existing images');
       // Don't include images or imageUrl in updates to preserve existing values
     }
 
-    console.log('Final updates object:', updates);
 
     const updatedProduct = await Product.findByIdAndUpdate(
       id,
@@ -353,7 +327,6 @@ export const updateProduct = async (req, res) => {
       responseData.price = await getLatestPurchasePrice(updatedProduct._id) || 0;
     }
 
-    console.log('Product updated successfully:', updatedProduct.id);
 
     res.json({
       success: true,
