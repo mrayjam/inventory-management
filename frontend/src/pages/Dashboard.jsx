@@ -20,7 +20,7 @@ import {
   Bar,
 } from "recharts";
 import StatCard from "../components/StatCard";
-import { SkeletonStatsCards, SkeletonChart } from "../components/Skeleton";
+import { SkeletonChart } from "../components/Skeleton";
 import { useDashboard } from "../contexts/DashboardContext";
 import { analyticsApi } from "../services/apiClient";
 import { useAuth } from "../contexts/AuthContext";
@@ -61,26 +61,14 @@ export default function Dashboard() {
     loadChartData();
   }, [token]);
 
-  if (loading) {
-    return (
-      <div className="w-full max-w-full overflow-x-hidden min-w-0">
-        {/* Header Skeleton */}
-        <div className="mb-6">
-          <div className="animate-pulse h-8 bg-slate-200 rounded w-64 mb-2"></div>
-          <div className="animate-pulse h-4 bg-slate-200 rounded w-96"></div>
-        </div>
-
-        {/* Stats Cards Skeleton */}
-        <SkeletonStatsCards />
-
-        {/* Charts Skeleton */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 lg:gap-8">
-          <SkeletonChart height="300px" />
-          <SkeletonChart height="340px" />
-        </div>
-      </div>
-    );
-  }
+  const statsData = loading ? {
+    totalProducts: null,
+    lowStockItems: null,
+    totalSuppliers: null,
+    totalSalesAmount: null,
+    totalPurchasesAmount: null,
+    totalRevenue: null
+  } : stats;
 
 
 
@@ -96,117 +84,95 @@ export default function Dashboard() {
         </p>
       </div>
 
-      <motion.div
-        className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 min-[2178px]:grid-cols-6 gap-4 sm:gap-6 mb-6 lg:mb-8 px-3"
-        variants={{
-          hidden: { opacity: 0 },
-          show: {
-            opacity: 1,
-            transition: {
-              staggerChildren: 0.1,
-            },
-          },
-        }}
-        initial="hidden"
-        animate="show"
-      >
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 min-[2178px]:grid-cols-6 gap-4 sm:gap-6 mb-6 lg:mb-8 px-3">
         <motion.div
-          variants={{
-            hidden: { opacity: 0, y: 20 },
-            show: { opacity: 1, y: 0 },
-          }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5, duration: 1.2, ease: "easeOut" }}
         >
           <StatCard
             title="Total Products"
-            value={stats.totalProducts.toLocaleString()}
-            rawValue={stats.totalProducts}
+            value={statsData.totalProducts !== null ? statsData.totalProducts.toLocaleString() : "..."}
+            rawValue={statsData.totalProducts}
             icon={CubeIcon}
             color="blue"
           />
         </motion.div>
         <motion.div
-          variants={{
-            hidden: { opacity: 0, y: 20 },
-            show: { opacity: 1, y: 0 },
-          }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.6, duration: 1.2, ease: "easeOut" }}
         >
           <StatCard
             title="Low Stock Items"
-            value={stats.lowStockItems}
-            rawValue={stats.lowStockItems}
+            value={statsData.lowStockItems !== null ? statsData.lowStockItems : "..."}
+            rawValue={statsData.lowStockItems}
             icon={ExclamationTriangleIcon}
             color="red"
           />
         </motion.div>
         <motion.div
-          variants={{
-            hidden: { opacity: 0, y: 20 },
-            show: { opacity: 1, y: 0 },
-          }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.7, duration: 1.2, ease: "easeOut" }}
         >
           <StatCard
             title="Active Suppliers"
-            value={stats.totalSuppliers}
-            rawValue={stats.totalSuppliers}
+            value={statsData.totalSuppliers !== null ? statsData.totalSuppliers : "..."}
+            rawValue={statsData.totalSuppliers}
             icon={BuildingStorefrontIcon}
             color="green"
           />
         </motion.div>
         <motion.div
-          variants={{
-            hidden: { opacity: 0, y: 20 },
-            show: { opacity: 1, y: 0 },
-          }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.8, duration: 1.2, ease: "easeOut" }}
         >
           <StatCard
             title="Total Sales"
-            value={`$${stats.totalSalesAmount || 0}`}
-            rawValue={stats.totalSalesAmount || 0}
+            value={statsData.totalSalesAmount !== null ? `$${statsData.totalSalesAmount || 0}` : "..."}
+            rawValue={statsData.totalSalesAmount || 0}
             icon={ReceiptPercentIcon}
             color="purple"
           />
         </motion.div>
         <motion.div
-          variants={{
-            hidden: { opacity: 0, y: 20 },
-            show: { opacity: 1, y: 0 },
-          }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.9, duration: 1.2, ease: "easeOut" }}
         >
           <StatCard
             title="Total Purchases"
             value={
-              stats.totalPurchasesAmount > 0
-                ? `$${(stats.totalPurchasesAmount / 1000).toFixed(1)}K`
-                : "$0"
+              statsData.totalPurchasesAmount !== null
+                ? (statsData.totalPurchasesAmount > 0
+                    ? `$${(statsData.totalPurchasesAmount / 1000).toFixed(1)}K`
+                    : "$0")
+                : "..."
             }
-            rawValue={stats.totalPurchasesAmount || 0}
+            rawValue={statsData.totalPurchasesAmount || 0}
             icon={ShoppingCartIcon}
             color="orange"
           />
         </motion.div>
         <motion.div
-          variants={{
-            hidden: { opacity: 0, y: 20 },
-            show: { opacity: 1, y: 0 },
-          }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.0, duration: 1.2, ease: "easeOut" }}
         >
           <StatCard
             title="Total Revenue"
-            value={`$${stats.totalRevenue}`}
-            rawValue={stats.totalRevenue || 0}
+            value={statsData.totalRevenue !== null ? `$${statsData.totalRevenue}` : "..."}
+            rawValue={statsData.totalRevenue || 0}
             icon={CurrencyDollarIcon}
             color="purple"
           />
         </motion.div>
-      </motion.div>
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 lg:gap-8">
-        <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.2 }}
-          className="bg-white/80 backdrop-blur-sm rounded-xl shadow-sm border border-white/30 p-3 sm:p-4 max-[2178px]:p-3 lg:p-6"
-        >
+        <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-sm border border-white/30 p-3 sm:p-4 max-[2178px]:p-3 lg:p-6">
           <h3 className="text-sm sm:text-base max-[2178px]:text-sm lg:text-lg font-semibold text-slate-900 mb-3 sm:mb-4">
             Sales Trend
           </h3>
@@ -256,14 +222,9 @@ export default function Dashboard() {
               </ResponsiveContainer>
             )}
           </div>
-        </motion.div>
+        </div>
 
-        <motion.div
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.4 }}
-          className="bg-white/80 backdrop-blur-sm rounded-xl shadow-sm border border-white/30 p-3 sm:p-4 max-[2178px]:p-3 lg:p-6"
-        >
+        <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-sm border border-white/30 p-3 sm:p-4 max-[2178px]:p-3 lg:p-6">
           <h3 className="text-sm sm:text-base max-[2178px]:text-sm lg:text-lg font-semibold text-slate-900 mb-3 sm:mb-4">
             Inventory by Category
           </h3>
@@ -307,7 +268,7 @@ export default function Dashboard() {
               </ResponsiveContainer>
             )}
           </div>
-        </motion.div>
+        </div>
       </div>
     </div>
   );
