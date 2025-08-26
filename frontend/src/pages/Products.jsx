@@ -329,29 +329,21 @@ const ProductModal = ({ isOpen, onClose, product, mode, onProductSaved }) => {
       (product?.imageUrl && product.imageUrl !== 'https://images.unsplash.com/photo-1586880244386-8b3e34c8382c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&q=80')
     
     
-    // Handle image logic with three clear states
     if (mode === 'edit') {
-      // STATE 1: Image explicitly removed (set to fallback)
       if (removeCurrentImage && hasExistingImage) {
         if (product?.images?.length > 0) {
           formData.append('deletedImages', JSON.stringify([product.images[0].publicId]))
         }
       }
       
-      // STATE 2: New image uploaded (replace with new)
       if (newImageFile) {
-        // If replacing existing image with publicId, also mark old one for deletion
         if (product?.images?.length > 0 && product.images[0].publicId && !removeCurrentImage) {
           formData.append('deletedImages', JSON.stringify([product.images[0].publicId]))
         }
         formData.append('images', newImageFile)
       }
       
-      // STATE 3: Image untouched (keep existing)
-      // If neither removeCurrentImage nor newImageFile, send no image data
-      // Backend will preserve existing image
     } else {
-      // For add mode, include new image if selected
       if (newImageFile) {
         formData.append('images', newImageFile)
       }
@@ -516,7 +508,7 @@ const ProductModal = ({ isOpen, onClose, product, mode, onProductSaved }) => {
                   </p>
                   {currentImage && (
                     <p className="text-xs text-green-600 font-medium">
-                      ✓ Image selected
+Image selected
                     </p>
                   )}
                 </div>
