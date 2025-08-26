@@ -200,26 +200,26 @@ const SuperAdminPanel = () => {
             </motion.h2>
             
             <div className="border-b border-gray-200 mb-4 sm:mb-6">
-              <nav className="-mb-px flex space-x-8">
+              <nav className="-mb-px flex space-x-2 sm:space-x-8">
                 <button
                   onClick={() => setActiveTab('create')}
-                  className={`whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm ${
+                  className={`whitespace-nowrap py-2 px-1 border-b-2 font-medium text-xs sm:text-sm ${
                     activeTab === 'create'
                       ? 'border-indigo-500 text-indigo-600'
                       : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                   }`}
                 >
-                  Create Admin
+                  <span className="max-[320px]:text-[10px]">Create Admin</span>
                 </button>
                 <button
                   onClick={() => setActiveTab('reset')}
-                  className={`whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm ${
+                  className={`whitespace-nowrap py-2 px-1 border-b-2 font-medium text-xs sm:text-sm ${
                     activeTab === 'reset'
                       ? 'border-indigo-500 text-indigo-600'
                       : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                   }`}
                 >
-                  Reset Password
+                  <span className="max-[320px]:text-[10px]">Reset Password</span>
                 </button>
               </nav>
             </div>
@@ -237,7 +237,7 @@ const SuperAdminPanel = () => {
                     animate={{ x: 0, opacity: 1 }}
                     transition={{ delay: 0.4, duration: 0.5 }}
                   >
-                    <label htmlFor="name" className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2">
+                    <label htmlFor="name" className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2 text-left">
                       Full Name
                     </label>
                     <input
@@ -269,7 +269,7 @@ const SuperAdminPanel = () => {
                     animate={{ x: 0, opacity: 1 }}
                     transition={{ delay: 0.5, duration: 0.5 }}
                   >
-                    <label htmlFor="email" className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2">
+                    <label htmlFor="email" className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2 text-left">
                       Email Address
                     </label>
                     <input
@@ -301,7 +301,7 @@ const SuperAdminPanel = () => {
                     animate={{ x: 0, opacity: 1 }}
                     transition={{ delay: 0.6, duration: 0.5 }}
                   >
-                    <label htmlFor="password" className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2">
+                    <label htmlFor="password" className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2 text-left">
                       Password
                     </label>
                     <input
@@ -365,7 +365,7 @@ const SuperAdminPanel = () => {
                     animate={{ x: 0, opacity: 1 }}
                     transition={{ delay: 0.4, duration: 0.5 }}
                   >
-                    <label htmlFor="adminId" className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2">
+                    <label htmlFor="adminId" className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2 text-left">
                       Select Admin
                     </label>
                     <select
@@ -402,7 +402,7 @@ const SuperAdminPanel = () => {
                     animate={{ x: 0, opacity: 1 }}
                     transition={{ delay: 0.5, duration: 0.5 }}
                   >
-                    <label htmlFor="newPassword" className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2">
+                    <label htmlFor="newPassword" className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2 text-left">
                       New Password
                     </label>
                     <input
@@ -437,7 +437,7 @@ const SuperAdminPanel = () => {
                     <button
                       type="submit"
                       disabled={isLoading}
-                      className="w-full flex justify-center py-2.5 sm:py-3 lg:py-3.5 px-3 sm:px-4 lg:px-6 border border-transparent text-xs sm:text-sm lg:text-base font-medium rounded-lg sm:rounded-xl text-white bg-gradient-to-r from-red-600 via-red-700 to-red-600 hover:from-red-700 hover:via-red-800 hover:to-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] min-h-[40px] sm:min-h-[44px] lg:min-h-[48px]"
+                      className="w-full flex justify-center py-2.5 sm:py-3 lg:py-3.5 px-3 sm:px-4 lg:px-6 border border-transparent text-xs sm:text-sm lg:text-base font-medium rounded-lg sm:rounded-xl text-white bg-gradient-to-r from-red-600 via-red-700 to-red-800 hover:from-red-700 hover:via-red-800 hover:to-red-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] min-h-[40px] sm:min-h-[44px] lg:min-h-[48px]"
                     >
                       {isLoading ? (
                         <motion.div
@@ -446,7 +446,7 @@ const SuperAdminPanel = () => {
                           className="w-3.5 h-3.5 sm:w-4 sm:h-4 lg:w-5 lg:h-5 border-2 border-white border-t-transparent rounded-full"
                         />
                       ) : (
-                        'Reset Password'
+                        <span className="max-[390px]:text-[9px]">Reset Password</span>
                       )}
                     </button>
                   </motion.div>
