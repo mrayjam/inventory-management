@@ -6,7 +6,6 @@ import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-// https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   resolve: {
@@ -18,7 +17,6 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          // Vendor chunks for better caching
           vendor: ['react', 'react-dom', 'react-router-dom'],
           charts: ['recharts'],
           ui: ['framer-motion', '@heroicons/react', 'lucide-react'],
@@ -26,12 +24,9 @@ export default defineConfig({
         }
       }
     },
-    // Enable source maps for production debugging
     sourcemap: true,
-    // Optimize chunk size
     chunkSizeWarningLimit: 1000
   },
-  // Performance optimizations
   optimizeDeps: {
     include: ['react', 'react-dom', 'axios']
   }
