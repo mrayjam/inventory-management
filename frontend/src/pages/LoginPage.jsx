@@ -103,7 +103,7 @@ const LoginPage = () => {
         setServerError(result.error)
         toast.error(result.error, { id: loadingToast })
       }
-    } catch (error) {
+    } catch (_error) {
       const errorMessage = 'An unexpected error occurred'
       setServerError(errorMessage)
       toast.error(errorMessage, { id: loadingToast })

@@ -112,7 +112,7 @@ const ChangePasswordPage = () => {
       } else {
         toast.error(result.error, { id: loadingToast })
       }
-    } catch (error) {
+    } catch (_error) {
       toast.error('An unexpected error occurred', { id: loadingToast })
     } finally {
       setIsLoading(false)

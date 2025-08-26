@@ -328,14 +328,6 @@ const ProductModal = ({ isOpen, onClose, product, mode, onProductSaved }) => {
     const hasExistingImage = (product?.images?.length > 0) || 
       (product?.imageUrl && product.imageUrl !== 'https://images.unsplash.com/photo-1586880244386-8b3e34c8382c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&q=80')
     
-    console.log('Form submission - Image state:', {
-      mode,
-      hasNewImage: !!newImageFile,
-      removeCurrentImage,
-      hasExistingImage,
-      productImageUrl: product?.imageUrl,
-      productImagesLength: product?.images?.length || 0
-    })
     
     // Handle image logic with three clear states
     if (mode === 'edit') {
@@ -344,7 +336,6 @@ const ProductModal = ({ isOpen, onClose, product, mode, onProductSaved }) => {
         if (product?.images?.length > 0) {
           formData.append('deletedImages', JSON.stringify([product.images[0].publicId]))
         }
-        console.log('Image state: REMOVED - will use fallback')
       }
       
       // STATE 2: New image uploaded (replace with new)
@@ -354,23 +345,15 @@ const ProductModal = ({ isOpen, onClose, product, mode, onProductSaved }) => {
           formData.append('deletedImages', JSON.stringify([product.images[0].publicId]))
         }
         formData.append('images', newImageFile)
-        console.log('Image state: NEW IMAGE - replacing existing')
       }
       
       // STATE 3: Image untouched (keep existing)
       // If neither removeCurrentImage nor newImageFile, send no image data
       // Backend will preserve existing image
-      if (!removeCurrentImage && !newImageFile) {
-        console.log('Image state: UNTOUCHED - keeping existing image')
-        console.log('No image data sent - backend should preserve existing image')
-      }
     } else {
       // For add mode, include new image if selected
       if (newImageFile) {
         formData.append('images', newImageFile)
-        console.log('Image state: NEW PRODUCT with image')
-      } else {
-        console.log('Image state: NEW PRODUCT without image - will use fallback')
       }
     }
     

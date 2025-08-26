@@ -23,8 +23,6 @@ export default function Analytics() {
   const [revenueData, setRevenueData] = useState(null)
   const [topProducts, setTopProducts] = useState([])
   const [categoryData, setCategoryData] = useState([])
-  const [inventoryValue, setInventoryValue] = useState(0)
-  const [advancedMetrics, setAdvancedMetrics] = useState(null)
   const [loading, setLoading] = useState(true)
   const { token } = useAuth()
 
@@ -34,20 +32,15 @@ export default function Analytics() {
       
       try {
         setLoading(true)
-        const [revenueResponse, topProductsResponse, categoryDistribution, inventoryValueResponse, advancedMetricsResponse] = await Promise.all([
+        const [revenueResponse, topProductsResponse, categoryDistribution] = await Promise.all([
           analyticsApi.getRevenue(),
           analyticsApi.getTopSellingProducts(),
           analyticsApi.getCategoryDistribution(),
-          analyticsApi.getInventoryValue(),
-          analyticsApi.getAdvancedMetrics()
         ])
         
-        console.log(revenueResponse)
         setRevenueData(revenueResponse)
         setTopProducts(topProductsResponse)
         setCategoryData(categoryDistribution)
-        setInventoryValue(inventoryValueResponse.totalInventoryValue)
-        setAdvancedMetrics(advancedMetricsResponse)
       } catch (error) {
         console.error('Failed to load analytics data:', error)
         const message = error.response?.data?.message || error.message || 'Failed to load analytics data'

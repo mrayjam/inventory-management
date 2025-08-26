@@ -152,15 +152,11 @@ const SaleModal = ({ isOpen, onClose, sale, mode, onSaleSaved }) => {
         try {
           setLoading(true)
           const productList = await productsApi.getAll()
-          console.log('Loaded products:', productList)
           const availableProducts = productList.filter(p => (p.stock || 0) > 0)
-          console.log('Products with stock > 0:', availableProducts)
           
           if (availableProducts.length === 0 && productList.length > 0) {
-            console.log('No products with stock, showing all products')
             setProducts(productList)
           } else {
-            console.log('Setting products state with', availableProducts.length, 'items')
             setProducts(availableProducts)
           }
         } catch (error) {
@@ -502,18 +498,14 @@ export default function Sales() {
   }
 
   const handleSaleSaved = async (action, saleId, saleData) => {
-    try {
-      if (action === 'create') {
-        await salesApi.create(saleData)
-      } else if (action === 'update') {
-        await salesApi.update(saleId, saleData)
-      }
-      
-      const updatedSales = await salesApi.getAll()
-      setSales(updatedSales.sort((a, b) => new Date(b.saleDate) - new Date(a.saleDate)))
-    } catch (error) {
-      throw error
+    if (action === 'create') {
+      await salesApi.create(saleData)
+    } else if (action === 'update') {
+      await salesApi.update(saleId, saleData)
     }
+    
+    const updatedSales = await salesApi.getAll()
+    setSales(updatedSales.sort((a, b) => new Date(b.saleDate) - new Date(a.saleDate)))
   }
 
   const handleDelete = async (saleId) => {
